@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.linear-gradient-text {
+    background: linear-gradient(to right, orange, orangered);
+    -webkit-background-clip: text;
+    /*background-clip: text;*/
+    color: transparent;
+}
+
+.forest-bg{
+    background-image: url("./public/forest.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    backdrop-opacity: 0.5;
+}
+
+.code-bg{
+    background-image: url("./public/codes.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    backdrop-opacity: 0.5;
+}
+
+.contact-bg{
+    background-image: url("./public/back_2.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    backdrop-opacity: 0.5;
+}
+
+/*::-webkit-scrollbar {*/
+/*    width: 4px;*/
+/*    height: 6px;*/
+/*}*/
+
+/*::-webkit-scrollbar-track-piece {*/
+/*    background-color: transparent;*/
+/*    border-radius: 5px;*/
+/*}*/
+
+/*::-webkit-scrollbar-thumb {*/
+/*    cursor: pointer;*/
+/*    background-color: rgba(19, 191, 255, 0.33);*/
+/*    border-radius: 20px;*/
+/*    transition: all 1s ease-in-out;*/
+/*}*/
+
+/*::-webkit-scrollbar-thumb:hover {*/
+/*    background-color: rgba(0, 193, 255, 0.89);*/
+/*}*/
+
+/*::-webkit-scrollbar-corner {*/
+/*    display: block;*/
+/*}*/
+
+.card_title {
+    content: " - ";
+}
+
+.card_title {
+    transition: all .5s ease-in-out;
+}
+
+.card_title:hover {
+    opacity: 0.7;
+}
+
+/*.card_title:hover::after {*/
+/*    content: "↗";*/
+/*    font-size: 1rem;*/
+/*    color: #707070;*/
+/*}*/
+
+.content_title:hover::after {
+    content: " #";
+    font-size: 1.25rem;
+    color: #ff8000;
+    font-weight: normal;
+}
+
+/*.nextra-scrollbar 的滚动条样式修改 */
+.nextra-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(115,115,115,.4) transparent;
+}

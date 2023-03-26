@@ -1,0 +1,25 @@
+{
+  "index": "引入",
+  "-- Basic": {
+    "type": "separator",
+    "title": "基础"
+  },
+  "html": "HTML",
+  "css": "CSS",
+  "javascript": "JavaScript",
+  "typescript": "TypeScript",
+  "network": "网络",
+  "-- FrameWork": {
+    "type": "separator",
+    "title": "框架"
+  },
+  "react": "React",
+  "minpro": "微信小程序",
+  "-- Backend": {
+    "type": "separator",
+    "title": "后端"
+  },
+  "nodejs": "Node.js",
+  "express": "Express",
+  "java": "Java"
+}

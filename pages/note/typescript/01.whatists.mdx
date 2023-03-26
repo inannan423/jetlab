@@ -1,0 +1,86 @@
+---
+title: 什么是 TypeScript
+date: 2023-01-15
+authors: Chengzihan
+tags: [TypeScript]
+---
+
+> 任何可以使用 JavaScript 来编写的优秀的大型应用程序，最终都会由 TypeScript 编写。 —— 韩骏（微软）
+
+## 编程语言类型
+
+- 动态类型语言（Dynamically Typed Language），如 JavaScript、Python、Ruby 等
+- 静态类型语言（Statically Typed Language），如 Java、C#、C++ 等
+
+## TypeScript 是什么
+
+TypeScript 是 JavaScript 的一个超集，主要提供了类型系统和对 ES6-ES10 的支持。TypeScript 由 Microsoft 开发，是 JavaScript 的一个开源语言。
+
+## 为什么要使用 TypeScript
+
+- 代码更加健壮，更少的 Bug ，在编译阶段就能发现大部分错误，减少线上 Bug
+- 函数或者类的参数类型更加明确，代码本身就是一种文档
+- 更好的 IDE 支持，包括代码提示、类型提示、自动补全等
+- 包容性更好，TypeScript 是 JavaScript 的超集，可以很好的兼容 JavaScript 代码
+
+**缺点**：增加了学习成本，需要学习 TypeScript 的语法，需要编译成 JavaScript 才能运行。
+
+## 安装 TypeScript
+
+需要先安装 Node.js，然后使用 npm 安装 TypeScript。
+
+```bash
+npm install -g typescript
+```
+
+检查是否安装成功
+
+```bash
+tsc -v
+```
+
+`tsc` 即 TypeScript Compiler，是 TypeScript 的编译器。
+
+## Hello World
+
+新建一个 `hello.ts` 文件，输入以下代码：
+
+```ts
+function hello(person: string) {
+  // 指定 person 参数类型为 string
+  return 'Hello, ' + person;
+}
+
+hello('TypeScript');
+```
+
+编译成 JavaScript 文件：
+
+```bash
+tsc hello.ts
+```
+
+会生成一个 `hello.js` 文件，内容如下：
+
+```js
+function hello(person) {
+  return 'Hello, ' + person;
+}
+
+hello('TypeScript');
+```
+
+如果传入的参数不是字符串:
+
+```ts
+hello(123);
+```
+
+编译时会报错：
+
+```bash
+tsc hello.ts
+hello.ts:2:12 - error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+```
+
+我们会发现，编译后的 JavaScript 文件中没有类型信息，这是因为 TypeScript 本质上是开发时的工具，编译后的 JavaScript 文件是为了在浏览器中运行的，所以不需要类型信息。

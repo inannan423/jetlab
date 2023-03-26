@@ -1,0 +1,73 @@
+import { Projects } from '../../data/projectdata'
+import Link from 'next/link'
+import { AiFillStar } from 'react-icons/ai'
+import { useEffect, useState } from 'react'
+import { getGitHubRepoStar } from '../../utils'
+
+export function ProjectCard (item) {
+  item = item.item
+  const [loading, setLoading] = useState(true)
+  const [star, setStar] = useState(0)
+  useEffect(() => {
+    getGitHubRepoStar({
+      username: item.username,
+      repo: item.repo
+    }).then(res => {
+      console.log(res)
+      setStar(res)
+      setLoading(false)
+    })
+  }, [])
+  return (
+    <div className={'h-96 w-full bg-gray-200 dark:bg-gray-800 rounded-md my-1 flex flex-col'}>
+      <div className={'h-48 w-full'}>
+        <img src={item.banner} className={'h-48 w-full rounded-t-md object-cover'} alt={item.name} />
+      </div>
+      <div className={'px-3 mt-2 h-12 w-full flex justify-between items-center'}>
+        <Link href={item.link} target={'_blank'} >
+          <div className={'border-l-4 w-max border-l-blue-600 pl-3 text-xl font-bold hover:underline hover:decoration-blue-600 transition-all ease duration-500'}>
+            {item.name}
+          </div>
+        </Link>
+        <div
+          className={'h-8 w-max bg-gray-300 dark:bg-gray-700 px-3 py-1 rounded-md flex justify-center items-center cursor-pointer hover:bg-gray-400'}>
+          <AiFillStar className={'inline-block mr-1 text-xl'} color={'orange'} />
+          <div className={'pl-1 text-black dark:text-white'}>
+            {loading ? 'loading..' : star || '0'}
+          </div>
+        </div>
+      </div>
+      <div className={'p-3 text-gray-500 text-sm -mt-1'}>
+        {item.desc}
+      </div>
+    </div>
+  )
+}
+
+export function ProjectView () {
+  return (
+    <div className={'grid lg:grid-cols-4 gap-2 mt-3'}>
+      {
+        Projects.map((item, index) => {
+          return (
+            <div key={index}>
+              <ProjectCard item={item} />
+            </div>
+          )
+        })
+      }
+    </div>
+  )
+}
+
+<div className={'h-96 w-3/4 bg-gradient-to-r -z-10 from-blue-500 to-red-800 absolute right-0 -top-12 opacity-10 dark:opacity-20 !blur-3xl rounded-full'}></div>
+<div className={'flex flex-col w-full justify-start h-24 items-center my-3 mt-12'}>
+  <h1 className={'text-5xl font-bold underline decoration-blue-400 underline-offset-4'}>
+    Projects
+  </h1>
+  <div className={'mt-6'}>
+    一些开源实践，练手项目，欢迎使用与贡献
+  </div>
+</div>
+
+<ProjectView />
