@@ -31,6 +31,10 @@
       "layout": "full"
     }
   },
+  "CodeSnippets": {
+    "title": "CodeSnippet",
+    "type": "page"
+  },
   "projects": {
     "title": "Projects",
     "type": "page",

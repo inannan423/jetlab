@@ -1,0 +1,36 @@
+# Promise Array 异步数组
+
+异步数组用于处理多个异步操作，它的实现基于 Promise.all() 方法。待所有异步操作完成后，异步数组会返回一个包含所有异步操作结果的数组。  
+
+```js
+// 创建 promise 数组
+const promiseArr = panoList.map(async (item) => {
+    return await fetch(`${reqLink}/pano/getPano/${item}`).then(async (response) => await response.json()).catch((err) => {
+        console.log(err)
+    })
+})
+// 执行 promise 数组
+void Promise.all(promiseArr).then((data) => {
+    console.log(data)
+    setLikeList(data)
+    setFetchLoading(false)
+})
+```
+
+在这段代码中，我们需要遍历一个数组，来请求一个接口多次，并将所有请求的结果保存到一个数组中。因此我们创建了一个 promise 数组，然后遍历数组，将每次请求的结果 push 到 promise 数组中。最后，我们执行 promise 数组，将所有请求的结果保存到一个数组中。  
+
+下面是一个更简明的例子：  
+
+```js
+const promiseArr = [1, 2, 3].map((item) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve(item)   // 将每次请求的结果 push 到 promise 数组中
+        }, 1000)
+    })
+})
+
+void Promise.all(promiseArr).then((data) => {
+    console.log(data)
+})
+```

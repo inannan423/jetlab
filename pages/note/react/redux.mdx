@@ -1,0 +1,352 @@
+---
+theme: Chinese-red
+highlight: sunburst
+---
+
+# 简单明了的 Redux 使用说明
+
+## 为什么需要 Redux
+
+假设有一个电子商务网站，需要管理以下数据：
+
+1. 用户登录状态
+2. 用户购物车中的商品列表
+3. 用户的订单列表
+
+这些数据可能在应用程序的多个组件中使用，例如：导航栏、商品列表、购物车页面等等。如果没有统一的状态管理解决方案，开发人员将需要在应用程序中跟踪这些数据，使它们保持同步和一致。
+
+![1](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20230326164535.png)
+
+再具体一点，在上图中，如果我在商品列表中将一个商品添加到了购物车，那么在页面顶部的购物车中我们需要增加一项新的商品，该怎么做？显然并没有那么简单，但是我们想得简单一点，单纯想要在用户添加的时候，实现上方购物车的更新？显然我们会想到通过组件传参将状态传递。但是在多层组件中层层传递，显然不是一件轻松的事。
+
+使用 Redux，可以将所有这些数据存储在一个**中央位置**中。组件可以从存储器中读取和更新数据，而不必知道其他组件对该数据所做的更改。Redux 还提供了一些API，使开发人员可以轻松地更新状态、监听状态更改和追踪状态历史记录。
+
+例如，在用户向购物车中添加商品时，Redux 存储器中的购物车商品列表状态将被更新。此时，任何需要购物车商品列表状态的组件都可以从Redux存储器中获取最新的购物车商品列表状态。在Redux的帮助下，开发人员可以更轻松地编写、测试和维护应用程序，同时确保应用程序的状态保持一致和可预测。因此，Redux的重要性在于它可以提供一种有效的状态管理解决方案，使开发人员可以更容易地构建和维护大型应用程序。
+
+## 单一数据源
+
+**单一数据源**是 Redux 设计中的一个核心概念，它指的是在 Redux 应用程序中，所有的状态都保存在一个单一的 JavaScript 对象中，称为 Store。在这个对象中，每个状态都被保存为一个键值对，其中键表示状态的名称，值表示状态的值。
+
+这个单一的数据源意味着，应用程序中的所有状态都可以在一个地方访问和管理，这种方式有以下优点：
+
+1. 状态集中管理：所有状态都被保存在一个地方，可以更方便地进行管理、监控和调试。
+2. 一致性保证：由于所有状态都是从单一数据源中派生的，因此状态之间的依赖关系可以更好地管理，减少了状态之间的冲突和不一致性。
+3. 更容易的状态共享：单一数据源使得状态共享更加容易，任何组件都可以访问到状态，避免了在多个组件之间传递状态的麻烦。
+4. 更容易的状态持久化：将所有状态保存在单一数据源中，可以更容易地将状态持久化到本地存储或远程服务器中。
+
+总之，Redux 单一数据源的概念可以帮助开发人员更好地管理和共享应用程序的状态，并减少状态之间的冲突和不一致性。
+
+## 核心概念
+
+1. Store（仓库）：应用程序状态的单一源，是一个 JavaScript 对象，保存整个应用程序的状态。
+2. Action（动作）：描述发生在应用程序中的事件，它们是一个普通的 JavaScript 对象，其中必须包含一个 type 属性来描述事件的类型。
+3. Reducer：指定应用程序状态的变化方式。它是一个纯函数，接收当前状态和发生的动作作为输入，返回新状态作为输出。
+4. Dispatch（分发器）：触发应用程序状态变化的方法。它是一个函数，接收一个动作作为参数，并将该动作发送到仓库中。
+5. Subscribe（订阅）：响应仓库状态变化的方法。它接收一个回调函数，并在状态发生变化时调用该函数。
+
+## 简单示例
+
+下面是一个简单的 Redux 和 React-Redux 应用程序的示例，展示了如何使用 Redux 存储和管理应用程序状态：
+
+首先创建一个 Redux Store：
+
+```js
+import { createStore } from 'redux';
+
+const initialState = { count: 0 };
+
+function counterReducer(state = initialState, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { count: state.count + 1 };
+    case 'DECREMENT':
+      return { count: state.count - 1 };
+    default:
+      return state;
+  }
+}
+
+const store = createStore(counterReducer);
+```
+
+在上面的示例中，我们创建了一个名为 `counterReducer` 的 Redux 约简器来管理一个名为 `count` 的状态属性，然后使用 `createStore` 函数创建一个 Redux 仓库，并将该约简器传递给它。
+
+然后创建 React 组件并连接到 Redux Store：
+
+```jsx
+import React from 'react';
+import { connect } from 'react-redux';
+
+function Counter({ count, dispatch }) {
+  return (
+    <div>
+      <h1>{count}</h1>
+      <button onClick={() => dispatch({ type: 'INCREMENT' })}>+</button>
+      <button onClick={() => dispatch({ type: 'DECREMENT' })}>-</button>
+    </div>
+  );
+}
+
+const ConnectedCounter = connect(state => ({ count: state.count }))(Counter);
+```
+
+在上面的示例中，我们定义了一个名为 `Counter` 的 React 组件，并使用 `connect` 函数将其连接到 Redux Store。我们使用 `state => ({ count: state.count })` 函数将仓库中的状态映射到组件的 `props` 上，这样就可以在组件中访问状态属性。然后，我们在组件中使用 `dispatch` 函数将 `INCREMENT` 和 `DECREMENT` 动作发送到 Redux 仓库中。
+
+## redux-toolkit
+
+此外，Redux 还提供了 Toolkit 的使用方式。它简化了 Redux 的用法，在使用 `Redux Toolkit` 之前，你通常会编写带有 `switch` 的声明和手动更新的 `reducer`。如上面的例子。但是 Redux 提供的 redux-toolkit 工具库为我们简化了操作。我们看一个新的例子：
+
+### createSlice
+
+首先使用 `createSlice` 声明一个 Reducer,用于管理一个状态。
+
+```js
+import { createSlice } from '@reduxjs/toolkit';
+
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: { value: 0 },
+  reducers: {
+    increment(state) {
+      state.value++;
+    },
+    decrement(state) {
+      state.value--;
+    },
+    incrementByAmount(state, action) {
+      state.value += action.payload;
+    },
+  },
+});
+
+export const { increment, decrement, incrementByAmount } = counterSlice.actions;
+export default counterSlice.reducer;
+```
+
+这段代码使用了 Redux Toolkit 库来创建了一个名为 `counter` 的 reducer，它有三个 actions: `increment`，`decrement` 和 `incrementByAmount`，每个 action 对应一个 state 更新的操作，用于更新 `counter` 的 `value` 属性。具体来说：
+
+-   `increment` 和 `decrement` 分别将 `state.value` 增加和减少 1。
+-   `incrementByAmount` 将 `state.value` 增加指定的 `action.payload` 值。
+
+`action.payload`  指的是在调用 action 时传递的参数，如下：
+
+```js
+dispatch(incrementByAmount(10));
+```
+
+代码最后通过 `export` 将三个 action 导出，使得其他组件可以使用这些 action 来更新 `counter` reducer 中的状态，同时也导出了 reducer 函数 `counterSlice.reducer`，该函数被用于创建 Redux store。
+
+同样地，再创建另一个：
+
+```js
+import { createSlice } from '@reduxjs/toolkit';
+
+const userSlice = createSlice({
+  name: 'user',
+  initialState: { name: '张三', email: '1234@163.com' },
+  reducers: {
+    setName(state, action) {
+      state.name = action.payload;
+    },
+    setEmail(state, action) {
+      state.email = action.payload;
+    },
+  },
+});
+
+export const { setName, setEmail } = userSlice.actions;
+export default userSlice.reducer;
+```
+
+这里使用了 Toolkit 的 API 。`createSlice` 是 Redux Toolkit 库提供的一个 API，用于简化 Redux 的使用。它可以快速生成一个包含 reducer 和 action creators 的 "slice"，使得 Redux 开发更加高效和易用。
+
+`createSlice` 接收一个对象作为参数，该对象包含以下属性：
+
+-   `name`（可选）：slice 的名称，用于在 Redux DevTools 等工具中识别这个 slice。如果省略该属性，Redux Toolkit 将使用 reducer 函数的名称。
+-   `initialState`：该 slice 的初始状态。
+-   `reducers`：一个对象，包含每个 action 的名称和 reducer 函数。每个 reducer 函数用于处理对应的 action，返回一个新的 state 对象。
+
+`createSlice` 的输出是一个包含以下两个属性的对象：
+
+-   `reducer`：一个 reducer 函数，用于处理所有该 slice 中的 actions。
+-   `actions`：一个对象，包含该 slice 中定义的所有 action creators。每个 action creator 都是一个简单的函数，用于创建对应的 action 对象。
+
+`createSlice` 自动地生成了每个 action creator，这些 action creator 的名称是 `reducer` 对象中定义的 action 名称，它们可以用来直接调用对应的 action，更新 slice 的 state。
+
+例如，在上面的代码中，`createSlice` 的参数对象包含了 `name`，`initialState` 和 `reducers` 三个属性。它的输出对象包含了一个 `reducer` 函数和三个 action creators：`increment`，`decrement` 和 `incrementByAmount`。这些 action creators 可以在其他组件中使用，例如：
+
+```js
+import { increment } from './counterSlice';
+
+dispatch(increment()); // 调用 increment action creator 更新 state
+```
+
+相比于传统的 Redux 写法（使用 switch 语句来判断 action 的类型，然后根据 action 的类型返回新的 state 对象），createSlice API 有以下好处：
+
+- 代码量更少：使用 createSlice 可以让开发者更专注于定义 reducer 的逻辑，而不是处理冗长的 switch 语句。
+
+- 代码结构更清晰：createSlice API 将 reducer 函数和 action creators 集成在一个对象中，使得相关的代码更容易组织和维护。
+
+- 容易生成 action creators：createSlice 自动生成了每个 action creator，让开发者能够更容易地创建和使用 action。
+
+- 不可变性更容易处理：使用 createSlice 自动生成的 action creators，可以很容易地实现不可变性，因为它们基于 immer 库实现了自动的深层更新 state 对象。
+
+写好了 slice，接下来我们就可以在 `store` 中使用它们生成的 reducer 函数了。
+
+### configureStore
+
+在 `store` 中使用 slice 生成的 reducer 函数，需要使用 `configureStore` API。
+
+`configureStore` 是 Redux Toolkit 提供的一个 API，用于快速创建一个 Redux store。它可以自动地为 Redux store 应用许多中间件，以及提供一些额外的功能，例如自动添加了 reducer 的热替换、可配置的持久化、非标准 action 的处理等，从而让开发者更容易地创建和管理 Redux 应用。
+
+`configureStore` 接收一个对象作为参数，该对象包含以下属性：
+
+- reducer：一个 reducer 函数或者多个 reducer 函数组成的对象，用于处理应用程序的所有状态更新。该属性可以接受一个 reducer 函数，也可以接受一个 combineReducers 函数组成的对象，用于将多个 reducer 函数组合成一个 reducer。
+- middleware（可选）：一个包含多个中间件函数的数组，用于扩展 Redux store 的功能。默认情况下，configureStore 会自动添加一些常用的中间件，例如 redux-thunk 和 redux-logger。
+- devTools（可选）：一个布尔值或者对象，用于启用或禁用 Redux DevTools 扩展。如果该属性设置为 true，则会自动启用 Redux DevTools 扩展。如果设置为一个对象，则可以传递更多配置选项，例如 name，actionsBlacklist，actionsCreators 等。
+- preloadedState（可选）：一个对象，用于设置 Redux store 的初始状态。
+- enhancers（可选）：一个数组，用于添加 Redux store 的增强器。增强器是一种扩展 Redux store 功能的方式，可以添加自定义的功能或中间件。例如，可以使用 applyMiddleware 函数将中间件添加到增强器中。
+
+`configureStore` 的输出是一个 Redux store 对象，该对象具有以下方法：
+
+- getState：用于获取当前的 store 状态。
+- dispatch：用于将 action 分发到 Redux store 中，从而触发相应的 reducer 函数更新状态。
+- subscribe：用于监听 store 的变化，并在每次 store 更新时调用指定的回调函数。
+- replaceReducer：用于动态替换 store 中的 reducer 函数。
+
+除此之外，configureStore API 还可以自动为你的 reducer 函数添加许多额外的功能，例如热替换、异步 action 的处理、非标准 action 的处理等，以提高开发效率和代码可维护性。例如，在使用 createSlice 和 configureStore 创建 Redux 应用时，可以通过以下代码来创建 Redux store：
+
+``` js
+import { configureStore } from '@reduxjs/toolkit';
+import counterReducer from './counterSlice';
+import userReducer from './userSlice';
+
+const rootReducer={
+counter:counterReducer,
+user:userReducer,
+};
+
+const store = configureStore({
+  reducer: rootReducer,
+});
+
+export default store;
+```
+
+那么我们就完成了必要的 Redux 配置，接下来就可以开始编写 React 组件了使用它们了。不过使用前我们要现在 `_app.js` 中引入 `Provider` 组件包裹 `Component` 组件，这样才能让 Redux store 对象在整个应用程序中可用。
+
+``` js
+import { Provider } from 'react-redux';
+import store from '../redux/store';
+
+function MyApp({ Component, pageProps }) {
+  return (
+    <Provider store={store}>
+      <Component {...pageProps} />
+    </Provider>
+  );
+}
+
+export default MyApp;
+```
+### Redux Hook
+
+我们可以使用 Redux Toolkit 提供的 Hook 方法来获取 Redux store 中的状态和分发 action。这些 Hook 方法包括：
+
+- useSelector：用于从 Redux store 中获取状态。
+- useDispatch：用于分发 action。
+
+多说无益，我们直接上代码。
+
+`counter.js` 组件：
+
+```js
+import { useSelector, useDispatch } from 'react-redux';
+import { increment, decrement } from '../redux/counterSlice';
+import { setName } from '../redux/userSlice';
+
+function Counter() {
+  const counter = useSelector((state) => state.counter.value);
+  const dispatch = useDispatch();
+
+  return (
+    <div>
+      <h1>{counter}</h1>
+      <button onClick={() => dispatch(increment())}>+</button>
+      <br />
+      <button onClick={() => dispatch(decrement())}>-</button>
+    </div>
+  );
+}
+
+export default Counter;
+```
+
+在这个组件中，我们使用 useSelector Hook 方法从 Redux store 中获取状态，使用 useDispatch Hook 方法分发 action。这样就可以在组件中使用 Redux store 中的状态和分发 action 了。
+
+`useSelector` 方法接收一个函数作为参数，该函数的参数是 Redux store 中的核心状态对象，该函数的返回值就是组件需要的状态。在这个例子中，我们使用了 ES6 的解构赋值语法，从 Redux store 中获取了 counterSlice 中的 value 状态。为什么它叫 `useSelector` 呢？因为它的作用就是从 Redux store 中**选择状态**。
+
+`useDispatch` 方法返回一个函数，该函数可以分发 action。在这个例子中，我们使用了 ES6 的箭头函数语法，将 action 分发到 Redux store 中。
+
+同样地，创建 `user` 组件：
+
+``` js
+import { useSelector, useDispatch } from 'react-redux';
+import { setName } from '../redux/userSlice';
+
+function User() {
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  return (
+    <div>
+      <p>{user.name}</p>
+      <p>{user.email}</p>
+      <button onClick={() => dispatch(setName('你好'))}>改名</button>
+      <button onClick={() => dispatch(setName('张三'))}>改回</button>
+    </div>
+  );
+}
+
+export default User;
+```
+这就完成了整个 Redux 的使用，我们看看页面构建的结果：
+
+![2](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20230312145421_rec_.gif)
+
+你可以看到我们并没有使用 `useState` 来管理状态，而是使用了 Redux 来管理状态。这样做的好处是，我们可以在任何组件中使用 Redux store 中的状态，实现状态的共享。
+
+在上面我们好像并没有看出页面的共享性，因为我们只是在两个组件中使用了 Redux store 中的状态。那么我们在 User 中订阅 counterSlice 中的状态：
+
+``` diff
+import { useSelector, useDispatch } from 'react-redux';
+import { setName } from '../redux/userSlice';
+
+function User() {
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
++ const counter = useSelector((state) => state.counter.value);
+
+  return (
+    <div>
+        <p>{user.name}</p>
+        <p>{user.email}</p>
+        <button onClick={() => dispatch(setName('你好'))}>改名</button>
+        <button onClick={() => dispatch(setName('张三'))}>改回</button>
++       <p> counter组件中的值为：{counter} </p>
+    </div>
+    );
+}
+
+export default User;
+```
+
+![2](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20230312150420_rec_.gif)
+
+我们观察页面，可以看到，当我们点击 counter 组件中的按钮时，User 组件中的 counter 值也会发生变化。这就是 Redux 的状态共享性。
+
+这就解决了本文开头提出的有关购物车的问题，**我们可以在组件 A 中订阅数据源，在组件 B 中修改数据源，这样组件 A 也能感知到数据源的变化**，尽管组件 A 和组件 B 并没有直接关联，甚至跨越了多层级的组件树。
+
+完整代码可见：[redux demo in StackBlitz](https://stackblitz.com/edit/nextjs-syzjvt?embed=1&file=pages/user.js)
+
+以上就是关于 Redux 的简单使用，如果你想了解更多关于 Redux 的知识，可以参考[官方文档](https://redux.js.org/)。
