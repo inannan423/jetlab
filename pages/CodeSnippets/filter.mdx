@@ -1,0 +1,27 @@
+# filter
+
+filter 的作用是过滤掉不符合条件的元素，返回符合条件的元素组成的数组。
+
+```js
+const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const result = arr.filter(item => item % 2 === 0);
+console.log(result); // [2, 4, 6, 8, 10]
+```
+
+下面让我们来自己实现一个 filter 函数。
+
+```js
+Arrary.prototype.myFilter(cb){
+    // cb 是传入的参数，即一个函数即 item => item % 2 === 0
+    let arr = []
+    for (let i=0;i< this.length;i++){
+        if (cb(this[i])) // 执行这个函数，因为函数最终返回的是 Boolean 对象
+        {
+            arr.push(this[i])
+        }
+    }
+    return arr
+}
+```
+
+在这个函数中，我们将传入的参数作为函数执行来筛选出符合条件的元素。
