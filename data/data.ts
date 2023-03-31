@@ -18,7 +18,7 @@ export const NavData: NavCatagory[] = [
         link: 'http://www.zounuo.cc/',
         desc: 'nekoken\'s blog:)',
         type: 'friend',
-        avatar: 'http://www.zounuo.cc/wp-content/uploads/2023/03/cropped-cropped-cropped-fangao%E7%9A%84%E5%89%AF%E6%9C%AC.png'
+        avatar: '/avatar/nekoken.png'
       },
       {
         name: 'swfoodt',
