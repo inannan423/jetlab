@@ -14,6 +14,13 @@ export const NavData: NavCatagory[] = [
         avatar: 'https://kuizuo.cn/img/logo.webp'
       },
       {
+        name: 'nekoken',
+        link: 'http://www.zounuo.cc/',
+        desc: 'nekoken\'s blog:)',
+        type: 'friend',
+        avatar: 'http://www.zounuo.cc/wp-content/uploads/2023/03/cropped-cropped-cropped-fangao%E7%9A%84%E5%89%AF%E6%9C%AC.png'
+      },
+      {
         name: 'swfoodt',
         link: 'https://swfoodt.netlify.app/',
         desc: 'swfoodt的个人博客',
