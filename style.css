@@ -86,3 +86,7 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(115,115,115,.4) transparent;
 }
+
+.flex-box{
+    @apply flex flex-row flex-wrap justify-center items-center;
+}

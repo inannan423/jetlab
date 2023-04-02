@@ -166,3 +166,18 @@ export interface TypeLark {
   space_id: string
   title: string
 }
+
+export interface Context {
+  title: string
+  children: contextItems[]
+}
+
+export interface contextItems {
+  title: string
+  children: contextChild[]
+}
+
+export interface contextChild {
+  link: string
+  title: string
+}

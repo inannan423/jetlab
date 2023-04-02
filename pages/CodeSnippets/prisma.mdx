@@ -1,0 +1,337 @@
+# Prisma
+
+> Prisma 速查表
+
+## 1. 安装
+
+```bash
+npm install prisma
+```
+
+## 2. 初始化
+
+```bash
+npx prisma init
+```
+
+## 3. 生成客户端
+
+```bash
+npx prisma generate
+```
+
+## 4. 生成数据库
+
+```bash
+npx prisma migrate dev --name init
+```
+
+## `prisma.schema`
+
+用于定义数据库模型
+
+### 1. 数据源
+
+选择数据库的种类，以及连接数据库的 URL
+
+```prisma filename='sqlite'
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+```
+
+此外还支持 `mysql`、`postgresql`、`sqlserver` 等数据库如下：
+
+```prisma filename='mysql'
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+```
+
+```prisma filename='postgresql'
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+```
+
+```prisma filename='sqlserver'
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+```
+
+### 2. 模型
+
+定义数据库中的表
+
+```prisma
+model User {
+  id    Int      @id @default(autoincrement())
+  email String   @unique
+  name  String?
+  posts Post[]
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+}
+```
+
+`@id` 表示主键，`@default(autoincrement())` 表示自增
+
+`@unique` 表示唯一
+
+`@relation` 表示外键
+
+此外，还支持 `@map`、`@default`、`@updatedAt`、`@createdAt`、`@ignore`、`@comment`、`@db`、`@index` 等，分别表示数据库中的字段名、默认值、更新时间、创建时间、忽略、注释、数据库名、索引等。
+
+详细的字段类型可以参考 [Prisma Schema Reference](https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference)。
+
+### 常见数据类型
+
+#### 1. String
+
+```prisma
+model User {
+  id    Int      @id @default(autoincrement())
+  email String   @unique
+  name  String?
+}
+```
+
+#### 2. Int
+
+```prisma
+model User {
+  id    Int      @id @default(autoincrement())
+  email String   @unique
+  age   Int?
+}
+```
+
+#### 3. Float
+
+```prisma
+model User {
+  id    Int      @id @default(autoincrement())
+  email String   @unique
+  height Float?
+}
+```
+
+#### 4. Boolean
+
+```prisma
+model User {
+  id    Int      @id @default(autoincrement())
+  email String   @unique
+  isMale Boolean?
+}
+```
+
+#### 5. DateTime
+
+```prisma
+model User {
+  id    Int      @id @default(autoincrement())
+  email String   @unique
+  createdAt DateTime @default(now())
+}
+```
+
+#### 6. Json
+
+```prisma
+model User {
+  id    Int      @id @default(autoincrement())
+  email String   @unique
+  info  Json?
+}
+```
+
+#### 7. Enum
+
+```prisma
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id    Int      @id @default(autoincrement())
+  email String   @unique
+  role  Role     @default(USER)
+}
+```
+
+更多的数据类型可以参考 [Prisma Schema Reference](https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#model-field-scalar-types)。
+
+### 3. 关系
+
+可以定义两个模型之间的关系，包括一对一、一对多、多对多等。
+
+```prisma
+model User {
+  id    Int      @id @default(autoincrement())
+  email String   @unique
+  name  String?
+  // posts Post[] 指向 Post 模型中的 author 字段
+  posts Post[]
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+}
+```
+
+在这里，`User` 模型中的 `posts` 字段表示一对多的关系，`Post` 模型中的 `author` 字段表示一对一的关系。
+
+更多的关系可以参考 [Prisma Schema Reference](https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#model-field-relation)。
+
+## `prisma.client`
+
+用于操作数据库
+
+### 1. 连接数据库
+
+```ts
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+```
+
+### 2. 创建数据
+
+```ts
+const user = await prisma.user.create({
+  data: {
+    email: '',
+    name: '',
+  },
+})
+```
+
+### 3. 查询数据
+
+```ts
+const users = await prisma.user.findMany()
+```
+
+### 4. 更新数据
+
+```ts
+const user = await prisma.user.update({
+  where: {
+    id: 1,
+  },
+  data: {
+    name: 'new name',
+  },
+})
+```
+
+### 5. 删除数据
+
+```ts
+const user = await prisma.user.delete({
+  where: {
+    id: 1,
+  },
+})
+```
+
+### 6. 关联查询
+
+```ts
+const user = await prisma.user.findUnique({
+  where: {
+    id: 1,
+  },
+  include: {
+    posts: true,
+  },
+})
+```
+
+这将返回一个 `User` 对象，其中包含 `posts` 字段，该字段是一个 `Post` 对象的数组。如：
+
+```json
+{
+  "id": 1,
+  "email": "",
+  "name": "new name",
+  "posts": [
+    {
+      "id": 1,
+      "title": "title",
+      "content": "content",
+      "published": false,
+      "authorId": 1
+    }
+  ]
+}
+```
+
+### 7. 事务
+
+```ts
+const result = await prisma.$transaction([
+  prisma.user.create({
+    data: {
+      email: '',
+      name: '',
+    },
+  }),
+  prisma.post.create({
+    data: {
+      title: '',
+      content: '',
+      published: false,
+      authorId: 1,
+    },
+  }),
+])
+```
+
+表示同时创建 `User` 和 `Post` 两个模型的数据。
+
+## `seed.ts`
+
+用于初始化数据库
+
+```ts
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+
+async function main() {
+  await prisma.user.create({
+    data: {
+      email: 'example@w.com',
+      name: 'example',
+    },
+  })
+}
+
+main()
+  .catch((e) => {
+    throw e
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })
+```
