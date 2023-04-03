@@ -5,6 +5,8 @@
     "title": "速查"
   },
   "prisma": "Prisma",
+  "redux": "Redux",
+  "reactRouter": "React Router",
   "-- handwriting": {
     "type": "separator",
     "title": "手写代码"

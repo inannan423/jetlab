@@ -1,0 +1,218 @@
+# Redux
+
+> Redux Toolkit 速查表
+
+Redux 是一个用于管理应用状态的库，它提供了一个统一的状态管理机制，可以让你的应用状态更加可预测。Redux Toolkit 是一个用于简化 Redux 使用的工具集，它提供了一些便捷的 API，可以让你的 Redux 代码更加简洁。
+
+## 1. 安装
+
+```bash
+npm install @reduxjs/toolkit
+```
+
+## 2. 使用
+
+### 2.1 创建 store
+
+```js filename='store.js'
+import { configureStore } from '@reduxjs/toolkit'
+
+const store = configureStore({
+  reducer: {
+    // your reducers
+  },
+})
+
+export default store
+```
+
+接着在 `app.js` 中引入并使用：
+
+```js filename='app.js'
+import { Provider } from 'react-redux'
+import store from './store'
+
+const App = () => {
+  return (
+    <Provider store={store}>
+      <Counter />
+    </Provider>
+  )
+}
+```
+
+### 2.2 创建 reducer
+
+```js filename='counterSlice.js'
+import { createReducer } from '@reduxjs/toolkit'
+
+const initialState = {
+  value: 0,
+}
+
+const counterReducer = createReducer(initialState, {
+  increment: (state) => {
+    state.value += 1
+  },
+  decrement: (state) => {
+    state.value -= 1
+  },
+  incrementByAmount: (state, action) => {
+    state.value += action.payload
+  },
+})
+
+export default counterReducer
+```
+
+### 2.3 创建 action
+
+```js filename='counterSlice.js'
+import { createAction } from '@reduxjs/toolkit'
+
+export const increment = createAction('counter/increment')
+export const decrement = createAction('counter/decrement')
+export const incrementByAmount = createAction('counter/incrementByAmount')
+```
+
+### 2.4 在页面中使用
+
+```js filename='Counter.js' {5,13}
+import { useSelector, useDispatch } from 'react-redux'
+import { increment, decrement, incrementByAmount } from './counterSlice'
+
+const Counter = () => {
+  const count = useSelector((state) => state.counter.value)
+  const dispatch = useDispatch()
+
+  return (
+    <div>
+      <div>
+        <button
+          aria-label="Increment value"
+          onClick={() => dispatch(increment())}
+        >
+          +
+        </button>
+        <span>{count}</span>
+        <button
+          aria-label="Decrement value"
+          onClick={() => dispatch(decrement())}
+        >
+          -
+        </button>
+      </div>
+      <div>
+        <button
+          onClick={() => dispatch(incrementByAmount(5))}
+        >
+          Add Amount
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export default Counter
+```
+
+## 3. API
+
+### 3.1 configureStore
+
+```js
+configureStore({
+  reducer: {
+    // your reducers
+  },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+  devTools: process.env.NODE_ENV !== 'production',
+})
+```
+
+### 3.2 createReducer
+
+```js
+createReducer(initialState, {
+  // your reducers
+})
+```
+
+### 3.3 createAction
+
+```js
+createAction('counter/increment')
+```
+
+## 4. 参考
+
+[Redux Toolkit](https://redux-toolkit.js.org/)
+
+[Redux](https://redux.js.org/)
+
+## 5. 特别说明
+
+React 新版本之后，由于 `context` 的使用，全局状态管理的方式也有了很大的变化，比如 `useContext`、`useReducer` 等，这些都是 React 官方推荐的方式，而 Redux 也是一个非常优秀的状态管理库，但是它的使用方式和 React 有一定的冲突，所以在 React 项目中使用 Redux 时，需要做一些额外的工作，比如使用 `react-redux` 这个库来连接 React 和 Redux，这样就可以在 React 组件中使用 Redux 的状态了。
+
+例如，我们可以用 React 原生的 API 来实现一个简单的全局状态管理：
+
+```js filename='app.js'
+import React, { createContext, useContext, useReducer } from 'react'
+
+const initialState = {
+  count: 0,
+}
+
+const store = createContext(initialState)
+
+const { Provider } = store
+
+const StateProvider = ({ children }) => {
+  const [state, dispatch] = useReducer((state, action) => {
+    switch (action.type) {
+      case 'increment':
+        return { count: state.count + 1 }
+      case 'decrement':
+        return { count: state.count - 1 }
+      default:
+        throw new Error()
+    }
+  }, initialState)
+
+  return <Provider value={{ state, dispatch }}>{children}</Provider>
+}
+
+const Counter = () => {
+  const { state, dispatch } = useContext(store)
+
+  return (
+    <div>
+      <div>
+        <button
+          aria-label="Increment value"
+          onClick={() => dispatch({ type: 'increment' })}
+        >
+          +
+        </button>
+        <span>{state.count}</span>
+        <button
+          aria-label="Decrement value"
+          onClick={() => dispatch({ type: 'decrement' })}
+        >
+          -
+        </button>
+      </div>
+    </div>
+  )
+}
+
+const App = () => {
+  return (
+    <StateProvider>
+      <Counter />
+    </StateProvider>
+  )
+}
+
+export default App
+```

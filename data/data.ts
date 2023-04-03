@@ -1402,5 +1402,61 @@ export const NavData: NavCatagory[] = [
         type: 'nav'
       }
     ]
+  },
+  {
+    id: 25,
+    name: 'ORM',
+    desc: '对象关系映射',
+    navs: [
+      {
+        name: 'Prisma',
+        link: 'https://www.prisma.io/',
+        desc: 'Prisma 是一个方便快捷的 ORM 库',
+        type: 'nav'
+      },
+      {
+        name: 'TypeORM',
+        link: 'https://typeorm.io/#/',
+        desc: 'TypeORM 是一个 ORM 库',
+        type: 'nav'
+      }
+    ]
+  },
+  {
+    id: 26,
+    name: 'Serverless',
+    desc: 'Serverless 无服务器提供商',
+    navs: [
+      {
+        name: 'Vercel',
+        link: 'https://vercel.com/',
+        desc: 'Vercel 是最流行的服务器无关的部署平台',
+        type: 'nav'
+      },
+      {
+        name: 'Netlify',
+        link: 'https://www.netlify.com/',
+        desc: 'Netlify 是一个静态站点托管平台',
+        type: 'nav'
+      },
+      {
+        name: 'Supabase',
+        link: 'https://supabase.io/',
+        desc: 'Supabase 是一个开源的 Firebase 替代品',
+        type: 'nav'
+      },
+      {
+        name: 'Railway',
+        link: 'https://railway.app/',
+        desc: 'Railway 是项目部署平台',
+        type: 'nav'
+      },
+      {
+        name: 'Render',
+        link: 'https://render.com/',
+        desc: 'Render 是一个托管平台',
+        type: 'nav'
+      }
+    ]
   }
 ]

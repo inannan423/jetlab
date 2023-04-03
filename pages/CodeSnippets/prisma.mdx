@@ -2,6 +2,8 @@
 
 > Prisma 速查表
 
+Prisma 是一个开源的数据库工具，可以方便地连接数据库、生成客户端、操作数据库等。是 Node.js 和 TypeScript 的首选 ORM。ORM 是 Object Relational Mapping 的缩写，意思是对象关系映射，是一种程序设计技术，用于实现面向对象编程语言里不同类型系统的数据之间的转换。ORM 通过使用描述对象和数据库之间映射的元数据，将程序中的对象自动持久化到关系数据库中。
+
 ## 1. 安装
 
 ```bash
@@ -24,6 +26,14 @@ npx prisma generate
 
 ```bash
 npx prisma migrate dev --name init
+```
+
+## 启动 Studio
+
+Prisma Studio 是一个可视化的数据库管理工具，可以方便地查看、编辑数据库中的数据。
+
+```bash
+npx prisma studio
 ```
 
 ## `prisma.schema`

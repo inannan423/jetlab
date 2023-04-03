@@ -1,0 +1,243 @@
+# React Router
+
+> React Router 速查表
+
+React Router 是一个 React 应用的路由库，它可以让你在应用中快速地导航。
+
+## 安装
+
+```bash
+npm install react-router-dom
+```
+
+## 基本用法
+
+```jsx {7,17,29}
+import React from 'react'
+
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from 'react-router-dom'
+
+function App() {
+  return (
+    <Router>
+      <div>
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/about">About</Link>
+            </li>
+            <li>
+              <Link to="/users">Users</Link>
+            </li>
+          </ul>
+        </nav>
+
+        <Switch>
+          <Route path="/about">
+            <About />
+          </Route>
+          <Route path="/users">
+            <Users />
+          </Route>
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
+  )
+}
+
+function Home() {
+  return <h2>Home</h2>
+}
+
+function About() {
+  return <h2>About</h2>
+}
+
+function Users() {
+  return <h2>Users</h2>
+}
+
+export default App
+```
+
+## 路由参数
+
+路由参数是 URL 中的动态部分，它可以在路由中被访问。
+
+```jsx
+<Route path="/users/:id">
+  <User />
+</Route>
+
+// 接收组件
+function User() {
+  let { id } = useParams()  // useParams 是一个 React Hook，由 react-router-dom 提供
+  return <h3>Requested topic ID: {id}</h3>
+}
+```
+
+## 嵌套路由
+
+嵌套路由是指在一个路由中嵌套另一个路由。下面这段代码展示了如何在一个路由中嵌套另一个路由。它实现了在 `/topics` 路由下，再嵌套了 `/topics/rendering`、`/topics/components` 和 `/topics/props-v-state` 三个路由。点击这些路由，会在页面中显示对应的内容。
+
+```jsx
+<Route path="/topics">
+  <Topics />
+</Route>
+
+// 接收组件
+function Topics() {
+  let { path, url } = useRouteMatch()  // useRouteMatch 用于获取当前路由的信息
+  return (
+    <div>
+      <h2>Topics</h2>
+
+      <ul>
+        <li>
+          <Link to={`${url}/rendering`}>Rendering with React</Link>
+        </li>
+        <li>
+          <Link to={`${url}/components`}>Components</Link>
+        </li>
+        <li>
+          <Link to={`${url}/props-v-state`}>Props v. State</Link>
+        </li>
+      </ul>
+
+      <Switch>
+        <Route exact path={path}>
+          <h3>Please select a topic.</h3>
+        </Route>
+        <Route path={`${path}/:topicId`}>
+          <Topic />
+        </Route>
+      </Switch>
+    </div>
+  )
+}
+```
+`useRouteMatch` 返回的对象包含了当前路由的信息，包括 `path` 和 `url`。`path` 是当前路由的路径，`url` 是当前路由的 URL。
+
+`exact` 属性用于指定当前路由是否是精确匹配。如果设置为 `true`，则只有当当前路由和 URL 完全匹配时，才会渲染当前路由。
+
+## 重定向
+
+重定向是指当用户访问一个路由时，自动跳转到另一个路由。
+
+```jsx
+<Redirect from="/old-match" to="/will-match" />
+```
+
+## 路由守卫
+
+路由守卫是指在用户访问某个路由时，进行一些操作，比如判断用户是否登录，如果没有登录，则跳转到登录页面。
+
+```jsx
+function AuthExample() {
+  return (
+    <Router>
+      <div>
+        <AuthButton />
+
+        <ul>
+          <li>
+            <Link to="/public">Public Page</Link>
+          </li>
+          <li>
+            <Link to="/protected">Protected Page</Link>
+          </li>
+        </ul>
+
+        <Switch>
+          <Route path="/public">
+            <PublicPage />
+          </Route>
+          <Route path="/login">
+            <LoginPage />
+          </Route>
+          <PrivateRoute path="/protected">
+            <ProtectedPage />
+          </PrivateRoute>
+        </Switch>
+      </div>
+    </Router>
+  )
+}
+
+// 一个简单的认证组件
+function AuthButton() {
+  let history = useHistory()
+
+  return fakeAuth.isAuthenticated ? (
+    <p>
+      Welcome!{" "}
+      <button
+        onClick={() => {
+          fakeAuth.signout(() => history.push("/"))
+        }}
+      >
+        Sign out
+      </button>
+    </p>
+  ) : (
+    <p>You are not logged in.</p>
+  )
+}
+
+// 一个简单的认证函数
+let fakeAuth = {
+  isAuthenticated: false,
+  authenticate(cb) {
+    fakeAuth.isAuthenticated = true
+    setTimeout(cb, 100) // fake async
+  },
+  signout(cb) {
+    fakeAuth.isAuthenticated = false
+    setTimeout(cb, 100)
+  }
+}
+
+// 一个简单的私有路由组件
+function PrivateRoute({ children, ...rest }) {
+  return (
+    <Route
+      {...rest}
+      render={({ location }) =>
+        fakeAuth.isAuthenticated ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: location }
+            }}
+          />
+        )
+      }
+    />
+  )
+}
+
+function PublicPage() {
+  return <h3>Public</h3>
+}
+
+function ProtectedPage() {
+  return <h3>Protected</h3>
+}
+
+export default AuthExample
+```
+在上面的代码中，我们实现了一个简单的认证功能。当用户访问 `/protected` 路由时，会先判断用户是否登录，如果没有登录，则跳转到 `/login` 路由。`PrivateRoute` 的 children 属性是一个组件，它会在用户登录后渲染。也就是会渲染 `ProtectedPage` 组件。
+
