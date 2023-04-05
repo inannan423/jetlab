@@ -70,26 +70,24 @@ function myUseState(initialValue){
 }
 ```
 
-export function myUseState (initialValue) {
-  const getter = () => initialValue
-  const setter = (newValue) => {
-    console.log(newValue)
-    initialValue = newValue
-  }
-  return [getter, setter]
-}
-
 export function Example2 () {
+  function myUseState (initialValue) {
+    const getter = () => initialValue
+    const setter = (newValue) => {
+      console.log(newValue)
+      initialValue = newValue
+    }
+    return [getter, setter]
+  }
   const [count, setCount] = myUseState(0)
   return (
     <div className={'flex h-max'}>
-      {count()}
       <button className={'ml-5 h-5 text-blue-500 flex items-center justify-center text-center text-2xl'} onClick={() => setCount(count() + 1)}>+</button>
     </div>
   )
 }
 
-使用示例如下，但是你会发现点击后，计数器的值并没有发生变化。这是因为我们还没实现更新状态的功能。但是你打开控制台，你会发现，当点击按钮时，`count` 的值确实发生了变化。
+使用示例如下，但是你会发现点击后，计数器的值并没有发生变化。这是因为这需要更新 UI ，而我们这里只是更新了状态，所以你可以在控制台中看到状态的变化。
 
 <Exb>
 <Example2 />
@@ -198,18 +196,299 @@ function myUseEffect (callback) {
     execute,
     deps: new Set(),
   }
+  // 立即执行一次，建立订阅发布关系，因为在第一次渲染之后，我们需要执行一次 effect
   execute();
 }
 ```
-这里在执行回调函数前我们使用 cleanup 函数来重置依赖，这是因为当依赖发生变化时，我们需要将 effect 从原来的 state 的 subs 中移除，然后再添加到新的 state 的 subs 中。这里我们使用 `Set` 来保存依赖，因为 `Set` 中的成员是唯一的，所以我们可以通过 `Set` 来判断依赖是否发生变化。
+
+每个 Effect 对象都由一个回调函数和一些依赖组成，当依赖发生变化时，我们需要重新执行回调函数。因此我们定义了 Effect 对象。我们把 Effect 对象放到一个栈中，正在执行的 Effect 对象就是栈顶的 Effect 对象。当我们执行回调函数时，我们需要将当前的 Effect 对象推到栈顶，这样我们就可以通过栈顶的 Effect 对象来获取依赖的 state，然后将当前的 Effect 对象添加到这些 state 的 subs 中。可以把 effect 想象成一个盒子，里面装着一个任务和一些标签。任务就是回调函数，标签就是依赖。每次渲染后，你需要检查盒子的标签是否有变化，如果有变化，就要重新执行盒子里的任务。为了方便检查标签，你需要在第一次渲染后，把盒子放到一个栈里，这样你就知道当前有哪些盒子。而在收集标签的时候，你需要知道当前正在处理哪个盒子，这样才能把标签贴到正确的盒子上。而当前正在处理的盒子，就是栈顶的那个。
+
+这里在执行回调函数前我们使用 cleanup 函数来重置依赖，这是因为当依赖发生变化时，我们需要将 effect 从原来的 state 的 subs 中移除，然后再添加到新的 state 的 subs 中。这里我们使用 `Set` 来保存依赖，因为 `Set` 中的成员是唯一的，所以我们可以通过 `Set` 来判断依赖是否发生变化。为什么要在执行回调函数前重置依赖呢？这将在后面揭晓。
 
 ```jsx filename="cleanup.js"
 function cleanup (effect) {
   // 从该 effect 依赖的 state 的 subs 中移除该 effect
   for (const state of effect.deps) {
-    state.subs.delete(effect);
+    state.delete(effect);  // delete 是 Set 的方法
   }
   // 清空该 effect 依赖的 state 的集合
-  effect.deps.clear();
+  effect.deps.clear();  // clear 是 Set 的方法
 }
 ```
+
+接下来我们需要在 myUseState 中维护一个订阅者列表，来保存订阅这个 state 变化的 effect。
+
+```jsx filename="myUseState.js"
+function myUseState (value) {
+  const subs = new Set();
+
+  const getter = () => {
+    // 获取上下文的 effect
+    const effect = effectStack[effectStack.length - 1]; // 取栈顶
+    if (effect) {
+      subscribe(effect, subs);  // 建立订阅发布关系
+    }
+    return value;
+  }
+
+  const setter = (newValue) => {
+    value = newValue;
+    // 执行所有订阅者的回调函数
+    for (const effect of [...subs]) {
+      effect.execute(); // 执行 effect 的回调函数
+    }
+  }
+
+  return [getter, setter];
+}
+```
+获取上下文的 effect 并建立订阅发布关系，是为了实现状态和副作用的同步。**如果一个 effect 使用了一个状态，那么这个 effect 就应该在这个状态变化时重新执行，以保证副作用的正确性**。例如，如果一个 effect 是打印一个状态的值，那么这个 effect 就应该在这个状态变化时重新打印，以保证打印的值是最新的。为了实现这个功能，就需要在状态和 effect 之间建立订阅发布关系，这样当状态变化时，就可以通知所有订阅了这个状态的 effect，让它们重新执行。
+
+上面的这些话有点绕，让我们看一个例子：
+
+```jsx
+// 假设有一个自定义的 useState 函数，返回一个状态值和一个更新状态的函数
+const [count, setCount] = myUseState(0);
+
+// 假设有一个自定义的 useEffect 函数，接受一个回调函数
+myUseEffect(() => {
+  // 在回调函数中，打印状态值
+  console.log(count());
+});
+
+// 这个例子的内部过程如下：
+
+// 首先，调用 myUseState(0)，创建一个状态值为 0 的状态
+// 创建一个 subs 集合，用于存储订阅了这个状态的 effect
+// 创建一个 getter 函数，用于获取状态值
+// 创建一个 setter 函数，用于更新状态值
+// 返回 getter 和 setter 函数
+
+// 然后，调用 myUseEffect(() => {console.log(count());})，创建一个 effect
+// 创建一个 execute 函数，用于执行回调函数
+// 创建一个 effect 对象，包含 execute 函数和一个存储依赖的集合
+// 调用 execute 函数
+
+// 在 execute 函数中，先重置依赖，然后将当前的 effect 对象推到一个栈中
+// 然后执行回调函数，在回调函数中，打印状态值
+// 在打印状态值时，调用 getter 函数，获取状态值
+// 在获取状态值时，如果存在当前正在处理的 effect，就将这个 effect 添加到 subs 集合中，建立订阅关系，因为这个 effect 依赖了这个状态
+// 最后将 effect 对象从栈中弹出
+
+// 这样，当状态值变化时，就可以通过 setter 函数更新状态值，并通知所有订阅了这个状态的 effect，让它们重新执行回调函数，打印最新的状态值
+```
+![](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/mermaid-diagram-2023-04-05-145725.svg)
+
+## subscribe
+
+接下来我们来实现 subscribe 函数，它的作用是建立订阅关系。
+
+```jsx filename="subscribe"
+function subscribe (effect, subs) {
+    // 订阅关系建立
+    subs.add(effect); // 将 effect 添加到 state 的 subs 中
+    // 将 effect 依赖的 state 添加到 effect 的 deps 中
+    effect.deps.add(subs);
+}
+```
+## `useMemo`
+
+`useMemo` 用于缓存一个值，当依赖发生变化时，才会重新计算这个值。它的实现也很简单，我们只需要在 `useMemo` 中维护一个缓存对象，当依赖发生变化时，才会重新计算这个值。
+
+```jsx filename="myUseMemo.js"
+function myUseMemo (callback) {
+  const [s, set] = myUseState()
+  // 首次执行 callback，建立回调中 state 的订阅发布关系
+  myUseEffect(() => {
+    set(callback())
+  })
+  return s
+}
+```
+使用 `useMemo` 的例子：
+
+```jsx
+const [count, setCount] = myUseState(0);
+
+const memoizedValue = myUseMemo(() => {
+  return count() * 2;
+});
+
+myUseEffect(() => {
+  console.log(memoizedValue());
+});
+```
+它的作用是，当 count 变化时，才会重新计算 memoizedValue 的值。
+
+我们看一个关于使用 useMyEffect 、useMyState 和 useMyMemo 的例子：
+
+```jsx
+export default function App() {
+  const [count, setCount] = myUseState(0);
+  const [name, setName] = myUseState('Jet');
+
+  const memoizedValue = myUseMemo(() => {
+    return count() * 2;
+  });
+
+  myUseEffect(() => {
+    console.log(memoizedValue());
+  });
+
+  return (
+    <div>
+      <p>You clicked {count()} times</p>
+      <button onClick={() => setCount(count() + 1)}>
+        Click me
+      </button>
+      <p>My name is {name()}</p>
+      <button onClick={() => setName('JeLlab')}>
+        Change name
+      </button>
+    </div>
+  );
+}
+```
+
+## 为什么需要重置订阅发布关系？
+
+在之前的代码中，我么在每次 effect.execute() 时，都会重置 effect.deps，这是为什么呢？
+
+考虑下面的例子：
+
+```jsx
+const [name1, setName1] = myUseState('Jet');
+const [name2, setName2] = myUseState('JeLlab');
+const [showAll, setShowAll] = myUseState(true);
+
+const whoIsHere = useMemo(() => {
+  return showAll() ? `${name1()} and ${name2()}` : name1();
+});
+
+useEffect(() => {
+  console.log(whoIsHere()); // 初始化时，打印 'Jet and JeLlab'
+});
+```
+
+在上面的代码中，`whoIsHere` 依赖于 `name1` 和 `name2`，当 `name1` 或 `name2` 发生变化时，`whoIsHere` 都会发生变化, `whoIsHere` 实际上是一个无副作用的因变量，，接下来执行下面的代码：
+
+```jsx
+setName1('Jet2'); // 触发 effect，打印 'Jet2 and JeLlab'
+
+setShowAll(false); // 触发 effect，打印 'Jet2'
+
+setName2('JeLlab2'); // 不打印
+```
+
+当 setShowAll 变为 false 时，whoIsHere 执行 `name1()`，由于 `name2()` 没有被执行，因此 `name2()` 与 whoIsHere 没有订阅关系，所以 `name2()` 发生变化时，不会触发 `whoIsHere` 的重新计算。只有在再次修改 `showAll` 为 true 时，`whoIsHere` 才会重新计算。这就是为什么我们需要重置订阅发布关系。它的意义在于，当 effect 执行时，只会订阅 effect 中使用到的 state，而不会订阅 effect 之前使用过的 state。这也是为什么尽管在 `name2()` 曾经被 `whoIsHere` 依赖过，但是当 `name2()` 不被 `whoIsHere` 依赖时，`name2()` 发生变化时，不会触发 `whoIsHere` 的重新计算。
+
+## 总结
+
+在这里我们实现的细粒度更新，它无需显式指明依赖。更加简洁，也更加直观。但是 React 本身为什么不采用这种方式呢？因为 React 作为一个应用级框架，不需要过多的关注细粒度的更新。
+
+包含底层实现的完整代码如下：
+
+```jsx filename="myReact.js"
+export function Example4 () {
+
+  const effectStack = []
+
+  function subscribe (effect, subs) {
+    // 订阅关系建立
+    subs.add(effect) // 将 effect 添加到 state 的 subs 中
+    // 将 effect 依赖的 state 添加到 effect 的 deps 中
+    effect.deps.add(subs)
+  }
+
+  function myUseMemo (callback) {
+    const [s, set] = myUseState()
+    // 首次执行 callback，建立回调中 state 的订阅发布关系
+    myUseEffect(() => {
+      set(callback())
+    })
+    return s
+  }
+
+  function myUseState (value) {
+    const subs = new Set()  // 用于存放订阅者的集合
+
+    const getter = () => {
+      // 获取上下文的 effect
+      const effect = effectStack[effectStack.length - 1] // 取栈顶
+      if (effect) {
+        subscribe(effect, subs) // 建立订阅发布关系
+      }
+      return value
+    }
+
+    const setter = (newValue) => {
+      value = newValue
+      // 执行所有订阅者的回调函数
+      for (const effect of [...subs]) {
+        effect.execute() // 执行 effect 的回调函数
+      }
+    }
+
+    return [getter, setter]
+  }
+
+  function cleanup (effect) {
+    // 从该 effect 依赖的 state 的 subs 中移除该 effect
+    for (const subs of effect.deps) {
+      subs.delete(effect) // delete 是 Set 的方法
+    }
+    // 清空该 effect 依赖的 state 的集合
+    effect.deps.clear() // clear 是 Set 的方法
+  }
+
+  function myUseEffect (callback) {
+    const execute = () => {
+      // 重置依赖
+      cleanup(effect)
+      // 将当前 effect 推到栈顶
+      effectStack.push(effect)
+      try {
+        // 执行回调函数
+        callback()
+      } finally {
+        // 将当前 effect 从栈顶弹出
+        effectStack.pop()
+      }
+    }
+    const effect = {
+      execute,
+      deps: new Set()
+    }
+    // 立即执行一次，建立订阅发布关系，因为在第一次渲染之后，我们需要执行一次 effect
+    execute()
+  }
+
+  const [count, setCount] = myUseState(0)
+  const [name, setName] = myUseState('Jet')
+
+  const memoizedValue = myUseMemo(() => {
+    return count() * 2
+  })
+
+  myUseEffect(() => {
+    console.log(memoizedValue())
+  })
+
+  return (
+    <div>
+      <p>You clicked {count()} times</p>
+      <button onClick={() => setCount(count() + 1)}>
+        Click me
+      </button>
+      <p>My name is {name()}</p>
+      <button onClick={() => setName('JeLlab')}>
+        Change name
+      </button>
+    </div>
+  )
+}
+```
+
+<iframe src="https://stackblitz.com/edit/react-ts-yufgad?embed=1&file=App.tsx" style={{ width: '100%', height: '500px', border: 0 }}
+  className={'rounded-md'}
+></iframe>

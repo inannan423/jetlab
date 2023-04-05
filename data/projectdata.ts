@@ -64,5 +64,13 @@ export const Projects: Project[] = [
     banner: '/projects/jetlab.png',
     username: 'inannan423',
     repo: 'jetlab'
+  },
+  {
+    name: 'oss-strapi',
+    desc: '基于 Strapi 的 OSS 图床管理工具',
+    link: 'https://github.com/inannan423/oss-strapi',
+    banner: '/projects/oss.png',
+    username: 'inannan423',
+    repo: 'oss-strapi'
   }
 ]
