@@ -77,8 +77,8 @@ dependencies:
   next-fonts: 1.5.1
   next-mdx-remote: 4.4.1_biqbaboplfbrettd7655fr4n2y
   next-sanity: 4.1.5_next@13.0.6+react@18.2.0
-  nextra: 2.2.20_6jx7hpii6hgsrmhxgqrmo3277u
-  nextra-theme-docs: 2.2.20_y2m4zo3wzdppn55ez73bbnzkim
+  nextra: 2.3.0_6jx7hpii6hgsrmhxgqrmo3277u
+  nextra-theme-docs: 2.3.0_mxcpdgf2bjmigi4s5unlzojryq
   prismjs: 1.29.0
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -5588,11 +5588,11 @@ packages:
       - babel-plugin-macros
     dev: false
 
-  /nextra-theme-docs/2.2.20_y2m4zo3wzdppn55ez73bbnzkim:
-    resolution: {integrity: sha512-YbDbpwvLCUnDvq9afP57Zu/fDFbSrsvx5MEZIhKRcrn/eCfo4yIwoMMhdRF0yntB5uTDc4MZ8jqJgb25g2v7QA==}
+  /nextra-theme-docs/2.3.0_mxcpdgf2bjmigi4s5unlzojryq:
+    resolution: {integrity: sha512-KMvHhGOvaKIqR71Gnx+w/1c9LLfpQJ3+fnCAgg9qfjXo2agr1zRKyRDROyY8cGINdslpzmEGgs/MH2gDSAI6nw==}
     peerDependencies:
       next: '>=9.5.3'
-      nextra: 2.2.20
+      nextra: 2.3.0
       react: '>=16.13.1'
       react-dom: '>=16.13.1'
     dependencies:
@@ -5607,15 +5607,16 @@ packages:
       next: 13.0.6_biqbaboplfbrettd7655fr4n2y
       next-seo: 5.14.1_6jx7hpii6hgsrmhxgqrmo3277u
       next-themes: 0.2.1_6jx7hpii6hgsrmhxgqrmo3277u
-      nextra: 2.2.20_6jx7hpii6hgsrmhxgqrmo3277u
+      nextra: 2.3.0_6jx7hpii6hgsrmhxgqrmo3277u
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       scroll-into-view-if-needed: 3.0.4
       zod: 3.20.2
     dev: false
 
-  /nextra/2.2.20_6jx7hpii6hgsrmhxgqrmo3277u:
-    resolution: {integrity: sha512-V5P5UHvA7GvISziJSEMVV9jCDBm1aMlez3XqKPzvr/aIrugfnIPBhGrFh2YjpXp5FspldgTS8lbZVf36Alonhg==}
+  /nextra/2.3.0_6jx7hpii6hgsrmhxgqrmo3277u:
+    resolution: {integrity: sha512-v17vMq2bJa15iKKt9+6AidSeIoKcK1ZlXmwqFqTgc0pQmRrl6pTJaSR36UZKcpMwvvLZ/7/xWuWV/OQB599O3g==}
+    engines: {node: '>=16'}
     peerDependencies:
       next: '>=9.5.3'
       react: '>=16.13.1'
