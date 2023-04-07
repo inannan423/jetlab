@@ -31,7 +31,7 @@ myFun(); // undefined
 this 一般指向调用它的对象，第一个例子中，this指向obj，第二个例子中，this指向window。（也有意外情况，比如箭头函数没有自己的this，它的this指向上一级的this，如果上一级没有this，那么this就指向window，比如下面的例子）
 
 ```js
-let fav = '小张';
+var fav = '小张';
 
 let obj = {
     fav:'小李',
@@ -40,8 +40,10 @@ let obj = {
     }
 }
 
-obj.myFun(); // undefined
+obj.myFun(); // 小张
 ```
+
+这里要注意一个问题 如果使用 let 对 fav 赋值，其值并不会被赋值到 window 上。
 
 ## 功能
 call、apply、bind 都可以改变 this 的指向。

@@ -7,6 +7,7 @@
   "prisma": "Prisma",
   "redux": "Redux",
   "reactRouter": "React Router",
+  "regex": "正则表达式",
   "-- handwriting": {
     "type": "separator",
     "title": "手写代码"
