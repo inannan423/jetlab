@@ -12,5 +12,6 @@
     "title": "手写代码"
   },
   "PromiseArray": "Promise Array",
-  "Filter": "filter"
+  "Filter": "filter",
+  "changethis": "call、apply、bind"
 }

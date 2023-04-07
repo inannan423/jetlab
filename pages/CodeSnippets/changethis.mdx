@@ -1,0 +1,192 @@
+# call、apply、bind
+
+这三个方法都是用来改变函数的this指向的，但是有所不同。
+
+call和apply都是立即执行函数，而bind是返回一个新的函数，需要手动执行。
+
+首先看下面的代码：
+
+```js
+let name = '小王',age = 18;
+let obj = {
+    name:'小李',
+    objAge:this.age,
+    myFun:function () {
+        console.log(this.name + ' ' + this.age);
+    }
+}
+
+obj.objAge; // 18
+obj.myFun(); // 小李 18
+```
+还有第二个例子：
+
+```js
+function myFun() {
+    console.log(this.fav);
+}
+
+myFun(); // undefined
+```
+this 一般指向调用它的对象，第一个例子中，this指向obj，第二个例子中，this指向window。（也有意外情况，比如箭头函数没有自己的this，它的this指向上一级的this，如果上一级没有this，那么this就指向window，比如下面的例子）
+
+```js
+let fav = '小张';
+
+let obj = {
+    fav:'小李',
+    myFun:() => {
+        console.log(this.fav);
+    }
+}
+
+obj.myFun(); // undefined
+```
+
+## 功能
+call、apply、bind 都可以改变 this 的指向。
+
+```js
+let name = '小王',age = 18;
+let obj = {
+    name:'小李',
+    objAge:this.age,
+    myFun:function () {
+        console.log(this.name + ' ' + this.age);
+    }
+}
+
+let db = {
+    name:'小张',
+    age:20
+}
+
+obj.myFun.call(db); // 小张 20
+obj.myFun.apply(db); // 小张 20
+obj.myFun.bind(db)(); // 小张 20
+```
+他们三个方法都将 this 指向了 db 对象，所以输出的结果都是小张 20。obj 对象中并没有叫 age 的属性，并且 name 属性原本是小李，但是现在变成了小张。这表示手动改变 this 指向可以改变函数的执行环境。
+
+这里注意到 bind 后面有一个括号，这是因为 bind 返回的是一个新的函数，需要手动执行。其他两个都是**立即执行**函数。
+
+## 传参
+
+call、apply、bind 都可以传参，但是传参的方式不同。
+
+```js
+let name = '小王',age = 18;
+let obj = {
+    name:'小李',
+    objAge:this.age,
+    myFun:function (from,to) {
+        console.log(this.name + ' ' + this.age + 'from' + from + 'to' + to);
+    }
+}
+
+let db = {
+    name:'小张',
+    age:20
+}
+
+obj.myFun.call(db,'北京','上海'); // 小张 20from北京to上海
+obj.myFun.apply(db,['北京','上海']); // 小张 20from北京to上海
+obj.myFun.bind(db,'北京','上海')(); // 小张 20from北京to上海
+```
+call 中传参是直接和第一个 this 指向并列传入的，apply 中传参是放在一个数组中传入的，bind 中传参和 call 一样。
+
+```js
+// ...
+
+let params = ['北京','上海'];
+
+obj.myFun.call(db,...params); // 小张 20from北京to上海
+obj.myFun.apply(db,params); // 小张 20from北京to上海
+obj.myFun.bind(db,...params)(); // 小张 20from北京to上海
+```
+因此对于数组，可以使用扩展运算符来传参给 call 和 bind。
+
+## 具体实践
+
+说了那么多理论上的东西，那么它们在我们具体实践中能发挥什么作用呢？
+
+### 1. 使用 call 来继承
+
+```js
+function Person(name,age) {
+    this.name = name;
+    this.age = age;
+}
+
+function Student(name,age,grade) {
+    Person.call(this,name,age);
+    this.grade = grade;
+}
+
+let stu = new Student('小王',18,3);
+
+console.log(stu); // Student { name: '小王', age: 18, grade: 3 }
+```
+在这个例子中，我们使用 call 来继承 Person，这样就可以在 Student 中使用 Person 中的属性和方法了。因为 Student 中本身是没有 name 和 age 这两个属性的。
+
+### 2. 保持 this 的指向
+
+```js
+// 定义一个按钮
+var btn = document.getElementById("btn");
+
+// 给按钮添加点击事件
+btn.onclick = function() {
+  // 点击后禁用按钮
+  this.disabled = true;
+  // 使用 bind 方法延迟执行函数，并保持 this 指向
+  setTimeout(function() {
+    // 恢复按钮状态
+    this.disabled = false;
+  }, 2000);
+}
+```
+执行 `this.disabled = false` 时会报错，因为 this 指向的是 window，而 window 中并没有 disabled 这个属性。这时候我们可以使用 bind 来保持 this 的指向。
+
+![](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20230407183533.png)
+
+```js
+// 定义一个按钮
+var btn = document.getElementById("btn");
+
+// 给按钮添加点击事件
+btn.onclick = function() {
+  // 点击后禁用按钮
+  this.disabled = true;
+  // 使用 bind 方法延迟执行函数，并保持 this 指向
+  setTimeout(function() {
+    // 恢复按钮状态
+    this.disabled = false;
+  }.bind(this), 2000);
+}
+```
+这样就能保持 this 的指向了。
+
+![](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20230407183654.png)
+
+## 箭头函数无法使用 call、apply、bind
+
+```js
+let name = '小王',age = 18;
+
+let obj = {
+    name:'小李',
+    objAge:this.age,
+    myFun:() => {
+        console.log(this.name + ' ' + this.age);
+    }
+}
+
+let db = {
+    name:'小张',
+    age:20
+}
+
+obj.myFun.call(db); // Uncaught TypeError: Cannot read properties of undefined (reading 'call')
+obj.myFun.apply(db); // Uncaught TypeError: Cannot read properties of undefined (reading 'apply')
+obj.myFun.bind(db)(); // Uncaught TypeError: Cannot read properties of undefined (reading 'bind')
+```
