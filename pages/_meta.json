@@ -35,6 +35,10 @@
     "title": "CodeSnippet",
     "type": "page"
   },
+  "advanced": {
+    "title": "Advanced",
+    "type": "page"
+  },
   "projects": {
     "title": "Projects",
     "type": "page",

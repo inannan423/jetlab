@@ -1,0 +1,200 @@
+# 高阶函数
+
+## 概念
+
+高阶函数（higher-order function）是至少满足下列一个条件的函数：
+
+- 可以把函数作为参数传入另一个函数
+- 可以把函数作为输出结果
+
+## 函数作为参数
+
+### forEach
+
+forEach 是数组的一个方法，它接受一个函数作为参数，然后遍历每个元素并把元素传入该函数。
+
+```js
+let arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+function forEach(arr, fn) {
+  for (let i = 0; i < arr.length; i++) {
+    fn(arr[i]);
+  }
+}
+// 这里将匿名函数作为参数传入 forEach
+forEach(arr, function(item) {
+  console.log(item);
+});
+```
+那么这里的 forEach 就是一个高阶函数，因为它接受一个函数作为参数。
+
+### filter
+
+filter 是数组的一个方法，它接受一个函数作为参数，然后遍历每个元素，将传入的函数依次作用于每个元素。最终**根据传入的函数的返回值是 true 还是 false 决定是否保留该元素**。
+
+```js
+let arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+function filter(arr, fn) {
+  let result = [];
+  for (let i = 0; i < arr.length; i++) {
+    if (fn(arr[i])) {
+      result.push(arr[i]);
+    }
+  }
+  return result;
+}
+
+let r = filter(arr, function(item) {
+  return item % 2 === 0;
+});
+
+console.log(r); // [2, 4, 6, 8, 10]
+```
+
+## 函数作为返回值
+
+### makeAdder
+
+比如，我们生成一个求和函数，要求如下：
+
+```js
+let add = makeAdder(10);
+
+add(5); // 15
+add(20); // 30
+```
+
+我们可以这样实现：
+
+```js
+function makeAdder(x) {
+  return function(y) {
+    return x + y;
+  };
+}
+
+let add = makeAdder(10);
+
+console.log(add(5)); // 15
+console.log(add(20)); // 30
+```
+
+这里的 makeAdder 就是一个高阶函数，因为它返回了一个函数。
+
+### once
+
+once 是只让函数执行一次的高阶函数。比如在页面中只绑定一次 click 事件，具体而言比如购物时只能付款一次。
+
+```js
+function once(fn) {
+  let done = false;
+  return function() {
+    if (!done) {
+      done = true;
+      return fn.apply(this, arguments);
+    }
+  };
+}
+
+let pay = once(function(money) {
+  console.log(`支付：${money} RMB`);
+});
+
+pay(5); // 支付：5 RMB
+pay(5); // 不会执行
+pay(5); // 不会执行
+```
+
+## 高阶函数的意义
+
+高阶函数的意义在于可以抽象出通用的函数，使得代码更加简洁。比如上面的 forEach 和 filter，它们都是通用的遍历函数，可以用来遍历任何数组。我们只用传入不同的条件就可以得到不同的结果。不用再关心遍历的细节，只需要关心遍历的结果。
+
+## 常见的高阶函数
+
+高阶函数常见于 Array、String、Object 等原生对象的原型上，比如 forEach、map、filter、reduce、slice、split、join、bind、call、apply、Object.keys、Object.values、Object.entries 等。
+
+### Map
+
+Map 是数组的一个方法，它接受一个函数作为参数，然后遍历每个元素，将传入的函数依次作用于每个元素，**返回包含每次函数返回值的新数组**。
+
+```js
+function map(arr,fn){
+  let newArr = []
+  for (let i=0;i<arr.length;i++){
+    newArr.push(fn(arr[i]))
+  }
+  return newArr
+}
+
+let arr = [1,2,3,4,5,6,7,8,9,10]
+let r = map(arr,function(item){
+  return item * 2
+})
+```
+
+### Reduce
+
+Reduce 是数组的一个方法，它接受一个函数作为参数，然后遍历每个元素，将传入的函数依次作用于每个元素，**返回最终的累计计算结果**。
+
+```js
+function reduce(arr,fn,init){
+  let result = init
+  for (let i=0;i<arr.length;i++){
+    result = fn(result,arr[i])
+  }
+  return result
+}
+
+let arr = [1,2,3,4,5,6,7,8,9,10]
+
+let r = reduce(arr,function(result,item){
+  return result + item
+},0)
+
+console.log(r) // 55
+```
+### Every
+
+Every 是数组的一个方法，它接受一个函数作为参数，然后遍历每个元素，将传入的函数依次作用于每个元素，**如果每个元素都满足条件则返回 true，否则返回 false**。
+
+```js
+function every(arr,fn){
+  for (let i=0;i<arr.length;i++){
+    if (!fn(arr[i])){
+      return false
+    }
+  }
+  return true
+}
+
+let arr = [1,2,3,4,5,6,7,8,9,10]
+
+let r = every(arr,function(item){
+  return item > 0
+})
+
+console.log(r) // true
+```
+
+### Some
+
+Some 是数组的一个方法，它接受一个函数作为参数，然后遍历每个元素，将传入的函数依次作用于每个元素，**如果至少有一个元素满足条件则返回 true，否则返回 false**。
+
+```js
+function some(arr,fn){
+  for (let i=0;i<arr.length;i++){
+    if (fn(arr[i])){
+      return true
+    }
+  }
+  return false
+}
+
+let arr = [1,2,3,4,5,6,7,8,9,10]
+
+let r = some(arr,function(item){
+  return item > 5
+})
+
+console.log(r) // true
+```
