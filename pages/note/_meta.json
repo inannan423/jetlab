@@ -21,5 +21,10 @@
   },
   "nodejs": "Node.js",
   "express": "Express",
-  "java": "Java"
+  "java": "Java",
+  "-- Advanced": {
+    "type": "separator",
+    "title": "进阶"
+  },
+  "function": "函数式编程"
 }
