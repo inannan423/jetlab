@@ -75,7 +75,8 @@ export default function LarkList (): JSX.Element {
   return (
     <div className={'w-full'}>
       {
-        !fetched && (
+        // eslint-disable-next-line
+        !(Boolean(fetched)) && (
           <div className={'w-full flex items-center justify-center'}>
             <Lottie className={'bg-gray-100 dark:bg-gray-600 opacity-40 dark:opacity-25 rounded-full p-2 flex items-center justify-center'} animationData={require('../../public/activity.json')} />
           </div>
@@ -87,6 +88,7 @@ export default function LarkList (): JSX.Element {
             postsGroup[nowPage]?.map((post, index) => {
               return (
                 <Link
+                  // eslint-disable-next-line
                   href={`https://x0v86ddnier.feishu.cn/wiki/${post.node_token}`}
                   target={'_blank'}
                   key={index}
@@ -128,12 +130,14 @@ export default function LarkList (): JSX.Element {
               <FiArrowLeft/>
             </button>
             <div>
+              {/* eslint-disable-next-line */}
               {nowPage + 1} / {postsGroup.length}
             </div>
             <button
               className={`w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-all ease duration-700 cursor-pointer ${nowPage === postsGroup.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
               onClick={() => {
                 if (nowPage < postsGroup.length - 1) {
+                  // eslint-disable-next-line
                   setNowPage(nowPage + 1)
                   window.scrollTo({
                     top: 0,

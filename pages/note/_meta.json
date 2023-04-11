@@ -19,7 +19,7 @@
     "type": "separator",
     "title": "进阶"
   },
-  "functio": "函数式编程",
+  "jsfunc": "函数式编程",
   "-- Backend": {
     "type": "separator",
     "title": "后端"
