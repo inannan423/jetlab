@@ -34,7 +34,7 @@ specifiers:
   next-fonts: ^1.5.1
   next-mdx-remote: ^4.4.1
   next-sanity: ^4.1.5
-  nextra: latest
+  nextra: ^2.3.0
   nextra-theme-docs: latest
   postcss: ^8.4.21
   prismjs: ^1.29.0
