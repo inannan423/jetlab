@@ -15,16 +15,16 @@
   },
   "react": "React",
   "minpro": "微信小程序",
+  "-- Advanced": {
+    "type": "separator",
+    "title": "进阶"
+  },
+  "functions": "函数式编程",
   "-- Backend": {
     "type": "separator",
     "title": "后端"
   },
   "nodejs": "Node.js",
   "express": "Express",
-  "java": "Java",
-  "-- Advanced": {
-    "type": "separator",
-    "title": "进阶"
-  },
-  "functions": "函数式编程"
+  "java": "Java"
 }
