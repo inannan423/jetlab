@@ -14,5 +14,10 @@
   },
   "PromiseArray": "Promise Array",
   "Filter": "filter",
-  "changethis": "call、apply、bind"
+  "changethis": "call、apply、bind",
+  "-- algorithm": {
+    "type": "separator",
+    "title": "算法"
+  },
+  "gcd": "最大公约数"
 }

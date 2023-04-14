@@ -20,6 +20,7 @@
     "title": "进阶"
   },
   "jsfunc": "函数式编程",
+  "minireact": "实现 Mini React",
   "-- Backend": {
     "type": "separator",
     "title": "后端"
