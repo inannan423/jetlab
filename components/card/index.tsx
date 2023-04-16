@@ -3,6 +3,7 @@ import { type NavItem } from '../../types'
 import Link from 'next/link'
 import { Tooltip } from '@material-tailwind/react'
 
+// 卡片，用于展示友链、项目等
 export default function Card ({ item }: { item: NavItem }): JSX.Element {
   return (
     <Tooltip

@@ -188,7 +188,9 @@ let db = {
     age:20
 }
 
-obj.myFun.call(db); // Uncaught TypeError: Cannot read properties of undefined (reading 'call')
+obj.myFun.call(db); // Uncaught TypeError: Canot read prosperties of undefined (reading 'call')
 obj.myFun.apply(db); // Uncaught TypeError: Cannot read properties of undefined (reading 'apply')
 obj.myFun.bind(db)(); // Uncaught TypeError: Cannot read properties of undefined (reading 'bind')
 ```
+
+因为箭头函数中的 this 是在定义时就确定了，而不是在执行时确定的，所以无法使用 call、apply、bind 来改变 this 的指向。这是一个很大的坑，需要注意。
