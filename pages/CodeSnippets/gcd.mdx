@@ -84,6 +84,22 @@ def gcd(a, b):
     return a
 ```
 
+```java
+public int gcd(int a, int b) {
+  if (a < b) {
+    int temp = a;
+    a = b;
+    b = temp;
+  }
+  while (b != 0) {
+    int r = a % b;
+    a = b;
+    b = r;
+  }
+  return a;
+}
+```
+
 ## 实例
 
 对于字符串 s 和 t，只有在 s = t + ... + t（t 自身连接 1 次或多次）时，我们才认定 “t 能除尽 s”。
