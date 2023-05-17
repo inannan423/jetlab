@@ -7,6 +7,7 @@
   "prisma": "Prisma",
   "redux": "Redux",
   "reactRouter": "React Router",
+  "certbot": "Let's Encrypt",
   "regex": "正则表达式",
   "-- handwriting": {
     "type": "separator",

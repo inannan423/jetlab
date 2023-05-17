@@ -1,0 +1,48 @@
+# Let's Encrypt
+
+> Let's Encrypt 是一个免费的、自动化的证书颁发机构，可以为你的网站提供免费的 HTTPS 证书。这里使用 Certbot 来申请证书。
+
+## 前提
+
+- Ubuntu 20.04
+- 你的域名已经解析到服务器
+- 你的服务器已经安装了 Nginx
+
+## 安装 snapd
+
+snapd 是一个包管理器，可以用来安装 Certbot。
+
+```bash
+sudo apt update
+sudo apt install snapd
+```
+
+更新 snapd 到最新版本。
+
+```bash
+sudo snap install core; sudo snap refresh core
+```
+
+## 安装 Certbot
+
+```bash
+sudo snap install --classic certbot
+```
+
+## 执行签发证书命令
+
+```bash
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+sudo certbot --nginx
+```
+执行完毕后，Certbot 会自动配置 Nginx，添加 HTTPS 相关的配置。
+
+## 开启自动续订
+
+```bash
+sudo certbot renew --dry-run
+```
+
+## 其他操作系统
+
+[选择平台](https://certbot.eff.org/instructions)
