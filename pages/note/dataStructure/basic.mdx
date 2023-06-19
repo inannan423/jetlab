@@ -1,0 +1,246 @@
+# 基础
+
+## 数组
+
+数据结构中，数组是一种线性表数据结构。它用一组连续的内存空间，来存储一组具有相同类型的数据。
+
+```python
+# python中的数组
+arr = [1, 2, 3, 4, 5]
+```
+
+### 数组的特点
+
+- 支持随机访问，根据下标随机访问的时间复杂度为O(1)
+- 插入和删除操作，需要移动大量的元素，时间复杂度为O(n)
+
+### 数组的插入操作
+
+- 如果数组中没有空闲空间，需要重新申请一个更大的内存空间，将原数组中的数据拷贝过去，时间复杂度为O(n)
+- 如果数组中有空闲空间，只需要将要插入位置后面的数据往后移动一位，时间复杂度为O(n)
+
+```python
+# python中的数组插入操作
+arr = [1, 2, 3, 4, 5]
+arr.insert(2, 6)
+print(arr)  # [1, 2, 6, 3, 4, 5]
+```
+
+### 数组的删除操作
+
+- 如果数组中没有空闲空间，需要重新申请一个更大的内存空间，将原数组中的数据拷贝过去，时间复杂度为O(n)
+- 如果数组中有空闲空间，只需要将要删除位置后面的数据往前移动一位，时间复杂度为O(n)
+
+```python
+# python中的数组删除操作
+arr = [1, 2, 3, 4, 5]
+arr.pop(2)
+print(arr)  # [1, 2, 4, 5]
+```
+
+### 数组的随机访问
+
+- 数组的随机访问，是通过下标来进行访问的，下标从0开始，所以数组的随机访问时间复杂度为O(1)
+
+```python
+# python中的数组随机访问
+arr = [1, 2, 3, 4, 5]
+print(arr[2])  # 3
+```
+
+## 链表
+
+链表是一种线性表数据结构，它通过指针将一组零散的内存块串联起来使用。
+
+### 链表的特点
+
+- 链表中的内存块可以是不连续的
+- 链表中的内存块可以是任意的，不一定是按照顺序存储
+- 链表中的内存块，通过指针来进行连接
+
+### 链表操作
+
+```python
+class Node:
+    def __init__(self, data):
+        self.value = data
+        self.next = None
+
+class LinkList:
+    def __init__(self):
+        self.head = None
+
+    # 头插法
+    def head_add(self, data):
+        node = Node(data)
+        if self.head is not None:
+            node.next = self.head
+        self.head = node
+
+    # 尾插法
+    def tail_add(self, data):
+        node = Node(data)
+        if self.head is None:
+            self.head = Node
+        else:
+            cur = self.head
+            while cur.next is not None:
+                cur = cur.next
+            cur.next = node
+
+    def isEmpty(self):
+        if self.head is None:
+            return True
+        else:
+            return False
+
+    # 删除
+    def delete(self, data):
+        cur = self.head  # prev 用于记录前置节点
+        prev = self.head
+        while cur.next is not None:
+            if cur.value == data:
+                if cur == self.head:
+                    self.head = cur.next
+                else:
+                    prev.next = cur.next
+                break   # 找到了
+            prev = cur
+            cur = cur.next
+        return cur.value
+
+    def print(self):
+        cur = self.head
+        while cur is not None:
+            print(cur.value, end=' ')
+            cur = cur.next
+        print()
+
+    def modify(self,pos,data):
+        cur = self.head
+        i = 0
+        while cur is not None:
+            if i==pos:
+                cur.value = data
+                break
+            i = i + 1
+            cur = cur.next
+        return cur.value
+
+
+# 测试
+if __name__ == '__main__':
+    # 创建链表
+    link_list = LinkList()
+    print(link_list.isEmpty())
+    # 头插法
+    link_list.head_add(1)
+    link_list.head_add(2)
+    link_list.head_add(3)
+    # 尾插法
+    link_list.tail_add(4)
+    link_list.tail_add(5)
+    link_list.tail_add(6)
+    # 打印
+    link_list.print()
+    # 删除
+    link_list.delete(3)
+    link_list.print()
+    # 判断是否为空
+    print(link_list.isEmpty())
+    # 修改
+    link_list.modify(2,7)
+    link_list.print()
+```
+## 队列
+
+队列是一种先进先出的数据结构，它只允许在队列的头部进行删除操作，在队列的尾部进行插入操作。
+
+### 队列的特点
+
+- 队列是一种先进先出的数据结构
+- 队列只允许在队列的头部进行删除操作，在队列的尾部进行插入操作
+
+### 队列的操作
+
+使用数组实现队列的操作，需要两个指针，一个指针指向队列的头部，一个指针指向队列的尾部。
+
+```python
+class Queue:
+    def __init__(self):
+        self.items = []
+
+    def isEmpty(self):
+        return self.items == []
+
+    def enqueue(self, item):
+        self.items.insert(0, item)
+
+    def dequeue(self):
+        return self.items.pop()
+
+    def size(self):
+        return len(self.items)
+
+def test():
+    q = Queue()
+    q.enqueue(4)
+    q.enqueue('dog')
+    q.enqueue(True)
+    print(q.size())
+    print(q.isEmpty())
+    q.enqueue(8.4)
+    print(q.dequeue())
+    print(q.dequeue())
+    print(q.size())
+
+if __name__ == '__main__':
+    test()
+```
+
+## 栈
+
+栈是一种先进后出的数据结构，它只允许在栈的顶部进行插入和删除操作。
+
+### 栈的特点
+
+- 栈是一种先进后出的数据结构
+- 栈只允许在栈的顶部进行插入和删除操作
+
+### 栈的操作
+
+使用数组实现栈的操作，需要一个指针，指向栈顶部。
+
+```python
+class Stack:
+    def __init__(self):
+        self.items = []
+
+    def push(self,data):
+        self.items.append(data)
+
+    def pop(self):
+        self.items.pop()
+
+    def print(self):
+        print(self.items)
+
+    def isEmpty(self):
+        return self.items == []
+
+    def size(self):
+        return len(self.items)
+
+if __name__ == '__main__':
+    s = Stack()
+    s.push(1)
+    s.push(2)
+    s.push(3)
+    s.print()
+    s.pop()
+    s.print()
+    s.push(4)
+    s.print()
+    print(s.size())
+    print(s.isEmpty())
+```

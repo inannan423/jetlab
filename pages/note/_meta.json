@@ -9,6 +9,7 @@
   "javascript": "JavaScript",
   "typescript": "TypeScript",
   "network": "网络",
+  "dataStructure": "数据结构与算法",
   "-- FrameWork": {
     "type": "separator",
     "title": "框架"
