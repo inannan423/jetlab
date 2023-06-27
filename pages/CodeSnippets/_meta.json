@@ -1,5 +1,11 @@
 {
   "index": "引入",
+  "-- algorithm": {
+    "type": "separator",
+    "title": "算法"
+  },
+  "gcd": "最大公约数",
+  "LIS": "最长递增子序列",
   "-- reference": {
     "type": "separator",
     "title": "速查"
@@ -15,10 +21,6 @@
   },
   "PromiseArray": "Promise Array",
   "Filter": "filter",
-  "changethis": "call、apply、bind",
-  "-- algorithm": {
-    "type": "separator",
-    "title": "算法"
-  },
-  "gcd": "最大公约数"
+  "changethis": "call、apply、bind"
+
 }
