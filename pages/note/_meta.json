@@ -15,6 +15,7 @@
     "title": "框架"
   },
   "react": "React",
+  "learnreact": "React 快速入门",
   "minpro": "微信小程序",
   "-- Advanced": {
     "type": "separator",
