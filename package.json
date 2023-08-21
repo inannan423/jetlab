@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/shuding/nextra-docs-template#readme",
   "dependencies": {
+    "@codesandbox/sandpack-react": "^2.6.9",
+    "@codesandbox/sandpack-themes": "^2.0.21",
     "@emotion/react": "^11.10.6",
     "@headlessui/react": "^1.7.13",
     "@mapbox/rehype-prism": "^0.8.0",
