@@ -183,19 +183,37 @@ export default function Demo() {
 
 ```
 
-import React from 'react'
-import { Sandpack } from '@codesandbox/sandpack-react'
-import EX1 from '../../../data/code/example1'
+在 Sandpack 中运行效果如下：
 
-<Sandpack
-  template="static"
-  theme="dark"
-  files={{
-    '/index.html': {
-      code: EX1
-    }
-  }}
-/>
+import React from 'react'
+import {
+    SandpackLayout,
+    SandpackFileExplorer,
+    SandpackCodeEditor,
+    SandpackPreview,
+    SandpackProvider
+} from '@codesandbox/sandpack-react'
+import { sandpackDark } from '@codesandbox/sandpack-themes'
+import EX1 from '../../../data/code/example1'
+import EX2 from '../../../data/code/example2'
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="static"
+    theme={sandpackDark}
+    files={{
+      '/index.html': {
+        code: EX1
+      }
+    }}
+  >
+    <SandpackLayout>
+      <SandpackFileExplorer />
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
 
 我们可以使用 React 来解决这个问题，React 的组件化思想，可以将重复的代码抽象成组件，这样就可以很好的提高开发效率。
 
@@ -247,6 +265,26 @@ export default function Students() {
 }
 ```
 
+在 Sandpack 中运行效果如下：
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      'App.js': {
+        code: EX2
+      }
+    }}
+  >
+    <SandpackLayout>
+      <SandpackFileExplorer />
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
 ## React 历史
 
 React 是一个由 Facebook 开发的 JavaScript 库，用于构建用户界面。它的历史可以追溯到2011年，以下是 React 的主要历史里程碑：
@@ -264,3 +302,7 @@ React 是一个由 Facebook 开发的 JavaScript 库，用于构建用户界面�
 6. **至今：** React 在社区中持续发展壮大，成为了构建前端用户界面的首选工具之一。它广泛应用于各种项目，从小型应用到大型企业级应用，还有许多相关的库和工具，如 Redux（用于状态管理）和 React Router（用于路由管理）等。
 
 React 的历史充满了技术创新和演进，它不仅改变了前端开发的方式，还为构建高性能、可维护和可扩展的用户界面提供了强大的工具和思想。
+
+## 本章总结
+
+在本章中，我们简要介绍了 React 的历史，以及它的主要特性和优势。我们还通过一个简单的示例，展示了 React 的组件化思想，在下一章中，我们将了解 React 的基本用法，以及如何使用 React 来构建用户界面。

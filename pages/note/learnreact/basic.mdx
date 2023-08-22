@@ -1,0 +1,1058 @@
+# 语法基础
+
+## 基本结构
+
+React 代码的基本结果核心就是**函数**，这些函数被称为**组件**。组件是 React 应用的基本构建块，它们描述了你希望在屏幕上看到的内容。
+
+```jsx
+function Welcome(props) {
+  // 得益于 JSX 语法，我们可以在组件中直接使用 HTML 标签，这样就可以很方便地描述界面元素了。
+  return <h1>Hello, {props.name}</h1>;
+}
+```
+
+上面的代码定义了一个名为 `Welcome` 的组件，它接收一个名为 `props` 的参数，并返回一个 React 元素。React 元素是构成 React 应用的最小单位，它描述了你希望在屏幕上看到的内容。
+
+这让我们想到了 C++ 中的函数：
+
+```cpp
+void Welcome(string name) {
+  cout << "Hello, " << name << endl;
+}
+```
+
+只不过有一个很大的区别，React 组件返回的是界面元素，用于渲染到屏幕上，而 C++ 函数只执行一些操作，不返回任何东西，使用 `cout` 将结果输出到屏幕上。
+
+在 React 中，如果一个函数返回的是界面元素，它就可以使用标签的方式调用，就像调用 HTML 标签一样。
+
+```jsx
+function Hello() {
+  return <h1>Hello</h1>;
+}
+
+function App() {
+  return <Hello />; // 调用 Hello 组件
+}
+```
+
+在 React 中，如果一个函数返回的是普通的数据，它就可以使用函数的方式调用。
+
+```jsx
+function Add(a, b) {
+  return a + b;
+}
+
+Add(1, 2); // 3
+```
+
+一个完整的 React 应用，通常会由很多个组件组成，这些组件之间可以相互嵌套，形成一个组件树。
+
+```jsx
+function Hello() {
+  return <h1>Hello</h1>;
+}
+
+function World() {
+  return <h1>World</h1>;
+}
+
+function Word() {
+  return <div>
+    <Hello />
+    <World />
+    </div>;
+}
+
+export default function App() {
+  return <Word />;
+}
+```
+
+`export default` 语句用于对外输出本模块的默认接口，它也代表某个组件或页面的根节点。
+
+import React from 'react'
+import {
+  SandpackLayout,
+  SandpackFileExplorer,
+  SandpackCodeEditor,
+  SandpackPreview,
+  SandpackProvider,
+  Sandpack
+} from '@codesandbox/sandpack-react'
+import { sandpackDark } from '@codesandbox/sandpack-themes'
+import EX3 from '../../../data/code/example3'
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+        '/App.js': { code: EX3, active: true }
+    }}
+  >
+    <SandpackLayout>
+
+[//]: # (<SandpackFileExplorer />)
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+树的结构如下：
+
+```bash
+App
+└── Word
+    ├── Hello
+    └── World
+```
+
+## JSX 语法
+
+### 基本特征
+
+上面的代码中，我们使用了 JSX 语法，它是一种 JavaScript 的语法扩展，可以在 JavaScript 中直接使用 HTML 标签。这样就可以很方便地描述界面元素了。
+
+```jsx
+const element = <h1>Hello, world!</h1>;
+```
+
+注意看，我们曾经在 C++ 中，遇到过 `int`、`string`、`double` 等类型，它们都是一种数据类型，而 JSX 语法中的 `<h1>Hello, world!</h1>` 也是一种特殊的数据类型，它的类型是 `ReactElement`。
+
+当然，作为一个变量，它也可以被赋值给其他变量，也可以作为函数的参数，也可以作为函数的返回值。
+
+```jsx
+const element = <h1>Hello, world!</h1>;
+
+function showElement(element) {
+  return (
+    <div>
+      {element}
+      {element}
+    </div>
+  );
+}
+
+export default function App() {
+  return showElement(element);
+}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+ code: `const element = <h1>Hello, world!</h1>;
+function showElement(element) {
+  return (
+    <div>
+      {element}
+      {element}
+    </div>
+  );
+}
+export default function App() {
+  return showElement(element);
+}
+`,
+        active: true
+}
+    }}
+  >
+    <SandpackLayout>
+
+[//]: # (<SandpackFileExplorer />)
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+最终组成的界面如下：
+
+```html
+<div>
+  <h1>Hello, world!</h1>
+  <h1>Hello, world!</h1>
+</div>
+```
+### 显示动态的数据
+
+有这样一个情况，我们需要显示一个动态的数据，比如说，我们需要显示一个用户的名字，这个名字是从后端获取的，我们不知道它是什么，但是我们知道它一定是一个字符串。我们想根据后端的数据，显示不同的名字。
+
+JSX 为我们提供了一种很方便的方式，就是使用花括号 `{}`，在花括号中，我们可以写任何 JavaScript 表达式，这样就可以根据后端的数据，显示不同的名字了。
+
+```jsx
+export default function App() {
+  const name = 'Josh Perez';
+  return <h1>Hello, {name}</h1>;
+}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `export default function App() {
+    const name = 'Josh Perez';
+    return <h1>Hello, {name}</h1>;
+}
+`,
+        active: true
+      }
+    }}
+  >
+    <SandpackLayout>
+
+[//]: # (<SandpackFileExplorer />)
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+当然，你也可以在花括号中写任何 JavaScript 表达式，比如说，你可以写一个函数调用。
+
+```jsx
+function Add(a, b) {
+  return a + b;
+}
+
+export default function App() {
+  return <h1>1 + 2 = {Add(1, 2)}</h1>;
+}
+```
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `function Add(a, b) {
+    return a + b;
+}
+export default function App() {
+  return <h1>1 + 2 = {Add(1, 2)}</h1>;
+}
+`,
+        active: true
+      }
+    }}
+  >
+    <SandpackLayout>
+
+      [//]: # (<SandpackFileExplorer />)
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+### 列表渲染
+
+有这样一个情况，数据库中有很多用户的名字，我们需要把这些名字都显示出来，这些名字是一个数组，我们不知道它有多少个元素，但是我们知道它一定是一个数组。我们想根据后端的数据，显示名字的列表。
+
+正如我们上面所说的，花括号中可以写任何 JavaScript 表达式，所以我们可以写一个循环语句，来遍历这个数组，然后把数组中的每一个元素都显示出来。
+
+```jsx
+const names = ['Alice', 'Bob', 'Cathy', 'Daisy', 'Ethan'];
+
+export default function App() {
+  return (
+    <div>
+      {names.map(name => (
+        <p>Hello, {name}</p>
+      ))}
+    </div>
+  );
+}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `const names = ['Alice', 'Bob', 'Cathy', 'Daisy', 'Ethan'];
+export default function App() {
+    return (
+        <div>
+        {names.map(name => (
+            <p>Hello, {name}</p>
+        ))}
+        </div>
+    );
+}
+    `,
+            active: true
+        }
+        }}
+    >
+        <SandpackLayout>
+
+        [//]: # (<SandpackFileExplorer />)
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+这让我们想起了 C++ 中的 `for` 循环语句:
+
+```cpp
+const std::vector<std::string> names = {"Alice", "Bob", "Cathy", "Daisy", "Ethan"};
+
+for (const auto& name : names) {
+    std::cout << "Hello, " << name << std::endl;
+}
+```
+这里使用到的是 JS 的 `map` 方法，它和循环语句的作用是一样的，都是遍历数组中的每一个元素，然后执行一些操作。`map` 方法的参数是一个函数，这个函数的参数是数组中的每一个元素，这个函数的返回值是一个新的数组，这个新的数组的元素是这个函数的返回值。像这里返回的就是 JSX 元素的数组。
+
+```js
+const names = ['Alice', 'Bob', 'Cathy', 'Daisy', 'Ethan'];
+
+const elements = names.map(name => <p>Hello, {name}</p>);
+console.log(elements);
+```
+
+最终的结果是这样的：
+
+```js
+[
+  <p>Hello, Alice</p>,
+  <p>Hello, Bob</p>,
+  <p>Hello, Cathy</p>,
+  <p>Hello, Daisy</p>,
+  <p>Hello, Ethan</p>
+]
+```
+
+### 显示对象
+
+对象是一种非常常见的数据类型，我们经常会用到对象。比如说，我们有一个用户的信息，这个用户的信息是一个对象，我们想把这个对象的信息都显示出来。
+
+```jsx
+const xiaoming = {
+  name: 'xiaoming',
+  age: 12
+}
+
+export default function App() {
+  return (
+    <div>
+      <p>name: {xiaoming.name}</p>
+      <p>age: {xiaoming.age}</p>
+    </div>
+  );
+}
+```
+
+这让我们想起了 C++ 中的 `struct` 结构体:
+
+```cpp
+struct Person {
+    std::string name;
+    int age;
+};
+
+Person xiaoming = {"xiaoming", 12};
+
+std::cout << "name: " << xiaoming.name << std::endl;
+std::cout << "age: " << xiaoming.age << std::endl;
+```
+
+当然，我们也可以把对象放到数组中，然后遍历数组，把数组中的每一个对象都显示出来。
+
+```jsx
+const users = [
+  { name: 'xiaoming', age: 12 },
+  { name: 'xiaohong', age: 13 },
+  { name: 'xiaozhang', age: 14 },
+  { name: 'xiaoli', age: 15 },
+  { name: 'xiaowang', age: 16 }
+];
+
+export default function App() {
+  return (
+    <div>
+      {/*
+        这里的 item，index 是规定好的参数顺序，分别表示数组中的元素和元素的下标，可以直接使用
+      */}
+      {users.map((item,index) => (
+        <div>
+          <p>第{index+1}个用户</p>
+          <p>name: {item.name}</p>
+          <p>age: {item.age}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `const users = [
+    { name: 'xiaoming', age: 12 },
+    { name: 'xiaohong', age: 13 },
+    { name: 'xiaozhang', age: 14 },
+    { name: 'xiaoli', age: 15 },
+    { name: 'xiaowang', age: 16 }
+];
+export default function App() {
+  return (
+    <div>
+      {/*
+        这里的 item，index 是规定好的参数顺序，分别表示数组中的元素和元素的下标，可以直接使用
+      */}
+      {users.map((item,index) => (
+        <div>
+          <p>第{index+1}个用户</p>
+          <p>name: {item.name}</p>
+          <p>age: {item.age}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+    `,
+            active: true
+        }
+        }}
+    >
+        <SandpackLayout>
+
+        [//]: # (<SandpackFileExplorer />)
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+### 条件渲染
+
+我们可以根据条件来决定是否显示某个元素，这就是条件渲染。
+
+```jsx
+export default function App() {
+  const [isShow, setIsShow] = useState(true);
+  return (
+    <div>
+      {isShow && <p>我显示出来啦！</p>}
+      <button onClick={() => {
+        setIsShow(!isShow);
+      }}>点击我切换显示状态</button>
+    </div>
+  );
+}
+```
+
+> 这里使用了 `useState` 这个 React 的 Hook，它的作用是创建一个状态，这个状态的值是 `true`，并且提供了一个函数 `setIsShow`，这个函数的作用是修改这个状态的值。`useState` 的参数是这个状态的初始值。后面会详细讲解 Hook。
+
+`&&` 表示逻辑与，只有两个操作数都为真时，结果才为真。这里的 `isShow` 就是一个布尔值，它的值为 `true` 或者 `false`，当它的值为 `true` 时，`{isShow && <p>我显示出来啦！</p>}` 的结果就是 `<p>我显示出来啦！</p>`，当它的值为 `false` 时，`{isShow && <p>我显示出来啦！</p>}` 的结果就是 `false`，也就是什么都不显示。
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `import { useState } from 'react';
+export default function App() {
+    const [isShow, setIsShow] = useState(true);
+    return (
+        <div>
+            {isShow && <p>我显示出来啦！</p>}
+            <button onClick={() => {
+                setIsShow(!isShow);
+            }}>点击我切换显示状态</button>
+        </div>
+    );
+}
+    `,
+            active: true
+        }
+        }}
+    >
+        <SandpackLayout>
+
+        [//]: # (<SandpackFileExplorer />)
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+我们还可以使用三元运算符来实现条件渲染。
+
+```jsx
+export default function App() {
+  const [isShow, setIsShow] = useState(true);
+  return (
+    <div>
+      {isShow ? <p>我显示出来啦！</p> : <p>我被隐藏了！</p>}
+      <button onClick={() => {
+        setIsShow(!isShow);
+      }}>点击我切换显示状态</button>
+    </div>
+  );
+}
+```
+
+`?` 表示三元运算符，它的第一个操作数是一个布尔值，当它的值为 `true` 时，结果就是第二个操作数，当它的值为 `false` 时，结果就是第三个操作数。
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `import { useState } from 'react';
+export default function App() {
+     const [isShow, setIsShow] = useState(true);
+     return (
+          <div>
+                {isShow ? <p>我显示出来啦！</p> : <p>我被隐藏了！</p>}
+                <button onClick={() => {
+                 setIsShow(!isShow);
+                }}>点击我切换显示状态</button>
+          </div>
+     );
+    }
+     `,
+                active: true
+          }
+          }}
+     >
+          <SandpackLayout>
+
+          [//]: # (<SandpackFileExplorer />)
+          <SandpackCodeEditor closableTabs showTabs />
+          <SandpackPreview />
+          </SandpackLayout>
+     </SandpackProvider>
+</div>
+
+### class 和 style
+
+在 React 中，我们可以使用 `className` 来设置元素的 class，使用 `style` 来设置元素的样式。
+
+```jsx
+export default function App() {
+  return (
+    <div>
+      <p className="text-red">我是红色的</p>
+      <p style={{ color: 'blue' }}>我是蓝色的</p>
+    </div>
+  );
+}
+```
+
+`className` 的值是一个字符串，它的值就是元素的 class，`style` 的值是一个对象，它的键是样式的名称，值是样式的值。
+
+`style` 示例写法如下：
+
+```jsx
+{{ color: 'blue' , fontSize: '20px' }}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `export default function App() {
+    return (
+        <div>
+            <p className="text-red">我是红色的</p>
+            <p style={{ color: 'blue' }}>我是蓝色的</p>
+        </div>
+    );
+}
+`,
+            active: true
+        },
+    '/styles.css': {
+      code: `.text-red {
+    color: red;
+}
+`,
+        active: true
+    }
+        }}
+    >
+        <SandpackLayout>
+
+        <SandpackFileExplorer />
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+### 事件
+
+在 React 中，我们可以使用 `onClick` 来监听元素的点击事件:
+
+```jsx
+export default function App() {
+  return (
+    <div>
+      <button onClick={() => {
+        alert('你点击了我！');
+      }}>点击我</button>
+    </div>
+  );
+}
+```
+
+`onClick` 的值是一个函数，当元素被点击时，这个函数就会被调用。也可以将函数单独定义出来，然后传给 `onClick`。
+
+```jsx
+export default function App() {
+  const handleClick = () => {
+    alert('你点击了我！');
+  };
+  return (
+    <div>
+      <button onClick={handleClick}>点击我</button>
+    </div>
+  );
+}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `export default function App() {
+    const handleClick = () => {
+        alert('你点击了我！');
+    };
+    return (
+        <div>
+            <button onClick={handleClick}>点击我</button>
+        </div>
+    );
+}
+`,
+            active: true
+        }
+        }}
+    >
+        <SandpackLayout>
+
+        [//]: # (<SandpackFileExplorer />)
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+组件也可以自定义事件，例如我们可以定义一个 `Button` 组件，它有一个 `onButtonClick` 事件，当按钮被点击时，这个事件就会被调用。
+
+```jsx
+function Button(props) {
+  return (
+    <button onClick={props.onButtonClick}>点击我</button>
+  );
+}
+
+export default function App() {
+  const handleClick = () => {
+    alert('你点击了我！');
+  };
+  return (
+    <div>
+      <Button onButtonClick={handleClick} />
+    </div>
+  );
+}
+```
+
+`Button` 组件的 `onButtonClick` 事件是一个函数，当按钮被点击时，这个函数就会被调用。
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/Button.js': {
+        code: `export default function Button(props) {
+    return (
+        <button onClick={props.onButtonClick}>点击我</button>
+    );
+}
+`,
+            active: true
+        },
+    '/App.js': {
+      code: `import Button from './Button';
+export default function App() {
+    const handleClick = () => {
+        alert('你点击了我！');
+    };
+    return (
+        <div>
+            <Button onButtonClick={handleClick} />
+        </div>
+    );
+}
+`,
+      active: true
+    }
+        }}
+    >
+        <SandpackLayout>
+
+        <SandpackFileExplorer />
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+### 表单
+
+在 React 中，我们可以使用 `input` 元素来创建表单，例如我们可以创建一个输入框，当输入框的值发生变化时，我们可以通过 `onChange` 事件来监听它的变化。
+
+```jsx
+export default function App() {
+  const [value, setValue] = useState('');
+  return (
+    <div>
+      <input value={value} onChange={(e) => {
+        setValue(e.target.value);
+      }} />
+      <p>输入框的值是：{value}</p>
+    </div>
+  );
+}
+```
+
+`input` 元素的 `value` 属性是输入框的值，`onChange` 事件是输入框的值发生变化时调用的函数。
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `import { useState } from 'react';
+export default function App() {
+    const [value, setValue] = useState('');
+    return (
+        <div>
+            <input value={value} onChange={(e) => {
+                setValue(e.target.value);
+            }} />
+            <p>输入框的值是：{value}</p>
+        </div>
+    );
+}
+`,
+            active: true
+        }
+        }}
+    >
+        <SandpackLayout>
+
+        [//]: # (<SandpackFileExplorer />)
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+## Hook
+
+Hook 是 React 16.8 新增的特性，它可以让我们在函数组件中使用状态和其他 React 特性。Hook 往往与生命周期绑定在一起，发挥特定的作用。
+
+### useState
+
+`useState` 是 React 中最基础的 Hook，它可以让我们在函数组件中使用状态。`useState` 接收一个参数，这个参数是状态的初始值，返回一个数组，数组的第一个元素是状态的值，第二个元素是设置状态的函数。
+
+```jsx
+import { useState } from 'react';
+
+export default function App() {
+  const [count, setCount] = useState(0);  // 初始值为 0，count 是状态的值，setCount 是设置状态的函数
+  return (
+    <div>
+      <p>当前的值是：{count}</p>
+      <button onClick={() => {
+        setCount(count + 1);
+      }}>加 1</button>
+    </div>
+  );
+}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `import { useState } from 'react';
+export default function App() {
+    const [count, setCount] = useState(0);
+    return (
+        <div>
+            <p>当前的值是：{count}</p>
+            <button onClick={() => {
+                setCount(count + 1);
+            }}>加 1</button>
+        </div>
+    );
+}
+`,
+            active: true
+        }
+        }}
+    >
+        <SandpackLayout>
+
+        [//]: # (<SandpackFileExplorer />)
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+这时候你会想，我们为什么要使用 `useState` 呢？我们完全可以使用 `let` 来定义一个变量，然后使用 `setState` 来设置它的值。
+
+```jsx
+export default function App() {
+  let count = 0;
+  return (
+    <div>
+      <p>当前的值是：{count}</p>
+      <button onClick={() => {
+        count = count + 1;
+      }}>加 1</button>
+    </div>
+  );
+}
+```
+
+
+
+
+但是这样做是不行的，因为 React 会在每次渲染时重新执行函数组件，这样 `count` 的值就会被重置为 0，而且并不是所有的变量都会触发重新渲染，这是出于性能的考虑，如果所有的变量都会触发重新渲染，那么每次渲染都会非常耗费性能。如下面的执行：
+
+<div className={'my-3'}>
+  <Sandpack
+    template="react"
+    theme={sandpackDark}
+    options={{ showConsole: true, showConsoleButton: true }}
+    files={{
+      '/App.js': {
+        code: `export default function App() {
+    let count = 0;
+    return (
+        <div>
+            <p>当前的值是：{count}</p>
+            <button onClick={() => {
+                count = count + 1;
+                console.log(count);
+            }}>加 1</button>
+        </div>
+    );
+}
+`,
+        active: true
+      }
+    }}
+  >
+  </Sandpack>
+</div>
+
+我们可以看出，每次点击按钮，`count` 的值都会加 1（在控制台显示了），但是页面上的值并没有发生变化，这是因为 `count` 并不会触发重新渲染，所以我们需要使用 `useState` 来定义状态，这样才能让 React 知道 `count` 的值发生了变化，需要重新渲染页面。
+
+### useEffect
+
+`useEffect` 是 React 中的另一个 Hook，它可以让我们在函数组件中执行副作用操作，例如发送网络请求、订阅事件等。`useEffect` 接收一个函数作为参数，这个函数就是我们要执行的副作用操作，它会在每次渲染时执行，如果我们需要在组件卸载时执行一些操作，我们可以在函数中返回一个函数，这个函数就是我们要执行的操作。
+
+举一个例子，比如我们要在页面渲染时获取用户的信：
+
+```jsx
+import { useState, useEffect } from 'react';
+
+export default function App() {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    console.log('执行了 useEffect');
+    // 假设这里是发送网络请求获取用户信息
+    const user = {
+        name: '张三',
+        age: 18
+    };
+    setUser(user);
+  }, []);
+  return (
+    <div>
+        {
+            user ? (
+            <div>
+                <p>用户名：{user.name}</p>
+                <p>年龄：{user.age}</p>
+            </div>
+            ) : '加载中...'
+        }
+        <button onClick={() => {
+            setUser('李四');
+        }}>
+            修改用户名
+        </button>
+    </div>
+  );
+}
+```
+
+<div className={'my-3'}>
+  <Sandpack
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `import { useState, useEffect } from 'react';
+export default function App() {
+    const [user, setUser] = useState(null);
+    useEffect(() => {
+        console.log('执行了 useEffect');
+        const user = {
+            name: '张三',
+            age: 18
+        }; // 假设这里是发送网络请求获取用户信息
+        setUser(user);
+    }, []);
+    return (
+        <div>
+            {
+                user ? (
+                    <div>
+                        <p>用户名：{user.name}</p>
+                        <p>年龄：{user.age}</p>
+                    </div>
+                ) : '加载中...'
+            }
+            <button onClick={() => {
+                setUser({
+                    name: '李四',
+                    age: 20
+                });
+            }}>
+              修改用户名
+            </button>
+        </div>
+    );
+}
+`,
+            active: true
+        }
+        }}
+    options={{ showConsole: true, showConsoleButton: true }}
+    >
+    </Sandpack>
+</div>
+
+我们可以看到，当页面渲染时，控制台会打印出 `执行了 useEffect`，这是因为 `useEffect` 会在每次渲染时执行，如果我们不想在每次渲染时执行，我们可以给 `useEffect` 传递第二个参数，这个参数是一个数组，数组中的值是我们要监听的变量，只有当这些变量发生变化时，才会执行 `useEffect`。比如，创建一个计数器，每次点击按钮，计数器加 1，当计数器的值大于 5 时，我们将其归零：
+
+```jsx
+import { useState, useEffect } from 'react';
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (count > 5) {
+      setCount(0);
+    }
+  }, [count]);
+  return (
+    <div>
+      <p>当前的值是：{count}</p>
+      <button onClick={() => {
+        setCount(count + 1);
+      }}>加 1</button>
+    </div>
+  );
+}
+```
+
+<div className={'my-3'}>
+  <Sandpack
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `import { useState, useEffect } from 'react';
+export default function App() {
+    const [count, setCount] = useState(0);
+    useEffect(() => {
+        console.log('执行了 useEffect');
+        if (count > 5) {
+            console.log('count 大于 5 了');
+            setCount(0);
+        }
+    }, [count]);
+    return (
+        <div>
+            <p>当前的值是：{count}</p>
+            <button onClick={() => {
+                setCount(count + 1);
+            }}>加 1</button>
+        </div>
+    );
+}
+`,
+            active: true
+        }
+        }}
+    options={{ showConsole: true, showConsoleButton: true }}
+    >
+    </Sandpack>
+</div>
+
+我们可以看到，当 `count` 的值大于 5 时，控制台会打印出 `count 大于 5 了`，并且 `count` 的值会被归零。
+
+清除副作用操作：当我们需要在组件卸载时执行一些操作时，我们可以在 `useEffect` 的回调函数中返回一个函数，这个函数就是我们要执行的操作，它会在组件卸载时执行。
+
+```jsx
+import { useState, useEffect } from 'react';
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    console.log('执行了 useEffect');
+    return () => {
+      console.log('组件卸载了');
+    };
+  }, []);
+  return (
+    <div>
+      <p>当前的值是：{count}</p>
+      <button onClick={() => {
+        setCount(count + 1);
+      }}>加 1</button>
+    </div>
+  );
+}
+```
+
+这个操作在一些需要清除的副作用操作中很有用，比如我们在组件中订阅了一个事件，当组件卸载时，我们需要取消订阅，否则会造成内存泄漏。
+
+以上两个就是 React 中最基础的两个 Hook，它们可以让我们在函数组件中使用状态和副作用操作，从此之后我们便可以游刃有余地使用函数组件了。
