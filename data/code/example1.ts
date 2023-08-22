@@ -1,4 +1,6 @@
 export default `
+<!DOCTYPE html>
+<html lang="en">
   <body>
       <div id="main">
           <div id="" class="id-w">
@@ -40,4 +42,5 @@ export default `
                   cent.innerHTML = str
               </script>
           </body>
+        </html>
 `
