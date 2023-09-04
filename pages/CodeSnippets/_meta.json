@@ -10,6 +10,7 @@
     "type": "separator",
     "title": "速查"
   },
+  "python": "Python",
   "prisma": "Prisma",
   "redux": "Redux",
   "reactRouter": "React Router",
