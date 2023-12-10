@@ -32,6 +32,7 @@ export function Stacks ({ stacks, direction }: { stacks: TechStacks[], direction
           {stacks.map((stack, index) => (
             <div key={index} className={'flex items-center mx-6'}>
               <Tooltip
+                placeholder={stack.name}
                 content={stack.name}
                 animate={{
                   mount: { scale: 1, y: 0 },
