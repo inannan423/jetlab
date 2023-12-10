@@ -1,0 +1,741 @@
+# Go 基础
+
+## 环境搭建
+
+### 下载安装包
+
+[下载地址](https://golang.org/dl/)
+
+下载完成后，可以使用 `go version` 查看版本信息。
+
+```bash
+$ go version
+go version go1.15.6 darwin/amd64
+```
+## Go Modules
+
+### Hello World
+
+```bash
+$ mkdir hello
+$ cd hello
+$ go mod init hello
+go: creating new go.mod: module hello
+```
+通过 `go mod init` 命令初始化一个新的模块，会在当前目录下生成一个 `go.mod` 文件，内容如下：
+
+```go
+module hello
+
+go 1.15
+```
+
+然后创建一个 `hello.go` 文件，内容如下：
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, World!")
+}
+```
+运行 `go run hello.go`，可以看到输出结果：
+
+```bash
+$ go run hello.go
+Hello, World!
+```
+### 编译
+
+```bash
+$ go build
+$ ./hello
+Hello, World!
+```
+这里 `go build` 命令会生成一个可执行文件，然后执行该文件。
+
+在 Windows 系统下，会生成一个 `hello.exe` 文件，然后执行该文件。
+
+### 同一包下不同文件中的函数调用
+
+在同一包下的不同文件中，可以直接调用其他文件中的函数：
+
+```go
+// /demo/main.go
+package main
+
+import "fmt"
+
+func main() {
+    printHello()
+}
+
+// /demo/hello.go
+package main
+
+import "fmt"
+
+func printHello() {
+    fmt.Println("Hello, World!")
+}
+```
+
+执行 `go run demo`，可以看到输出结果：
+
+```bash
+$ go run demo
+Hello, World!
+```
+
+或者可以用 `go run .` 来执行当前目录下的所有文件。
+
+### 不同包下的函数调用
+
+在不同包下的文件中，需要通过 `import` 导入其他包，然后通过 `包名.函数名` 的方式调用其他包中的函数：
+
+```go
+// demo/note/note.go
+package note
+
+import "fmt"
+
+func PrintHello() {
+    fmt.Println("Hello, World!")
+}
+```
+
+```go
+// demo/main.go
+package main
+
+import "demo/note"
+
+func main() {
+    note.PrintHello()
+}
+```
+## 注释和转义符
+
+### 注释
+
+Go 语言中的注释有两种，分别是单行注释和多行注释。
+
+单行注释以 `//` 开头，多行注释以 `/*` 开头，以 `*/` 结尾。
+
+```go
+// 这是单行注释
+
+/*
+这是多行注释
+*/
+```
+
+不过不推荐使用多行注释，Go 在源代码中均使用单行注释。
+
+### 转义符
+
+Go 语言中的转义符有以下几种：
+
+| 转义符 | 含义 |
+| --- | --- |
+| `\r` | 回车符（返回行首） |
+| `\n` | 换行符（直接跳到下一行的同列位置） |
+| `\t` | 制表符 |
+| `\\` | 反斜杠 |
+| `\'` | 单引号 |
+| `\"` | 双引号 |
+
+## Go 的分号
+
+Go 语言中的语句结尾不需要分号，如果写了分号，编译器会自动忽略。
+
+## 变量与常量
+
+### 变量（Variable）
+
+变量即一段或多段内存空间，用于存储数据。
+
+Go 语言中的变量声明格式为：
+
+```go
+var 变量名 变量类型
+```
+例如：
+
+```go
+var a int
+var b string
+var c bool
+a = 1
+b = "hello"
+c = true
+var d int = 2
+var e string = "world"
+var f bool = false
+// 类型推导
+var g = 3 // int
+// 简短声明
+h:= 4 // int
+```
+输出结果：
+
+```bash
+fmt.Print("a=%v, b=%v, c=%v\n", a, b, c)
+fmt.Print("d=%v, e=%v, f=%v\n", d, e, f)
+fmt.Print("g=%v, h=%v\n", g, h)
+```
+此处使用了 `fmt.Print` 函数，`%v` 为占位符，表示输出变量的值。
+
+### 常量（Constant）
+
+常量即固定值，不可修改。
+
+Go 语言中的常量声明格式为：
+
+```go
+const 常量名 常量类型 = 常量值
+```
+
+例如：
+
+```go
+const a int = 1
+const b string = "hello"
+const c bool = true
+```
+
+还有一种写法
+
+```go
+const (
+    a int = 1
+    b string = "hello"
+    c bool = true
+)
+```
+
+还可以使用 `iota` 来简化常量的定义：
+
+```go
+const (
+    a = iota  // 0
+    b // 1
+    c // 2
+)
+```
+
+`iota` 是一个特殊的常量，它的值默认为 0，每次使用后自动加 1。第一行使用后，后面行可以省略 `iota`。
+
+### 全局变量/常量
+
+变量通常的作用域为当前代码块，如果想要在整个包中使用，可以使用全局变量。
+
+全局变量的声明格式为：
+
+```go
+var 变量名 变量类型
+```
+
+注意，全局变量的声明不能使用 `:=`，只能使用 `var`。
+
+### 全局跨包变量/常量
+
+如果想要在其他包中使用全局变量，需要将变量名首字母大写。
+
+例如：
+
+```go
+// demo/note/note.go
+package note
+
+var Note string = "hello"
+```
+
+```go
+// demo/main.go
+
+import (
+    "demo/note"
+    "fmt"
+)
+
+func main() {
+    fmt.Println(note.Note)
+}
+```
+## 基本数据类型
+
+Go 中，所有的值类型变量常量都会在声明时被分配空间并赋予默认值。
+
+bit： 位，计算机中最小的数据单位，只有 0 和 1 两种状态。
+Byte：字节，计算机中基本的存储单位，1 Byte = 8 bit。
+
+### 整型
+
+| 类型     | 位数    | 取值范围                                       |
+|--------|-------|--------------------------------------------|
+| int8   | 8     | -128 ~ 127                                 |
+| uint8  | 8     | 0 ~ 255                                    |
+| int16  | 16    | -32768 ~ 32767                             |
+| uint16 | 16    | 0 ~ 65535                                  |
+| int32  | 32    | -2147483648 ~ 2147483647                   |
+| uint32 | 32    | 0 ~ 4294967295                             |
+| int64  | 64    | -9223372036854775808 ~ 9223372036854775807 |
+| uint64 | 64    | 0 ~ 18446744073709551615                   |
+| int    | 32/64 | 与操作系统有关，根据操作系统的位数决定                        |
+| uint   | 32/64 | 与操作系统有关                                    |
+
+```go
+var a int8 = 1
+var b uint8 = 2
+var c int16 = 3
+var d int = 4
+```
+
+支持二进制、八进制、十进制、十六进制的表示方式：
+
+```go
+var a int = 0b1010 // 二进制
+var b int = 0O12 // 八进制
+var c int = 10 // 十进制
+var d int = 0xA // 十六进制
+```
+
+精度转换：
+
+```go
+// 低精度转高精度
+var a int8 = 1
+var b int16 = int16(a)
+var c int32 = int32(b)
+var d int64 = int64(c)
+var e int = int(d)
+// 高精度转低精度
+var f int = 1
+var g int64 = int64(f)
+var h int32 = int32(g)
+var i int16 = int16(h)
+var j int8 = int8(i)
+```
+
+### 浮点型
+
+| 类型    | 位数  | 取值范围 |
+|-------|-----|------|
+| float | 32/64  |      |
+
+```go
+var a float32 = 1.1
+var b float64 = 2.2
+```
+
+Go 中有个 big 包，可以用来处理大数，支持任意精度的运算。
+
+### 字符型
+
+| 类型    | 位数  | 取值范围 |
+|-------|-----|------|
+| byte | 8  |      |
+| rune | 32  |      |
+
+```go
+var a byte = 'a'
+var b rune = 'b'
+```
+这里的 `byte` 和 `rune` 都是别名，实际上是 `uint8` 和 `int32` 来存储的。
+
+### 布尔型
+
+| 类型    | 位数  | 取值范围 |
+|-------|-----|------|
+| bool | 1  |      |
+
+```go
+var a bool = true
+var b bool = false
+```
+
+### 字符串
+
+字符串是一串固定长度的字符连接起来的字符序列。
+
+```go
+var a string = "hello"
+var b string = "world"
+```
+
+### 复数
+
+| 类型    | 位数  | 取值范围 |
+|-------|-----|------|
+| complex64 | 64  |      |
+| complex128 | 128  |      |
+
+```go
+var a complex64 = 1 + 2i
+var b complex128 = 3 + 4i
+```
+
+## 指针
+
+指针是存储另一个变量的内存地址的变量。
+
+```go
+var a int = 1
+var b *int = &a
+```
+
+这里的 `*int` 表示指向 `int` 类型的指针，`&a` 表示变量 `a` 的内存地址。
+`&` 表示取地址符，`*` 表示取指针的值。
+
+一个例子：
+
+```go
+func increase(a *int) {
+    *a++
+}
+
+func main() {
+    var a int = 1
+    increase(&a)
+    fmt.Println(a) // 2
+}
+```
+## fmt 格式化字符
+
+| 格式化字符 | 含义 |
+| --- | --- |
+| %v | 值的默认格式 |
+| %+v | 类似 %v，但输出结构体时会添加字段名 |
+| %#v | 值的 Go 语法表示 |
+| %T | 值的类型的 Go 语法表示 |
+| %% | 百分号 |
+| %b | 二进制表示 |
+| %c | 相应 Unicode 码点所表示的字符 |
+| %d | 十进制表示 |
+| %o | 八进制表示 |
+| %q | 单引号围绕的字符字面值，由 Go 语法安全地转义 |
+| %x | 十六进制表示，字母形式为小写 a-f |
+| %X | 十六进制表示，字母形式为大写 A-F |
+| %U | Unicode 格式：U+1234，等同于 "U+%04X" |
+| %e | 科学计数法表示 |
+| %E | 科学计数法表示 |
+| %f | 浮点数表示 |
+| %F | 等价于 %f |
+| %g | 根据情况选择 %e 或 %f 以产生更紧凑的（无末尾的 0）输出 |
+| %G | 根据情况选择 %E 或 %F 以产生更紧凑的（无末尾的 0）输出 |
+| %s | 字符串表示 |
+
+## 运算符
+
+### 算术运算符
+
+| 运算符 | 含义 |
+| --- | --- |
+| + | 相加 |
+| - | 相减 |
+| * | 相乘 |
+| / | 相除 |
+| % | 求余 |
+
+### 关系运算符
+
+| 运算符 | 含义 |
+| --- | --- |
+| `==` | 相等 |
+| `!=` | 不等 |
+| `>` | 大于 |
+| `<` | 小于 |
+| `>=` | 大于等于 |
+| `<=` | 小于等于 |
+
+### 逻辑运算符
+
+| 运算符 | 含义 |
+| --- | --- |
+| `&&` | 逻辑与 |
+| `||` | 逻辑或 |
+| `!` | 逻辑非 |
+
+### 位运算符
+
+| 运算符 | 含义 |
+| --- | --- |
+| `&` | 按位与 |
+| `|` | 按位或 |
+| `^` | 按位异或 |
+| `<<` | 左移 |
+| `>>` | 右移 |
+
+### 赋值运算符
+
+| 运算符 | 含义 |
+| --- | --- |
+| `=` | 简单赋值 |
+| `+=` | 相加后赋值 |
+| `-=` | 相减后赋值 |
+| `*=` | 相乘后赋值 |
+| `/=` | 相除后赋值 |
+| `%=` | 求余后赋值 |
+| `<<=` | 左移后赋值 |
+| `>>=` | 右移后赋值 |
+| `&=` | 按位与后赋值 |
+| `\|=` | 按位或后赋值 |
+| `^=` | 按位异或后赋值 |
+
+### 其他运算符
+
+| 运算符 | 含义 |
+| --- | --- |
+| `&` | 取地址 |
+| `*` | 取指针的值 |
+| `++` | 自增 |
+| `--` | 自减 |
+| `.` | 结构体成员 |
+
+## 流程控制
+
+### if
+
+```go
+if 条件 {
+    // do something
+} else if 条件 {
+    // do something
+} else {
+    // do something
+}
+```
+
+### switch
+
+```go
+switch 变量 {
+case 值1:
+    // do something
+case 值2:
+    // do something
+default:
+    // do something
+}
+```
+
+注意，与其他语言不同，Go 中的 `switch` 语句不需要 `break`，一旦条件符合自动终止。
+
+但是如果需要继续执行下一个条件，可以使用 `fallthrough` 关键字。
+
+```go
+switch 变量 {
+case 值1:
+    // do something
+    fallthrough
+case 值2:
+    // do something
+default:
+    // do something
+}
+```
+
+### for
+
+Go 中只提供了 `for` 循环，没有 `while` 循环。
+
+但是提供了三种 `for` 循环的写法。
+
+#### 无限循环
+
+```go
+for {
+    // do something
+}
+```
+
+例如：
+
+```go
+for {
+    fmt.Println("Hello, World!")
+}
+```
+
+如果想要终止循环，可以使用 `break` 关键字。
+
+```go
+for {
+    fmt.Println("Hello, World!")
+    break
+}
+```
+
+#### 条件循环
+
+```go
+for 条件 {
+    // do something
+}
+```
+
+例如：
+
+```go
+var i int = 0
+
+for i < 10 {
+    fmt.Println(i)
+    i++
+}
+```
+
+#### 计数循环
+
+```go
+for 初始语句; 条件; 结束语句 {
+    // do something
+}
+```
+
+例如：
+
+```go
+for i := 0; i < 10; i++ {
+    fmt.Println(i)
+}
+```
+
+#### 循环中的控制语句
+
+`break`：终止循环。
+
+`continue`：跳过当前循环，继续下一次循环。
+
+```go
+for i := 0; i < 10; i++ {
+    if i == 5 {
+        continue
+    }
+    fmt.Println(i)
+}
+```
+
+表示当 `i` 等于 5 时，跳过当前循环，继续下一次循环。
+
+### label 与 goto
+
+Go 中可以使用 `label` 和 `goto` 来实现跳转。
+
+```go
+label:
+    // do something
+goto label
+```
+
+例如：
+
+```go
+var i int = 0
+
+label:
+    fmt.Println(i)
+    i++
+    if i < 10 {
+        goto label
+    }
+```
+表示当 `i` 小于 10 时，跳转到 `label` 标签处。
+
+## 函数
+
+### 基本格式
+
+Go 中的函数定义格式为：
+
+```go
+func 函数名(参数列表) (返回值列表) {
+    // do something
+}
+```
+
+例如：
+
+```go
+func add(a int, b int) int {
+    return a + b
+}
+```
+
+如果参数类型相同，可以简写为：
+
+```go
+func add(a, b int) int {
+    return a + b
+}
+
+func main() {
+    fmt.Println(add(1, 2))
+}
+```
+
+Go 支持多个返回值，例如：
+
+```go
+// 求和并求差
+func sumAndSub(a, b int) (int, int) {
+    return a + b, a - b
+}
+
+func main() {
+    sum, sub := sumAndSub(1, 2)
+    fmt.Println(sum, sub)
+}
+```
+和 JS 类似，我们可以通过声明变量的形式来声明函数：
+
+```go
+func main() {
+    add := func(a, b int) int {
+        return a + b
+    }
+    fmt.Println(add(1, 2))
+}
+```
+这个函数被称为匿名函数，因为没有函数名。
+
+### defer
+
+Go 中的 `defer` 关键字用于延迟执行函数。
+
+```go
+func main() {
+    defer fmt.Println("Hello, World!")
+    fmt.Println("Hello, Go!")
+}
+```
+
+输出结果：
+
+```bash
+Hello, Go!
+Hello, World!
+```
+
+`defer` 关键字会将函数推迟到外层函数返回之后执行。
+
+延迟函数的参数会被立即计算，但是不会被执行。
+
+```go
+func main() {
+    i := 0
+    defer fmt.Println(i)
+    i++
+}
+```
+
+输出结果：
+
+```bash
+0
+```
+
+而不是 1。
