@@ -28,6 +28,7 @@
     "type": "separator",
     "title": "后端"
   },
+  "golang": "Go",
   "nodejs": "Node.js",
   "express": "Express",
   "java": "Java"
