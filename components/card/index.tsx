@@ -7,6 +7,7 @@ import { Tooltip } from '@material-tailwind/react'
 export default function Card ({ item }: { item: NavItem }): JSX.Element {
   return (
     <Tooltip
+      placeholder={item.name}
       content={item.desc}
       animate={{
         mount: { scale: 1, y: 0 },
