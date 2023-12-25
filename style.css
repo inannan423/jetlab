@@ -91,10 +91,12 @@
     @apply flex flex-row flex-wrap justify-center items-center;
 }
 
-article > main > h2, article > main > h3, article > main > h4, article > main > h5, article > main > h6 {
-    color: #0086E6 !important;
-}
+/*article > main > h1, article > main > h2, article > main > h3, article > main > h4, article > main > h5, article > main > h6 {*/
+/*    color: #ffffff !important;*/
+/*}*/
 
-strong {
-    color: #0086E6 !important;
-}
+
+
+/*strong {*/
+/*    color: #0086E6 !important;*/
+/*}*/
