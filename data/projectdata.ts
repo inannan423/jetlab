@@ -6,7 +6,7 @@ export const Projects: Project[] = [
     desc: '基于 ChatGPT 的翻译界面',
     link: 'https://gpt-translate.netlify.app/',
     banner: '/projects/gpt.png',
-    username: 'gpt-translate',
+    username: 'inannan423',
     repo: 'gpt-translate'
   },
   {
