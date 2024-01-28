@@ -1,11 +1,5 @@
 {
   "index": "引入",
-  "-- algorithm": {
-    "type": "separator",
-    "title": "算法"
-  },
-  "gcd": "最大公约数",
-  "LIS": "最长递增子序列",
   "-- reference": {
     "type": "separator",
     "title": "速查"
@@ -15,13 +9,5 @@
   "redux": "Redux",
   "reactRouter": "React Router",
   "certbot": "Let's Encrypt",
-  "regex": "正则表达式",
-  "-- handwriting": {
-    "type": "separator",
-    "title": "手写代码"
-  },
-  "PromiseArray": "Promise Array",
-  "Filter": "filter",
-  "changethis": "call、apply、bind"
-
+  "regex": "正则表达式"
 }

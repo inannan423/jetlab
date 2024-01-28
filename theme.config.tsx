@@ -1,6 +1,7 @@
 import React from 'react'
 import { type DocsThemeConfig } from 'nextra-theme-docs'
 import Link from 'next/link'
+import { BiMeteor } from 'react-icons/bi'
 
 export const VercelLogo = (): JSX.Element => (
   <div>
@@ -20,28 +21,6 @@ export const VercelLogo = (): JSX.Element => (
       </svg>
     </Link>
   </div>
-)
-
-// #6DDBFC
-export const Logo = ({ height, color }: { height: number, color: string }): JSX.Element => (
-    <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width={height} height={height} viewBox="0 0 266 266" fill="none">
-        <defs>
-            <rect id="path_0" x="0" y="0" width="266" height="266" />
-        </defs>
-        <g opacity="1" transform="translate(0 0)  rotate(0 133 133)">
-            <mask id="bg-mask-0" fill="white">
-                <use xlinkHref="#path_0"></use>
-            </mask>
-            <g mask="url(#bg-mask-0)" >
-                <g opacity="1" transform="translate(22.166666666666664 21.8203125)  rotate(0 110.83333333333331 111.00651041666666)">
-                    <path id="路径 1" style={{ stroke: color, strokeWidth: '22.173333333333332', strokeOpacity: 1, strokeDasharray: '0 0' }} transform="translate(0 0)  rotate(0 105.9074074074074 108.34651041666667)" d="M149.63,216.47C149.63,216.47 77.58,222.01 38.79,177.68C0,133.35 0,0.35 0,0.35C0,0.35 133,-5.2 177.33,28.05C221.67,61.3 210.58,155.51 210.58,155.51 " />
-                    <path id="路径 2" style={{ stroke: color, strokeWidth: '22.173333333333332', strokeOpacity: 1, strokeDasharray: '0 0' }} transform="translate(66.5 50.22135416666666)  rotate(0 77.58333333333331 85.89583333333331)" d="M155.17,171.79C155.17,171.79 93.21,124.97 55.42,83.12C17.62,41.28 0,0 0,0 " />
-                    <path id="路径 3" style={{ stroke: color, strokeWidth: '22.173333333333332', strokeOpacity: 1, strokeDasharray: '0 0' }} transform="translate(121.91666666666666 61.3046875)  rotate(0 2.770833333333333 36.02083333333333)" d="M0,72.04L5.54,0 " />
-                    <path id="路径 4" style={{ stroke: color, strokeWidth: '22.173333333333332', strokeOpacity: 1, strokeDasharray: '0 0' }} transform="translate(66.5 127.8046875)  rotate(0 27.70833333333333 2.770833333333333)" d="M55.42,5.54L0,0 " />
-                </g>
-            </g>
-        </g>
-    </svg>
 )
 
 const config: DocsThemeConfig = {
@@ -64,7 +43,7 @@ const config: DocsThemeConfig = {
   //   </a>
   // },
   feedback: {
-    content: null
+    content: '有问题？提一个 issue'
   },
   sidebar: {
     titleComponent ({ title, type }) {
@@ -77,23 +56,24 @@ const config: DocsThemeConfig = {
     toggleButton: true
   },
   editLink: {
+    // 帮我在 GitHub 改进文章
     text: '帮我在 GitHub 改进文章'
   },
   primaryHue: { dark: 205, light: 205 },
-  logo: (<>
-      <Logo height={30} color={'#6DDBFC'} />
-      <div className={'ml-3 nx-font-mono text-2xl hover:underline hover:decoration-pink-500 transition-all ease'}>JetLab</div>
-  </>),
+  logo: (<div className={'hover:opacity-30 transition-all ease flex'}>
+      <BiMeteor className={'text-3xl text-red-500'} />
+      <div className={'ml-2 nx-font-mono text-2xl'}>JetLab</div>
+  </div>),
   useNextSeoProps () {
     return {
-      titleTemplate: ' %s | JetLab 🍃'
+      titleTemplate: ' %s - JetLab 🍃'
     }
   },
   footer: {
     text: <div className={'flex flex-col lg:flex-row w-full'}>
       <div className={'flex flex-col w-full justify-between'}>
         <div className={'flex h-max'}>
-          <Logo height={30} color={'green'} />
+          <BiMeteor className={'text-3xl text-red-500'} />
           <div className={'ml-3 font-bold nx-font-mono text-2xl hover:underline hover:decoration-pink-500 transition-all ease'}>JetLab</div>
         </div>
         <div className={'mt-3 font-sans font-thin'}>

@@ -17,6 +17,13 @@
     backdrop-opacity: 0.5;
 }
 
+.dark .forest-bg{
+    background-image: url("./public/forest-night.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    backdrop-opacity: 0.5;
+}
+
 .code-bg{
     background-image: url("./public/codes.png");
     background-repeat: no-repeat;

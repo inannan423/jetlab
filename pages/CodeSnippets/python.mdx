@@ -775,3 +775,49 @@ print(a & b)   # {4, 5}
 print(a - b)   # {1, 2, 3}
 print(a ^ b)   # {1, 2, 3, 6, 7, 8}
 ```
+
+## 异常处理
+
+### try-except
+
+```python
+try:
+    print(1 / 0)
+except:
+    print("Error")
+```
+
+### try-except-else
+
+```python
+try:
+    print(1 / 1)
+except:
+    print("Error")
+else:
+    print("No error")
+```
+
+### try-except-finally
+
+```python
+try:
+    print(1 / 0)
+except:
+    print("Error")
+finally:
+    print("Finally")
+```
+
+### try-except-else-finally
+
+```python
+try:
+    print(1 / 1)
+except:
+    print("Error")
+else:
+    print("No error")
+finally:
+    print("Finally")
+```
