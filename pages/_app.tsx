@@ -1,6 +1,6 @@
 import '../style.css'
 import React from 'react'
-import localFont from '@next/font/local'
+// import localFont from '@next/font/local'
 // Vercel Analytics Vercel 分析
 import { Analytics } from '@vercel/analytics/react'
 // const myFont = localFont({ src: './PingFangSC.ttf' })
