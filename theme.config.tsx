@@ -59,7 +59,7 @@ const config: DocsThemeConfig = {
     // 帮我在 GitHub 改进文章
     text: '帮我在 GitHub 改进文章'
   },
-  primaryHue: { dark: 205, light: 205 },
+  primaryHue: { dark: 353, light: 353 },
   logo: (<div className={'hover:opacity-30 transition-all ease flex'}>
       <BiMeteor className={'text-3xl text-red-500'} />
       <div className={'ml-2 nx-font-mono text-2xl'}>JetLab</div>
@@ -67,6 +67,15 @@ const config: DocsThemeConfig = {
   useNextSeoProps () {
     return {
       titleTemplate: ' %s - JetLab 🍃'
+    }
+  },
+  themeSwitch: {
+    useOptions () {
+      return {
+        light: 'Light',
+        dark: 'Dark',
+        system: 'System'
+      }
     }
   },
   footer: {

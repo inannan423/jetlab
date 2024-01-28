@@ -27,6 +27,8 @@
     "@material-tailwind/react": "^1.4.2",
     "@next/font": "^13.2.4",
     "@notionhq/client": "^2.2.3",
+    "@splinetool/react-spline": "^2.2.6",
+    "@splinetool/runtime": "^1.0.38",
     "@supabase/supabase-js": "^2.12.0",
     "@vercel/analytics": "^0.1.11",
     "class-variance-authority": "^0.4.0",
