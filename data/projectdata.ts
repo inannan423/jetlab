@@ -2,6 +2,14 @@ import { type Project } from '../types'
 
 export const Projects: Project[] = [
   {
+    name: 'GPT-Translate',
+    desc: '基于 ChatGPT 的翻译界面',
+    link: 'https://gpt-translate.netlify.app/',
+    banner: '/projects/gpt.png',
+    username: 'gpt-translate',
+    repo: 'gpt-translate'
+  },
+  {
     name: 'TriangleUI',
     desc: '直观的 React UI 框架，基于 TS + SCSS + Dumi，字节跳动青训营超级码力奖',
     link: 'https://triangle-ui.netlify.app/',
