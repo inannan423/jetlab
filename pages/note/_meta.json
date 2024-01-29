@@ -12,7 +12,7 @@
     "type": "separator",
     "title": "Deep Learning"
   },
-  "machineLearning": "机器学习",
+  "deepLearning": "深度学习",
   "-- FrameWork": {
     "type": "separator",
     "title": "框架"

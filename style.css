@@ -107,3 +107,11 @@
 /*strong {*/
 /*    color: #0086E6 !important;*/
 /*}*/
+
+
+.katex {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

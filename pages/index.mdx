@@ -30,14 +30,14 @@ export function Cloud () {
           gyroControls: false,
           minHeight: 300.00,
           minWidth: 200.00,
-          backgroundColor: theme === 'light' ? 0xffffff : 0x0,
-          skyColor: theme === 'light' ? 0xaad5e5 : 0x141718,
-          speed: theme === 'light' ? 1.5 : 2.2,
-          cloudColor: theme === 'light' ? 0xadc4de : 0x7b7b8e,
-          sunColor: theme === 'light' ? 0xff9c21 : 0x654826,
-          sunGlareColor: theme === 'light' ? 0xfce9e2 : 0xb38181,
-          sunlightColor: theme === 'light' ? 0xff9933 : 0x0,
-          cloudShadowColor: theme === 'light' ? 0x5682ac : 0x20282e,
+          backgroundColor: theme === 'dark' ? 0x0 : 0xffffff,
+          skyColor: theme === 'dark' ? 0x141718 : 0xaad5e5,
+          speed: theme === 'dark' ? 2.2 : 1.5,
+          cloudColor: theme === 'dark' ? 0x7b7b8e : 0xadc4de,
+          sunColor: theme === 'dark' ? 0x654826 : 0xff9c21,
+          sunGlareColor: theme === 'dark' ? 0xb38181 : 0xfce9e2,
+          sunlightColor: theme === 'dark' ? 0x0 : 0xff9933,
+          cloudShadowColor: theme === 'dark' ? 0x20282e : 0x5682ac,
           THREE
         })
       )
