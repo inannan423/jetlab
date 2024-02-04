@@ -1,4 +1,7 @@
 {
   "intro":"机器学习介绍",
-  "math": "数学基础"
+  "mlbasic": "Pytorch 基础",
+  "linearAlgebra": "线性代数",
+  "calculus": "微积分",
+  "linearRegression": "线性回归"
 }
