@@ -21,8 +21,16 @@ export default function App ({ Component, pageProps }): JSX.Element {
       }
     }
   }, [])
+
   return <main>
     <Component {...pageProps} />
     <Analytics />
+    <script type="text/javascript">
+      {`
+            window.AppcuesSettings = { enableURLDetection: true };
+      `}
+    </script>
+    <script src="//fast.appcues.com/207750.js">
+    </script>
   </main>
 }
