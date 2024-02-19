@@ -30,6 +30,14 @@ const config: DocsThemeConfig = {
             <meta property="og:title" content="JetLab" />
             <meta property="og:description" content="JetLab Personal Blog" />
             <link rel="icon" href="/leaves.svg" />
+            <script>
+                    {`
+              window.userpilotSettings = {
+              token: NX-06252909
+            };
+              `}
+            </script>
+            <script src="https://js.userpilot.io/sdk/latest.js" ></script>
         </>
   ),
   project: {
