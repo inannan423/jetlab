@@ -38,6 +38,28 @@ const config: DocsThemeConfig = {
               `}
             </script>
             <script src="https://js.userpilot.io/sdk/latest.js" ></script>
+          <script>
+            {
+              `
+                userpilot.identify(
+            "UNIQUE USER ID", // Used to identify users
+            {
+              //name: "John Doe", // Full name 
+              //email: "customer@example.com", // Email address 
+              //created_at: '2019-10-17', // ISO8601 Date
+              company: {
+              id: "UNIQUE COMPANY ID", // Required, used to identify the company
+              //name: "Acme Labs",
+              //created_at: '2019-10-17' // ISO8601 Date
+            },
+              // Additional properties 
+              // projectId: "1",
+              // trialEnds: '2019-10-31' // ISO8601 Date
+            }
+            );
+              `
+            }
+          </script>
         </>
   ),
   project: {
