@@ -32,9 +32,9 @@ const config: DocsThemeConfig = {
             <link rel="icon" href="/leaves.svg" />
             <script>
                     {`
-              window.userpilotSettings = {
-              token: NX-06252909
-            };
+                    window.userpilotSettings = {
+                    token: 'NX-06252909'
+                  };
               `}
             </script>
             <script src="https://js.userpilot.io/sdk/latest.js" ></script>
