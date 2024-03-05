@@ -26,7 +26,7 @@ export default function App ({ Component, pageProps }): JSX.Element {
 
   React.useEffect(() => {
     console.log('Userpilot initialized')
-    Userpilot.initialize('NX-06252909')
+    Userpilot.initialize('NX-ecc6c81c')
 
     Userpilot.identify(
       'user-id-123', // Replace with your unique identifier for the user
