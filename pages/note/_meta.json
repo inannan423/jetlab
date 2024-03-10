@@ -12,7 +12,8 @@
     "type": "separator",
     "title": "Deep Learning"
   },
-  "deepLearning": "深度学习入门",
+  "ml&dl": "机器学习与深度学习导论",
+  "deepLearning": "深度学习",
   "-- FrameWork": {
     "type": "separator",
     "title": "框架"
