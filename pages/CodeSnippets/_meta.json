@@ -5,9 +5,12 @@
     "title": "速查"
   },
   "python": "Python",
+  "certbot": "Let's Encrypt",
+  "ubuntu": "Ubuntu And Linux",
+  "nginx": "Nginx",
+  "pm2": "PM2",
   "prisma": "Prisma",
   "redux": "Redux",
   "reactRouter": "React Router",
-  "certbot": "Let's Encrypt",
   "regex": "正则表达式"
 }
