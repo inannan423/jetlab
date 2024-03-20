@@ -1,6 +1,6 @@
 import Marquee from 'react-fast-marquee'
 import React from 'react'
-import { Tooltip } from '@material-tailwind/react'
+// import { Tooltip } from '@material-tailwind/react'
 
 export interface TechStacks {
   name: string
@@ -31,18 +31,18 @@ export function Stacks ({ stacks, direction }: { stacks: TechStacks[], direction
         <div className={'grid grid-flow-col auto-cols-max'}>
           {stacks.map((stack, index) => (
             <div key={index} className={'flex items-center mx-6'}>
-              <Tooltip
-                placeholder={stack.name}
-                content={stack.name}
-                animate={{
-                  mount: { scale: 1, y: 0 },
-                  unmount: { scale: 0, y: 25 }
-                }}
-                className={'bg-gray-100 text-black dark:bg-gray-800 dark:text-white'}
-              >
-                <img src={stack.img} className={'w-20 h-20 mr-2 opacity-30 cursor-pointer hover:opacity-60 transition-all ease-in-out duration-700'} alt={stack.name} />
-                {/* <div className={'text-sm'}>{stack.name}</div> */}
-              </Tooltip>
+              {/* <Tooltip */}
+              {/*   placeholder={stack.name} */}
+              {/*   content={stack.name} */}
+              {/*   animate={{ */}
+              {/*     mount: { scale: 1, y: 0 }, */}
+              {/*     unmount: { scale: 0, y: 25 } */}
+              {/*   }} */}
+              {/*   className={'bg-gray-100 text-black dark:bg-gray-800 dark:text-white'} */}
+              {/* > */}
+              {/*   <img src={stack.img} className={'w-20 h-20 mr-2 opacity-30 cursor-pointer hover:opacity-60 transition-all ease-in-out duration-700'} alt={stack.name} /> */}
+              {/*   /!* <div className={'text-sm'}>{stack.name}</div> *!/ */}
+              {/* </Tooltip> */}
             </div>
           ))}
         </div>
