@@ -6,15 +6,15 @@ import { Tooltip } from '@material-tailwind/react'
 // 卡片，用于展示友链、项目等
 export default function Card ({ item }: { item: NavItem }): JSX.Element {
   return (
-    <Tooltip
-      placeholder={item.name}
-      content={item.desc}
-      animate={{
-        mount: { scale: 1, y: 0 },
-        unmount: { scale: 0, y: 25 }
-      }}
-      className={'bg-gray-100 text-black dark:bg-gray-800 dark:text-white'}
-    >
+  // <Tooltip
+  //   placeholder={item.name}
+  //   content={item.desc}
+  //   animate={{
+  //     mount: { scale: 1, y: 0 },
+  //     unmount: { scale: 0, y: 25 }
+  //   }}
+  //   className={'bg-gray-100 text-black dark:bg-gray-800 dark:text-white'}
+  // >
       <Link href={item.link} target={'_blank'} className={`w-full h-24 my-1 mr-1 bg-gray-100 dark:bg-gray-900 hover:bg-gray-50 hover:dark:bg-gray-800 rounded-md flex ${item.type === 'friend' ? 'flex-row items-center' : 'flex-col'}  py-2 px-3 transition-all ease duration-700 cursor-pointer`}>
         <div>
           {item.type === 'friend' && (
@@ -33,6 +33,6 @@ export default function Card ({ item }: { item: NavItem }): JSX.Element {
           </div>
         </div>
       </Link>
-    </Tooltip>
+  // </Tooltip>
   )
 }
