@@ -115,3 +115,13 @@
     justify-content: center;
     align-items: center;
 }
+
+p::selection {
+    background: #fad3d3;
+}
+/*p::-moz-selection {*/
+/*    background:#fad3d3;*/
+/*}*/
+/*p::-webkit-selection {*/
+/*    background:#fad3d3;*/
+/*}*/
