@@ -6,6 +6,10 @@ import { Analytics } from '@vercel/analytics/react'
 import { Userpilot } from 'userpilot'
 // Initialize Userpilot with your API key
 // const myFont = localFont({ src: './PingFangSC.ttf' })
+import { Noto_Sans_SC } from 'next/font/google'
+
+// If loading a variable font, you don't need to specify the font weight
+const font = Noto_Sans_SC({ weight: '400', subsets: ['latin'] })
 
 export default function App ({ Component, pageProps }): JSX.Element {
   React.useEffect(() => {
@@ -38,7 +42,7 @@ export default function App ({ Component, pageProps }): JSX.Element {
     )
   }, [])
 
-  return <main>
+  return <main className={font.className}>
     <Component {...pageProps} />
     <Analytics />
   </main>
