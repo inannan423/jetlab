@@ -119,9 +119,73 @@
 p::selection {
     background: #fad3d3;
 }
-/*p::-moz-selection {*/
-/*    background:#fad3d3;*/
-/*}*/
-/*p::-webkit-selection {*/
-/*    background:#fad3d3;*/
-/*}*/
+
+h1::selection {
+    background: #fad3d3;
+}
+
+h2::selection {
+    background: #fad3d3;
+}
+
+h3::selection {
+    background: #fad3d3;
+}
+
+h4::selection {
+    background: #fad3d3;
+}
+
+h5::selection {
+    background: #fad3d3;
+}
+
+h6::selection {
+    background: #fad3d3;
+}
+
+a::selection {
+    background: #fad3d3;
+}
+
+code::selection {
+    background: #fad3d3;
+}
+
+pre::selection {
+    background: #fad3d3;
+}
+
+blockquote::selection {
+    background: #fad3d3;
+}
+
+ul::selection {
+    background: #fad3d3;
+}
+
+ol::selection {
+    background: #fad3d3;
+}
+
+li::selection {
+    background: #fad3d3;
+}
+
+table::selection {
+    background: #fad3d3;
+}
+
+th::selection {
+    background: #fad3d3;
+}
+
+td::selection {
+    background: #fad3d3;
+}
+
+tr::selection {
+    background: #fad3d3;
+}
+
+
