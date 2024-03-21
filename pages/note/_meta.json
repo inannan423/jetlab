@@ -4,7 +4,6 @@
     "type": "separator",
     "title": "基础"
   },
-  "typescript": "TypeScript",
   "network": "网络",
   "dataStructure": "数据结构与算法",
   "github": "Git & GitHub",
@@ -14,18 +13,20 @@
   },
   "ml&dl": "机器学习与深度学习导论",
   "deepLearning": "深度学习",
+  "-- Backend": {
+    "type": "separator",
+    "title": "语言"
+  },
+  "golang": "Go",
+  "typescript": "TypeScript",
+  "python": "Python",
+  "java": "Java",
   "-- FrameWork": {
     "type": "separator",
     "title": "框架"
   },
   "learnreact": "React",
   "minpro": "微信小程序",
-  "-- Backend": {
-    "type": "separator",
-    "title": "后端"
-  },
-  "golang": "Go",
   "nodejs": "Node.js",
-  "express": "Express",
-  "java": "Java"
+  "express": "Express"
 }
