@@ -117,75 +117,75 @@
 }
 
 p::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 h1::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 h2::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 h3::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 h4::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 h5::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 h6::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 a::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 code::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 pre::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 blockquote::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 ul::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 ol::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 li::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 table::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 th::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 td::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 tr::selection {
-    background: #fad3d3;
+    background: rgba(250, 211, 211, 0.6);
 }
 
 

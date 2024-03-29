@@ -41,6 +41,7 @@
     "got": "^12.6.0",
     "lottie-react": "^2.4.0",
     "lucide-react": "^0.127.0",
+    "mixpanel-browser": "^2.49.0",
     "next": "^13.0.6",
     "next-fonts": "^1.5.1",
     "next-mdx-remote": "^4.4.1",
@@ -68,6 +69,7 @@
     "vestor": "^1.1.1"
   },
   "devDependencies": {
+    "@types/mixpanel-browser": "^2.49.0",
     "@types/node": "18.11.10",
     "@types/p5": "^1.7.6",
     "@typescript-eslint/eslint-plugin": "^5.43.0",

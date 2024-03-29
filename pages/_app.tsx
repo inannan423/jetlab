@@ -3,10 +3,10 @@ import React from 'react'
 // import localFont from '@next/font/local'
 // Vercel Analytics Vercel 分析
 import { Analytics } from '@vercel/analytics/react'
-import { Userpilot } from 'userpilot'
 // Initialize Userpilot with your API key
 // const myFont = localFont({ src: './PingFangSC.ttf' })
 import { Noto_Sans_SC } from 'next/font/google'
+import mixpanel from 'mixpanel-browser'
 
 // If loading a variable font, you don't need to specify the font weight
 const font = Noto_Sans_SC({ weight: '400', subsets: ['latin'] })
@@ -29,17 +29,9 @@ export default function App ({ Component, pageProps }): JSX.Element {
   }, [])
 
   React.useEffect(() => {
-    console.log('Userpilot initialized')
-    Userpilot.initialize('NX-ecc6c81c')
-
-    Userpilot.identify(
-      'user-id-123', // Replace with your unique identifier for the user
-      {
-        name: 'John Doe',
-        email: 'jetzihan@outlook.com',
-        created_at: '2023-08-01'
-      }
-    )
+    mixpanel.init(
+      process.env.NEXT_PUBLIC_MIXPANEL_PROJECT_TOKEN as string,
+      { track_pageview: true })
   }, [])
 
   return <main className={font.className}>
