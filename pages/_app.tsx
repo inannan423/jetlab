@@ -32,7 +32,7 @@ export default function App ({ Component, pageProps }): JSX.Element {
     console.log('mixpanel.init')
     mixpanel.init(
       process.env.NEXT_PUBLIC_MIXPANEL_PROJECT_TOKEN as string,
-      { track_pageview: true })
+      { track_pageview: 'full-url' })
   }, [])
 
   return <main className={font.className}>
