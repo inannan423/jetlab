@@ -29,15 +29,75 @@ sudo snap install core; sudo snap refresh core
 sudo snap install --classic certbot
 ```
 
+## 配置 Nginx
+
+先为服务配置 80 端口的访问。
+
+```bash
+server {
+    listen 80;
+
+    server_name example.com www.example.com; #你的域名
+
+    location / {
+        proxy_set_header HOST $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_pass http://127.0.0.1:1000/; #你的服务地址
+    }
+}
+```
+
 ## 执行签发证书命令
 
 ```bash
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 sudo certbot --nginx
 ```
-执行完毕后，Certbot 会自动配置 Nginx，添加 HTTPS 相关的配置。
+执行完毕后，Certbot 会询问你的邮箱地址以及需要签发证书的域名，按照提示操作即可。
 
-## 开启自动续订
+操作完成后，Certbot 会自动为你的 Nginx 配置文件添加 HTTPS 配置。结果应该类似于下面的配置。
+
+```bash
+server {
+
+    server_name example.com www.example.com;
+
+    client_max_body_size 1024m;
+
+    location / {
+        proxy_set_header HOST $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_pass http://127.0.0.1:1000/;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/www.example.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/www.example.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = www.example.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen 80;
+
+    server_name example.com www.example.com;
+    return 404; # managed by Certbot
+}
+```
+
+## 检查自动续订
+
+Certbot 会自动为你的证书设置自动续订，可以通过下面的命令来检查。
 
 ```bash
 sudo certbot renew --dry-run
