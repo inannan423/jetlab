@@ -1,4 +1,4 @@
-# Go 基础
+# Go 语法基础
 
 ## 环境搭建
 
@@ -12,6 +12,116 @@
 $ go version
 go version go1.15.6 darwin/amd64
 ```
+
+## 环境变量
+
+Go 语言中环境变量主要有两个：
+
+- `GOROOT`：Go 语言的安装目录。`GOROOT/src` 目录下的函数都可以被导入和使用。例如 `fmt.Println`。
+- `GOPATH`：除了 Go 语言的安装目录外的源码目录，同样可以调用目录下的函数。
+
+可以使用 `go env` 查看环境变量。
+
+```bash
+$ go env GOROOT
+/usr/local/go
+$ go env GOPATH
+/Users/username/go
+```
+
+可以使用 `export` 命令设置环境变量。
+
+```bash
+$ export GOROOT=/usr/local/go
+$ export GOPATH=/Users/username/go
+```
+
+## IDE
+
+通常使用 GoLand 进行开发。下载地址：[GoLand](https://www.jetbrains.com/go/)
+
+## Go 的跨平台
+
+Java 一直遵循一次编译，到处运行的原则，虽然 Go 不是一次编译，到处运行的语言，但是能做到**一次编写，到处运行**。这是因为 Go 不像 Java 拥有自己的虚拟机，Go 语言的编译器会将 Go 代码编译成机器码，然后直接运行在操作系统上。虽然牺牲了一定的便利性，但是保障了性能。
+
+Go 语言会区分运行程序的操作系统，主要通过**操作系统**和**CPU 架构**来区分。
+
+```bash
+$ go env GOOS
+windows
+$ go env GOARCH
+amd64
+```
+
+常见的 Goos 和 Goarch 如下：
+
+| GOOS | GOARCH | 说明 |
+| --- | --- | --- |
+| darwin | amd64 | Mac OS |
+| linux | amd64 | Linux |
+| windows | amd64 | Windows |
+
+可以使用 `go tool dist list` 查看所有支持的操作系统和 CPU 架构。
+
+```bash
+$ go tool dist list
+```
+
+我们无需进行任何显式的操作，Go 语言会自动识别当前的操作系统和 CPU 架构，然后编译成对应的可执行文件。
+
+不过当我们尝试在 MacOS 上编译 Windows 的可执行文件时，需要进行一些额外的操作。
+
+```bash
+$ export GOOS=windows GOARCH=amd64
+$ go build hello.go
+```
+
+如果要恢复原来的运行状态，需要对这两个变量进行清空。
+
+```bash
+$ export GOOS= GOARCH=
+```
+
+## 编译执行过程
+
+我们通过 `go help build` 查看编译命令的帮助信息。
+
+```bash
+$ go help build
+- a
+    force rebuilding of packages that are already up-to-date.
+- n
+    print the commands but do not run them.
+...
+```
+
+有三个值得我们关注的参数：
+
+- `-n`：打印编译的详细过程，但不执行。相当于预览。
+- `-x`：打印编译的详细过程，并执行。
+- `--work`：打印编译的详细过程，并且保留生成的中间文件和目录，方便我们进行调试。
+
+```bash
+$ go build -x hello.go
+WORK=/var/folders/28/1z5z1j7d7zq7z1z7z1z7z1z7z1z7z1z/T/go-build1234567890
+mkdir -p $WORK/b001/
+cat >$WORK/b001/_gomod_.go << 'EOF' # internal
+packagefile command-line-arguments=/Users/username/Libraries/Caches/go-build/12/34567890abcdefg
+packagefile fmt=/usr/local/go/src/fmt.a
+packagefile runtime=/usr/local/go/src/runtime.a
+...
+...
+...
+packagefile runtime=/usr/local/go/src/path.a
+modinfo "0w\xaf\x1f\x.."
+EOF
+mkdir -p $WORK/b001/exe/
+cd .
+/usr/local/go/pkg/tool/darwin_amd64/compile -o $WORK/b001/exe/hello -trimpath $WORK -p main -complete -buildid 1234567890abcdefg -D _/Users/username/Libraries/Caches/go-build -I $WORK/b001 -pack ./hello.go
+/usr/local/go/pkg/tool/darwin_amd64/link -o $WORK/b001/exe/a.out -L $WORK/b001 -extld=clang -buildmode=exe -buildid=1234567890abcdefg $WORK/b001/exe/hello
+mv $WORK/b001/exe/a.out hello
+```
+
 ## Go Modules
 
 ### Hello World
@@ -47,6 +157,13 @@ func main() {
 $ go run hello.go
 Hello, World!
 ```
+
+### Main 函数
+
+Go 程序的入口是 `main` 函数。
+
+Go 程序执行时，将先从 fmt 包中导入 `Println` 函数以及其他的函数，并在 main 函数中调用。
+
 ### 编译
 
 ```bash
@@ -90,6 +207,12 @@ Hello, World!
 ```
 
 或者可以用 `go run .` 来执行当前目录下的所有文件。
+
+import { Callout } from 'nextra/components'
+
+<Callout emoji="👾">
+  注意，这里的 `import "fmt"` 用于导入其他包，`fmt` 并不是包名，而是一个相对路径，意即扫描目录下的所有代码。
+</Callout>
 
 ### 不同包下的函数调用
 
@@ -172,12 +295,16 @@ a = 1
 b = "hello"
 c = true
 var d int = 2
+// Go 具有类型推导，可以不指定类型
+var d = 2 // int
 var e string = "world"
 var f bool = false
 // 类型推导
 var g = 3 // int
 // 简短声明
 h:= 4 // int
+// 避免对已声明的变量进行重复声明
+h:= 5 // 报错
 ```
 输出结果：
 
@@ -187,6 +314,36 @@ fmt.Print("d=%v, e=%v, f=%v\n", d, e, f)
 fmt.Print("g=%v, h=%v\n", g, h)
 ```
 此处使用了 `fmt.Print` 函数，`%v` 为占位符，表示输出变量的值。
+
+当然，可以同时声明多个变量：
+
+```go
+var a, b, c int
+a, b, c = 1, 2, 3
+var d, e, f int = 4, 5, 6
+var g, h, i = 7, 8, 9
+j, k, l := 10, 11, 12
+```
+
+对于不同类型的变量必须要分开声明，但是 var 关键字可以共享。
+
+```go
+var (
+    a int = 1
+    b string = "hello"
+    c bool = true
+)
+```
+
+在 Go 中，一个变量只进行了声明而没有赋值，那么它的值就是该类型的零值。以下是 Go 中的一些零值：
+
+- 整型的零值是 0
+- 浮点型的零值是 0.0
+- 布尔型的零值是 false
+- 字符串的零值是 ""
+- 数组的零值是一个全是零值的数组
+- 接口（interface）、切片（slice）、通道（channel）、字典（map）、指针（pointer）、函数（func）的零值是 nil（空指针）
+- 结构体的零值是每个字段都是零值
 
 ### 常量（Constant）
 
@@ -228,9 +385,91 @@ const (
 
 `iota` 是一个特殊的常量，它的值默认为 0，每次使用后自动加 1。第一行使用后，后面行可以省略 `iota`。
 
+`iota` **计数不会中断**：
+
+```go
+const (
+    a = iota  // 0
+    b // 1
+    c = 100 // 100
+    d = iota // 3
+    e // 4
+)
+```
+
+但是如果在中断后不再使用 `iota`，则会重新计数：
+
+```go
+const (
+    a = iota  // 0
+    b // 1
+    c = 100 // 100
+    d // 100， 未显式赋值，将使用最近的赋值
+    e = 200 // 200
+    f // 200
+)
+```
+
+`iota` 需要谨慎使用，因为如果插入一个值将会产生骨牌效应，例如数据库中一张表使用枚举值表示状态，如果插入一个状态，将会导致后面的状态值全部改变，这将与之前的业务表达不符。例如：
+
+```go
+cosnt {
+    INIT = iota
+    START
+    STOP
+    PAUSE
+    FINISH
+}
+```
+
+在数据库中，上述的状态值分别对应 0、1、2、3、4。当某天程序员需要在 `START` 和 `STOP` 之间插入一个状态，例如为 `RUNNING`，那么 `STOP` 的值将变为 3，`PAUSE` 的值将变为 4，`FINISH` 的值将变为 5。这将导致数据库中的状态值全部改变，这是不可接受的。
+
+最佳使用 `iota` 的场景是在枚举类型中，例如：
+
+```go
+const (
+    MONDAY = iota
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
+)
+```
+
+但是如果我们希望从 1 开始计数，可以使用占位符 `_`：
+
+```go
+const (
+    _ = iota
+    MONDAY
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
+)
+```
+
+当然也可以使用 `iota+1`：
+
+```go
+const (
+    MONDAY = iota + 1
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
+)
+```
+
 ### 全局变量/常量
 
-变量通常的作用域为当前代码块，如果想要在整个包中使用，可以使用全局变量。
+变量通常的作用域为当前代码块，如果想要在整个包中使用，可以使用全局变量。全局变量和函数具有相同的作用域。
 
 全局变量的声明格式为：
 
@@ -265,6 +504,23 @@ func main() {
     fmt.Println(note.Note)
 }
 ```
+
+### 没有多余的局部变量
+
+Go 语言中，如果声明了一个局部变量，但是没有使用，编译器会报错。
+
+```go
+func main() {
+    var a int
+}
+```
+
+这里声明了一个变量 `a`，但是没有使用，编译器会报错。这是因为 Go 力求保持代码整洁。
+
+全局变量不会出现这种情况，未使用的全局变量不会报错。
+
+常量也可以不使用，不会报错。这是因为常量在编译器就已经决定，导致的副作用较小。
+
 ## 基本数据类型
 
 Go 中，所有的值类型变量常量都会在声明时被分配空间并赋予默认值。
@@ -739,3 +995,53 @@ func main() {
 ```
 
 而不是 1。
+
+## 命令行参数的接收
+
+Go 中可以通过 `os` 包来接收命令行参数。
+
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+)
+
+func main() {
+    for i, arg := range os.Args {
+        fmt.Printf("arg[%d]: %s\n", i, arg)
+    }
+}
+```
+
+执行 `go run main.go hello world`，可以看到输出结果：
+
+```bash
+arg[0]: /var/folders/28/1z5z1j7d7zq7z1z7z1z7z1z7z1z7z1z/T/go-build1234567890/b001/exe/main
+arg[1]: hello
+arg[2]: world
+```
+
+这是顺序获得命令行参数的方法，实际上还能通过参数名来获取参数。
+
+```go
+package main
+
+import (
+    "flag"
+    "fmt"
+)
+
+func main() {
+    var name = flag.String("name", "everyone", "The greeting object.") // 参数名，默认值，参数说明
+    flag.Parse()  // 解析参数
+    fmt.Println("Hello, ", *name) // *name 表示获取 name 的值, 如果直接使用 name 会输出指针地址
+}
+```
+
+执行 `go run main.go -name=world`，可以看到输出结果：
+
+```bash
+Hello, world
+```
