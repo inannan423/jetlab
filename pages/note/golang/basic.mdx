@@ -530,6 +530,8 @@ Byte：字节，计算机中基本的存储单位，1 Byte = 8 bit。
 
 ### 整型
 
+整型分为有符号整型和无符号整型。有符号整型包括 int8、int16、int32、int64 和 int。无符号整型包括 uint8、uint16、uint32、uint64 和 uint。
+
 | 类型     | 位数    | 取值范围                                       |
 |--------|-------|--------------------------------------------|
 | int8   | 8     | -128 ~ 127                                 |
@@ -542,6 +544,12 @@ Byte：字节，计算机中基本的存储单位，1 Byte = 8 bit。
 | uint64 | 64    | 0 ~ 18446744073709551615                   |
 | int    | 32/64 | 与操作系统有关，根据操作系统的位数决定                        |
 | uint   | 32/64 | 与操作系统有关                                    |
+
+<Callout emoji="👾">
+  为什么有了这么多版本的 int 和 unit 之后，还要设计单独的 int 和 unit 类型呢？
+  - 能够避免选择，程序员通常并不关注数据长度的具体大小，如果 32 或者 64 都可以满足需求，那么就可以使用 int 或者 unit。
+  - 提升效率。CPU 按照自己的字长（word size）的整数倍来处理数据肯定是效率最高的，所以 int 和 unit 会根据 CPU 的字长来选择 32 或者 64 以提升效率。
+</Callout>
 
 ```go
 var a int8 = 1
@@ -578,16 +586,57 @@ var j int8 = int8(i)
 
 ### 浮点型
 
-| 类型    | 位数  | 取值范围 |
-|-------|-----|------|
-| float | 32/64  |      |
+浮点型分为单精度浮点型和双精度浮点型。单精度浮点型为 float32，双精度浮点型为 float64。
+
+| 类型    | 位数  |
+|-------|-----|
+| float32 | 32 |
+| float64 | 64 |
 
 ```go
 var a float32 = 1.1
 var b float64 = 2.2
 ```
 
-Go 中有个 big 包，可以用来处理大数，支持任意精度的运算。
+**浮点型将导致精度丢失**
+
+> 在计算机中，整数是能够准确表达的，因为十进制整数转化为二进制是因为所有的整数的基石 1 是能够通过二进制准确表达的，**但是浮点数的小数部分利用 2 的幂次方来表示**，例如 2 的 -1 次方表示 0.5，2 的 -2 次方表示 0.25，但是 0.1 无法通过有限的二进制数来准确表示，这就导致了浮点数的精度丢失。
+
+浮点数在计算机中表示示意如下：
+
+- IEEE 32
+
+| 符号位 | 指数位 | 尾数位 |
+|------|------|------|
+| 1bit | 8bit | 23bit |
+
+- IEEE 64
+
+| 符号位 | 指数位 | 尾数位 |
+|------|------|------|
+| 1bit | 11bit | 52bit |
+
+不同于 Int 和 Uint 类型，Go 语言中没有 float 关键字来声明 32 位的浮点数或者与平台匹配的浮点数，只有 float32 和 float64。这可能是因为浮点数并不能准确表达一个数字，所以在这里程序员需要关注精度，所以需要明确声明。
+
+由于精度缺失，浮点数不能使用 `==` `>` `<` 来比较，而应使用 big 包中的函数。
+
+```go
+import "math/big"
+
+func main() {
+    a := 3.14
+    b := 3.14
+    result := big.NewFloat(a).Cmp(big.NewFloat(b))
+
+    if result == 0 {
+        fmt.Println("a == b")
+    } else if result == 1 {
+        fmt.Println("a > b")
+    } else {
+        fmt.Println("a < b")
+    }
+}
+```
 
 ### 字符型
 
@@ -599,14 +648,20 @@ Go 中有个 big 包，可以用来处理大数，支持任意精度的运算。
 ```go
 var a byte = 'a'
 var b rune = 'b'
+// 格式化打印字符
+fmt.Printf("%c\n", a)
+// 直接打印字符
+fmt.Println(b)
+// 强制转换为字符串
+fmt.Println(string(a))
 ```
 这里的 `byte` 和 `rune` 都是别名，实际上是 `uint8` 和 `int32` 来存储的。
 
 ### 布尔型
 
-| 类型    | 位数  | 取值范围 |
-|-------|-----|------|
-| bool | 1  |      |
+| 类型 | 位数 |
+|-------|-----|
+| bool | 1 |
 
 ```go
 var a bool = true
@@ -622,6 +677,68 @@ var a string = "hello"
 var b string = "world"
 ```
 
+字符串在内存中存储时，实际上是一个字节数组 `[]byte`，每个字符占用一个字节。字符串的长度是字符的个数，而不是字节数。
+
+字符串的长度可以通过 `len` 函数获取，但是其用于获得变量的实际的存储空间，即底层字节数组的长度。
+
+```go
+package main
+
+import {
+  "fmt"
+}
+
+func main{
+  s:= "字符串"
+
+  len:= len(s)
+  fmt.Println(len) // 9
+
+  for i:= 0; i < len; i++ {
+    fmt.Printf("%c\n", s[i])
+  }
+}
+```
+执行结果：
+
+```bash
+9
+E5 AD 97 E7 AC A6 E4 B8 B2
+```
+
+在这里打印的“字符串”的长度为 9，这对应每个汉字使用 3 个字节来存储。打印出来的内容也不是字符本身，而是字符的 UTF-8 编码。
+
+### rune 类型
+
+如果我们希望以自然语言的视角来处理字符串，我们需要使用 `rune` 类型。
+
+```go
+package main
+
+import {
+  "fmt"
+}
+
+func main{
+  s:= "字符串"
+
+  fmt.Println(utf8.RuneCountInString(s)) // 3
+
+  for _, r:= range s {
+      fmt.Printf("%T, %X\n", r, r)
+  }
+}
+```
+
+打印结果：
+
+```bash
+3
+int32, 5B57
+int32, 7B26
+int32, 4E32
+```
+
 ### 复数
 
 | 类型    | 位数  | 取值范围 |
@@ -632,6 +749,148 @@ var b string = "world"
 ```go
 var a complex64 = 1 + 2i
 var b complex128 = 3 + 4i
+```
+
+### 辨认数据类型
+
+Go 语言中可以使用 `reflect` 包来辨认数据类型。
+
+```go
+import "reflect"
+
+func main() {
+    var a int = 1
+    var b string = "hello"
+    var c bool = true
+    var d float32 = 1.1
+    var e float64 = 2.2
+    var f byte = 'a'
+    var g rune = 'b'
+    var h complex64 = 1 + 2i
+    var i complex128 = 3 + 4i
+
+    fmt.Println(reflect.TypeOf(a))
+    fmt.Println(reflect.TypeOf(b))
+    fmt.Println(reflect.TypeOf(c))
+    fmt.Println(reflect.TypeOf(d))
+    fmt.Println(reflect.TypeOf(e))
+    fmt.Println(reflect.TypeOf(f))
+    fmt.Println(reflect.TypeOf(g))
+    fmt.Println(reflect.TypeOf(h))
+    fmt.Println(reflect.TypeOf(i))
+}
+```
+
+## 数组
+
+数组是一种数据结构，用于存储固定长度的相同类型的元素。
+
+### 数组的声明
+
+Go 语言中数组的声明格式为：
+
+```go
+var 数组名 [数组长度]数组类型
+```
+
+示例如下：
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    a := [3]int{1, 2, 3}
+    // 或
+    var b [3]int
+    b = [3]int{4, 5, 6}
+    // 或
+    var c [3]int = [3]int{7, 8, 9}
+}
+```
+
+### 访问数组
+
+数组的访问方式为 `数组名[索引]`。
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    a := [3]int{1, 2, 3}
+    fmt.Println(a[0]) // 1
+    fmt.Println(a[1]) // 2
+    fmt.Println(a[2]) // 3
+}
+```
+
+### 数组传入函数
+
+数组作为参数传入函数时，会传入数组的副本，而不是数组的指针。
+
+```go
+package main
+
+import "fmt"
+
+func modify(a [3]int) {
+    a[0] = 4
+    fmt.Println(a) // [4 2 3]
+}
+
+func main() {
+    a := [3]int{1, 2, 3}
+    modify(a)
+    fmt.Println(a) // [1 2 3]
+}
+```
+
+**这表明，数组作为参数传入函数时，数组将被全量复制，而不是传入原数组的指针**。
+
+### 数组无法改变大小
+
+Go 语言中的数组是固定长度的，无法改变大小。这是因为数组在内存中是连续存储的，如果改变大小，将会导致内存的重新分配，这将导致性能问题。
+
+### 修改数组的值
+
+数组的值可以通过索引来修改。
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    a := [3]int{1, 2, 3}
+    a[0] = 4
+    fmt.Println(a) // [4 2 3]
+}
+```
+
+## 原义字符
+
+类似于 JS 中的模板字符串，Go 语言中也有原义字符。
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    a := `"hello
+    world"`
+    fmt.Println(a)
+}
+```
+
+输出结果：
+
+```bash
+"hello
+    world"
 ```
 
 ## 指针
