@@ -1,0 +1,94 @@
+# 函数
+
+## 基本格式
+
+Go 中的函数定义格式为：
+
+```go
+func 函数名(参数列表) (返回值列表) {
+    // do something
+}
+```
+
+例如：
+
+```go
+func add(a int, b int) int {
+    return a + b
+}
+```
+
+如果参数类型相同，可以简写为：
+
+```go
+func add(a, b int) int {
+    return a + b
+}
+
+func main() {
+    fmt.Println(add(1, 2))
+}
+```
+
+Go 支持多个返回值，例如：
+
+```go
+// 求和并求差
+func sumAndSub(a, b int) (int, int) {
+    return a + b, a - b
+}
+
+func main() {
+    sum, sub := sumAndSub(1, 2)
+    fmt.Println(sum, sub)
+}
+```
+和 JS 类似，我们可以通过声明变量的形式来声明函数：
+
+```go
+func main() {
+    add := func(a, b int) int {
+        return a + b
+    }
+    fmt.Println(add(1, 2))
+}
+```
+这个函数被称为匿名函数，因为没有函数名。
+
+## defer
+
+Go 中的 `defer` 关键字用于延迟执行函数。
+
+```go
+func main() {
+    defer fmt.Println("Hello, World!")
+    fmt.Println("Hello, Go!")
+}
+```
+
+输出结果：
+
+```bash
+Hello, Go!
+Hello, World!
+```
+
+`defer` 关键字会将函数推迟到外层函数返回之后执行。
+
+延迟函数的参数会被立即计算，但是不会被执行。
+
+```go
+func main() {
+    i := 0
+    defer fmt.Println(i)
+    i++
+}
+```
+
+输出结果：
+
+```bash
+0
+```
+
+而不是 1。

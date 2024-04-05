@@ -1,0 +1,171 @@
+# Map
+
+Map（映射）是一种键值对的数据结构，和切片中的有序存储不同，Map是无序的。Map 的主要优势在于能够通过 key 快速检索到对应的 value。
+
+## 声明和创建
+
+- 通过 var 声明一个 map
+
+```go
+var mapName map[keyType]valueType
+```
+
+`keyType` 是键的类型，`valueType` 是值的类型。
+
+- 通过 make 创建一个 map
+
+```go
+mapName := make(map[keyType]valueType)
+```
+
+## 元素的添加
+
+```go
+mapName[key] = value
+```
+
+如：
+
+```go
+var m map[string]int
+
+m["one"] = 1
+m["two"] = 2
+```
+
+## 元素的遍历
+
+```go
+for key, value := range mapName {
+    fmt.Println(key, value)
+}
+```
+
+## 元素查找
+
+若元素存在，则返回对应的值，否则返回零值。
+
+```go
+charCountMap := make(map[string]int)
+
+charCountMap["a"] = 1
+charCountMap["b"] = 2
+
+fmt.Println(charCountMap["a"]) // 1
+fmt.Println(charCountMap["c"]) // 0
+```
+
+但是返回 0 值就出现了问题，因为 0 有可能是元素的值。为了区分元素是否存在，可以使用多返回值的方式：
+
+```go
+value, ok := charCountMap["c"]
+
+if ok {
+    fmt.Println(value)
+} else {
+    fmt.Println("key not found")
+}
+```
+
+## 元素的删除
+
+```go
+delete(mapName, key)
+```
+
+该函数不会返回任何与执行结果相关的信息，如果 key 不存在，也不会抛出异常。
+
+## 存储结构\*
+
+### hmap
+
+Map 的查找效率非常高。Map 的数据结构主要采用 hmap 结构，其中 hmap 结构体定义如下：
+
+```go
+type hmap struct {
+    count int // 元素个数
+    flags uint8
+    B     uint8 // 桶的数量，意味着有 2^B 个桶
+    noverflow uint16  // 溢出桶的数量
+    hash0 uint32  // 随机数种子
+
+    buckets    unsafe.Pointer // Map 底层是一个桶的数组，buckets 指向第一个桶的指针
+    oldbuckets unsafe.Pointer // 扩容时，buckets 指向旧的桶数组
+    nevacuate  uintptr // 扩容时，已经迁移的桶的数量(迁移进度)
+    extra      *mapextra
+}
+```
+
+分区、分桶操作往往出现于数据库设计和变成语言中，本质上都是对 Key 进行哈希运算，然后将哈希值映射到不同的桶中（运算获得桶号）。
+
+以 B=4 为例，会产生 16 个桶。一个 key 值将先进行 hash 运算，然后对获得 hash 值取前 B 位，得到的结果就是桶号。
+
+### 桶
+
+桶在 Go 语言中主要使用 `bmap` 结构体表示，定义如下：
+
+```go
+type bmap struct {
+    tophash [bucketCnt]uint8
+}
+```
+
+在编译期，bmap 会被追加字段：
+
+```go
+type bmap struct {
+    tophash [bucketCnt]uint8
+    // 以下字段在编译期追加
+    // keys    [8]keytype
+    // values  [8]valuetype
+    // overflow *[]*bmap
+    // pad     uintptr
+}
+```
+
+一个桶的示意如下：
+
+```
+        +----------------------------+
+tophash |64|15|17|135|156|171|201|138|
+        +----------------------------+
+        |            key0            |
+        +----------------------------+
+        |            key1            |
+        +----------------------------+
+        |            key2            |
+        +----------------------------+
+        |            ....            |
+        +----------------------------+
+        |            key7            |
+        +----------------------------+
+        |           value0           |
+        +----------------------------+
+        |           ......           |
+        +----------------------------+
+        |           value7           |
+        +----------------------------+
+overflow|             nil            |
+        +----------------------------+
+```
+
+而在一个 hmap 中将包含多个桶。
+
+### 元素定位
+
+例如 key 为 "key1" ，假设获得的哈希值为：
+
+```
+00001111 | 0000111101101100100011110010100100010010110010101010 | 0000
+```
+若 B=4 ，则低 4 位（末尾4位）为桶号，即 0000 为桶号，对应的桶为第 0 个桶。
+
+接着取高 8 位 00001111 作为 tophash 的索引，即 `tophash[15]`，若 `tophash[15]` 为 0，则表示桶中没有元素，否则表示桶中有元素。
+
+在上面桶的示意中，索引为 1.
+
+接着计算 `keys[1]` 的内存地址，为 `bmap[0] + 8 + len(key_slot) * 1`，即为 `bmap[0] + 8 + 16 * 1`。
+
+`len(key_slot)` 表示一个 key 所占用的空间。
+
+计算出 `keys[1]` 的值后，与输入的 key 进行比较，若相等，则返回对应的 value。
