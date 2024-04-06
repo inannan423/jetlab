@@ -122,7 +122,7 @@ cd .
 mv $WORK/b001/exe/a.out hello
 ```
 
-## Go Modules
+## 快速开始
 
 ### Hello World
 
@@ -175,70 +175,6 @@ Hello, World!
 
 在 Windows 系统下，会生成一个 `hello.exe` 文件，然后执行该文件。
 
-### 同一包下不同文件中的函数调用
-
-在同一包下的不同文件中，可以直接调用其他文件中的函数：
-
-```go
-// /demo/main.go
-package main
-
-import "fmt"
-
-func main() {
-    printHello()
-}
-
-// /demo/hello.go
-package main
-
-import "fmt"
-
-func printHello() {
-    fmt.Println("Hello, World!")
-}
-```
-
-执行 `go run demo`，可以看到输出结果：
-
-```bash
-$ go run demo
-Hello, World!
-```
-
-或者可以用 `go run .` 来执行当前目录下的所有文件。
-
-import { Callout } from 'nextra/components'
-
-<Callout emoji="👾">
-  注意，这里的 `import "fmt"` 用于导入其他包，`fmt` 并不是包名，而是一个相对路径，意即扫描目录下的所有代码。
-</Callout>
-
-### 不同包下的函数调用
-
-在不同包下的文件中，需要通过 `import` 导入其他包，然后通过 `包名.函数名` 的方式调用其他包中的函数：
-
-```go
-// demo/note/note.go
-package note
-
-import "fmt"
-
-func PrintHello() {
-    fmt.Println("Hello, World!")
-}
-```
-
-```go
-// demo/main.go
-package main
-
-import "demo/note"
-
-func main() {
-    note.PrintHello()
-}
-```
 ## 注释和转义符
 
 ### 注释

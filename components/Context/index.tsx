@@ -8,6 +8,9 @@ export default function Context ({ json, title }: {
   title: string
 }): JSX.Element {
   const res = generateContext(json, title)
+
+  console.log(res)
+
   return (
     <div className={'w-full flex flex-col'}>
       {

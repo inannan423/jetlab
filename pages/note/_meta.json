@@ -5,7 +5,6 @@
     "title": "基础"
   },
   "network": "网络",
-  "dataStructure": "数据结构与算法",
   "github": "Git & GitHub",
   "-- Advanced": {
     "type": "separator",

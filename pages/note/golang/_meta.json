@@ -1,11 +1,13 @@
 {
-  "intro": "Intro",
+  "intro": "引入",
   "basic": "基础",
   "variable": "变量和数据类型",
   "array": "数组和指针",
   "slice": "切片",
   "map": "Map",
-  "function": "函数",
+  "channel": "通道",
+  "struct": "结构体",
   "flow": "流程控制",
-  "channel": "通道"
+  "module&package": "模块和包",
+  "function": "函数"
 }

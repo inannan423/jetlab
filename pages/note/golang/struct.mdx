@@ -1,0 +1,89 @@
+# 结构体
+
+Go 中的 slice、map 和 channel 等复杂数据类型都有对应的结构体类型，这些结构体类型是 Go 语言内建的类型，可以直接使用。同时我们也可以使用 struct 关键字来定义自己的结构体类型。
+
+## 自定义数据类型
+
+Go 语言中可以使用 type 关键字来定义自定义数据类型。
+
+```go
+type newType existType
+```
+
+新的类型 newType 将继承已存在的类型 existType 的数据结构，同时适用于 existType 的函数也将适用于 newType。但是方法不会继承。
+
+## 结构体的创建
+
+```go
+type newType struct {
+    field1 type1
+    field2 type2
+    ...
+}
+```
+
+例如创建一个 Person 结构体：
+
+```go
+type Person struct {
+    name string
+    age int
+}
+```
+
+这让我们想到了 C 语言中的结构体。
+
+```c
+struct Person {
+    char name[20];
+    int age;
+};
+```
+
+以及 TypeScript 中的接口。
+
+```typescript
+type Person {
+    name: string;
+    age: number;
+}
+```
+
+## 使用结构体
+
+```go
+package main
+
+import "fmt"
+
+type Person struct {
+    Name string
+    Age int
+}
+
+func main() {
+    var p1 = Person{
+        Name: "张三",
+        Age: 18,
+    }
+    fmt.Println(p1)
+}
+```
+
+或者初始时不进行赋值，使用默认值。
+
+```go
+var p1 = Person{}
+p1.Name = "张三"
+p1.Age = 18
+```
+
+可以使用 new 关键字创建一个结构体实例，返回的是一个指向结构体的指针。
+
+```go
+var p2 = new(Person)
+```
+
+## 权限控制
+
+Go 语言中，结构体的字段名首字母的大小写决定了该字段的访问权限。小写的字段名表示私有字段，只能在定义该结构体的包中访问，在其让包中无法访问。
