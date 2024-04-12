@@ -9,5 +9,6 @@
   "struct": "结构体",
   "flow": "流程控制",
   "module&package": "模块和包",
-  "function": "函数"
+  "function": "函数",
+  "error": "异常处理"
 }
