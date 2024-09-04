@@ -10,5 +10,6 @@
   "flow": "流程控制",
   "module&package": "模块和包",
   "function": "函数",
-  "error": "异常处理"
+  "error": "异常处理",
+  "objectOriented": "面向对象"
 }

@@ -4,6 +4,7 @@
     "type": "separator",
     "title": "速查"
   },
+  "deepLearning": "深度学习",
   "python": "Python",
   "certbot": "Let's Encrypt",
   "ubuntu": "Ubuntu And Linux",

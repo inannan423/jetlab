@@ -109,12 +109,12 @@
 /*}*/
 
 
-.katex {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+/*.katex {*/
+/*    width: 100%;*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*    align-items: center;*/
+/*}*/
 
 p::selection {
     background: rgba(250, 211, 211, 0.6);
