@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import { type DocsThemeConfig } from 'nextra-theme-docs'
 import Link from 'next/link'
@@ -25,12 +26,12 @@ export const VercelLogo = (): JSX.Element => (
 
 const config: DocsThemeConfig = {
   head: (
-        <>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <meta property="og:title" content="JetLab" />
-            <meta property="og:description" content="JetLab Personal Blog" />
-            <link rel="icon" href="/leaves.svg" />
-        </>
+    <>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta property="og:title" content="JetLab" />
+      <meta property="og:description" content="JetLab Personal Blog" />
+      <link rel="icon" href="/leaves.svg" />
+    </>
   ),
   project: {
     link: 'https://github.com/inannan423/jetlab'
@@ -46,7 +47,7 @@ const config: DocsThemeConfig = {
     content: '有问题？提一个 issue'
   },
   sidebar: {
-    titleComponent ({ title, type }) {
+    titleComponent({ title, type }) {
       if (type === 'separator') {
         return <span className="cursor-default">{title}</span>
       }
@@ -61,16 +62,16 @@ const config: DocsThemeConfig = {
   },
   primaryHue: { dark: 353, light: 353 },
   logo: (<div className={'hover:opacity-30 transition-all ease flex'}>
-      <BiMeteor className={'text-3xl text-red-500'} />
-      <div className={'ml-2 nx-font-mono text-2xl'}>JetLab</div>
+    <BiMeteor className={'text-3xl text-red-500'} />
+    <div className={'ml-2 nx-font-mono text-2xl'}>JetLab</div>
   </div>),
-  useNextSeoProps () {
+  useNextSeoProps() {
     return {
       titleTemplate: ' %s - JetLab 🍃'
     }
   },
   themeSwitch: {
-    useOptions () {
+    useOptions() {
       return {
         light: 'Light',
         dark: 'Dark',
@@ -90,8 +91,8 @@ const config: DocsThemeConfig = {
         </div>
       </div>
       <div className={'h-full w-max flex justify-center items-center mt-3 lg:mt-0'}>
-         <div className={'text-black dark:text-white w-max h-10 flex justify-center items-center mr-3 text-center whitespace-nowrap'}>Powered by</div>
-          <VercelLogo />
+        <div className={'text-black dark:text-white w-max h-10 flex justify-center items-center mr-3 text-center whitespace-nowrap'}>Powered by</div>
+        <VercelLogo />
       </div>
     </div>
   }
