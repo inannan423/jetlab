@@ -29,12 +29,13 @@ module.exports = {
     indent: 'off',
     '@typescript-eslint/prefer-nullish-coalescing': 'off',
     'react/prop-types': 'off',
-  //   @typescript-eslint/prefer-ts-expect-error
+    //   @typescript-eslint/prefer-ts-expect-error
     '@typescript-eslint/prefer-ts-expect-error': 'off',
-  //   react/no-children-prop
+    //   react/no-children-prop
     'react/no-children-prop': 'off',
-  //   @typescript-eslint/ban-ts-comment
-    '@typescript-eslint/ban-ts-comment': 'off'
+    //   @typescript-eslint/ban-ts-comment
+    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/space-before-function-paren': 'off'
   },
   settings: {
     'mdx/code-blocks': false,
