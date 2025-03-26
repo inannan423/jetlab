@@ -11,7 +11,7 @@ import mixpanel from 'mixpanel-browser'
 // If loading a variable font, you don't need to specify the font weight
 const font = Noto_Sans_SC({ weight: '400', subsets: ['latin'] })
 
-export default function App ({ Component, pageProps }): JSX.Element {
+export default function App({ Component, pageProps }): React.ReactElement {
   React.useEffect(() => {
     const threeScript = document.createElement('script')
     threeScript.setAttribute('id', 'threeScript')

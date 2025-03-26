@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import smoothscroll from 'smoothscroll-polyfill'
 
-export function Top (): JSX.Element {
+export function Top(): React.ReactElement {
   useEffect(() => {
     smoothscroll.polyfill()
   }, [])
@@ -16,9 +16,9 @@ export function Top (): JSX.Element {
   return (
     <div
       onClick={
-          () => {
-            scrollToAnchor('content-start')
-          }
+        () => {
+          scrollToAnchor('content-start')
+        }
       }
       className={'h-12 w-12 bg-gray-100 dark:bg-gray-800 fixed bottom-14 right-3 cursor-pointer rounded-full flex justify-center items-center border-orange-300 border-2'}>
       ↑

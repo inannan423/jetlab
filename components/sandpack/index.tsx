@@ -7,7 +7,7 @@ const App = ({
   files
 }: {
   files: any
-}): JSX.Element => {
+}): React.ReactElement => {
 
   return (
     <Sandpack

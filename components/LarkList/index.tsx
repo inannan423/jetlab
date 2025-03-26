@@ -4,14 +4,14 @@ import Lottie from 'lottie-react'
 import { FiArrowLeft, FiArrowRight, FiFileText, FiList, FiLayout, FiMap } from 'react-icons/fi'
 import Link from 'next/link'
 
-const LarkDocType = ({ type }: { type: string }): JSX.Element => {
-  const Icon = (type): JSX.Element => {
+const LarkDocType = ({ type }: { type: string }): React.ReactElement => {
+  const Icon = (type): React.ReactElement => {
     type = type.type
     if (type === 'docx') {
       return (
-          <div className={'flex h-max justify-center items-center gap-1 text-sm'}>
-            <FiFileText /> 文档
-          </div>
+        <div className={'flex h-max justify-center items-center gap-1 text-sm'}>
+          <FiFileText /> 文档
+        </div>
       )
     } else if (type === 'mindnote') {
       return (
@@ -40,13 +40,13 @@ const LarkDocType = ({ type }: { type: string }): JSX.Element => {
     }
   }
   return (
-        <div>
-          <Icon type={type} />
-        </div>
+    <div>
+      <Icon type={type} />
+    </div>
   )
 }
 
-export default function LarkList (): JSX.Element {
+export default function LarkList(): React.ReactElement {
 
   const [fetched, setFetched] = useState(false)
 
@@ -96,7 +96,7 @@ export default function LarkList (): JSX.Element {
                 >
                   <h1
                     className={'pt-5 text-2xl font-sans lg:text-2xl h-max font-bold w-full truncate cursor-pointer hover:opacity-60 transition-all ease-in-out duration-700'}
-                    // style={{ textUnderlineOffset: '6px' }}
+                  // style={{ textUnderlineOffset: '6px' }}
                   >
                     {post.title}
                   </h1>
@@ -127,7 +127,7 @@ export default function LarkList (): JSX.Element {
                 }
               }}
             >
-              <FiArrowLeft/>
+              <FiArrowLeft />
             </button>
             <div>
               {/* eslint-disable-next-line */}
@@ -146,7 +146,7 @@ export default function LarkList (): JSX.Element {
                 }
               }}
             >
-              <FiArrowRight/>
+              <FiArrowRight />
             </button>
           </div>
         </div>

@@ -7,7 +7,7 @@ export interface TechStacks {
   img: string
 }
 
-// const HoverTip = (item: TechStacks): JSX.Element => {
+// const HoverTip = (item: TechStacks): React.ReactElement => {
 //   const [showTip, setShowTip] = useState(false)
 //
 //   return (
@@ -25,27 +25,27 @@ export interface TechStacks {
 //   )
 // }
 
-export function Stacks ({ stacks, direction }: { stacks: TechStacks[], direction: 'left' | 'right' }): JSX.Element {
+export function Stacks({ stacks, direction }: { stacks: TechStacks[], direction: 'left' | 'right' }): React.ReactElement {
   return (
     <Marquee gradient={false} speed={50} direction={direction}>
-        <div className={'grid grid-flow-col auto-cols-max'}>
-          {stacks.map((stack, index) => (
-            <div key={index} className={'flex items-center mx-6'}>
-              {/* <Tooltip */}
-              {/*   placeholder={stack.name} */}
-              {/*   content={stack.name} */}
-              {/*   animate={{ */}
-              {/*     mount: { scale: 1, y: 0 }, */}
-              {/*     unmount: { scale: 0, y: 25 } */}
-              {/*   }} */}
-              {/*   className={'bg-gray-100 text-black dark:bg-gray-800 dark:text-white'} */}
-              {/* > */}
-              {/*   <img src={stack.img} className={'w-20 h-20 mr-2 opacity-30 cursor-pointer hover:opacity-60 transition-all ease-in-out duration-700'} alt={stack.name} /> */}
-              {/*   /!* <div className={'text-sm'}>{stack.name}</div> *!/ */}
-              {/* </Tooltip> */}
-            </div>
-          ))}
-        </div>
+      <div className={'grid grid-flow-col auto-cols-max'}>
+        {stacks.map((stack, index) => (
+          <div key={index} className={'flex items-center mx-6'}>
+            {/* <Tooltip */}
+            {/*   placeholder={stack.name} */}
+            {/*   content={stack.name} */}
+            {/*   animate={{ */}
+            {/*     mount: { scale: 1, y: 0 }, */}
+            {/*     unmount: { scale: 0, y: 25 } */}
+            {/*   }} */}
+            {/*   className={'bg-gray-100 text-black dark:bg-gray-800 dark:text-white'} */}
+            {/* > */}
+            {/*   <img src={stack.img} className={'w-20 h-20 mr-2 opacity-30 cursor-pointer hover:opacity-60 transition-all ease-in-out duration-700'} alt={stack.name} /> */}
+            {/*   /!* <div className={'text-sm'}>{stack.name}</div> *!/ */}
+            {/* </Tooltip> */}
+          </div>
+        ))}
+      </div>
     </Marquee>
   )
 }

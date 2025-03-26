@@ -4,7 +4,7 @@ import { type DocsThemeConfig } from 'nextra-theme-docs'
 import Link from 'next/link'
 import { BiMeteor } from 'react-icons/bi'
 
-export const VercelLogo = (): JSX.Element => (
+export const VercelLogo = (): React.ReactElement => (
   <div>
     <Link
       className="flex items-center gap-1 text-current"

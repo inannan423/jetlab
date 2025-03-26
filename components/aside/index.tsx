@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { type NavCatagory } from '../../types'
 import smoothscroll from 'smoothscroll-polyfill'
 
-export function Aside ({ data }: { data: NavCatagory[] }): JSX.Element {
+export function Aside({ data }: { data: NavCatagory[] }): React.ReactElement {
   useEffect(() => {
     smoothscroll.polyfill()
   }, [])

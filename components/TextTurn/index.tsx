@@ -31,7 +31,7 @@ const Projects: Project[] = [
 
 const INTERVAL = 3000
 
-export default function TextTurn (): JSX.Element {
+export default function TextTurn(): React.ReactElement {
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
@@ -43,25 +43,25 @@ export default function TextTurn (): JSX.Element {
 
   return (
     <div className="flex items-start justify-start w-max text-start">
-        {
-          Projects.map((item, i) => (
-            <div
-              key={i}
-              className={'flex flex-col items-start justify-start text-start'}
-            >
-              {(index === i) && (
-                <div key={i}>
-                  <div className={`animate-in fade-in-20 zoom-in text-3xl lg:text-6xl ${item.color} opacity-90 font-mono font-bold`}>
-                    {item.name}
-                  </div>
-                  <div className={'animate-in text-black fade-in-20 opacity-30 hover:opacity-60 mt-3'}>
-                    {item.description}
-                  </div>
+      {
+        Projects.map((item, i) => (
+          <div
+            key={i}
+            className={'flex flex-col items-start justify-start text-start'}
+          >
+            {(index === i) && (
+              <div key={i}>
+                <div className={`animate-in fade-in-20 zoom-in text-3xl lg:text-6xl ${item.color} opacity-90 font-mono font-bold`}>
+                  {item.name}
                 </div>
-              )}
-            </div>
-          ))
-        }
+                <div className={'animate-in text-black fade-in-20 opacity-30 hover:opacity-60 mt-3'}>
+                  {item.description}
+                </div>
+              </div>
+            )}
+          </div>
+        ))
+      }
     </div>
   )
 }
