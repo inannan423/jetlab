@@ -34,17 +34,5 @@
       "breadcrumb": false,
       "layout": "full"
     }
-  },
-  "nav": {
-    "title": "Navs",
-    "type": "page",
-    "theme": {
-      "sidebar": false,
-      "toc": false,
-      "footer": true,
-      "pagination": true,
-      "breadcrumb": false,
-      "layout": "full"
-    }
   }
 }

@@ -586,3 +586,23 @@ a \equiv b
 ```
 
 输出结果为：$a \equiv b$
+
+### 导数
+
+prime 是 prime derivative 的缩写。
+
+```latex
+f'(x)
+```
+
+输出结果为：$f'(x)$
+
+### 偏导数
+
+partial 是 partial derivative 的缩写。
+
+```latex
+\frac{\partial f}{\partial x}
+```
+
+输出结果为：$\frac{\partial f}{\partial x}$

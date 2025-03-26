@@ -4,15 +4,11 @@
     "type": "separator",
     "title": "速查"
   },
-  "deepLearning": "深度学习",
   "python": "Python",
   "latex": "LaTeX 公式",
   "certbot": "Let's Encrypt",
   "ubuntu": "Ubuntu And Linux",
   "nginx": "Nginx",
   "pm2": "PM2",
-  "prisma": "Prisma",
-  "redux": "Redux",
-  "reactRouter": "React Router",
   "regex": "正则表达式"
 }

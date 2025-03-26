@@ -3,10 +3,10 @@ import { generateContext } from '../../utils'
 import React from 'react'
 import Link from 'next/link'
 
-export default function Context ({ json, title }: {
+export default function Context({ json, title }: {
   json: string
   title: string
-}): JSX.Element {
+}): React.ReactElement {
   const res = generateContext(json, title)
 
   console.log(res)
