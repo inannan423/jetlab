@@ -1,0 +1,1692 @@
+---
+title: 微信小程序开发指南
+date: "2022-07-02"
+description: 微信小程序是微信推出的一种新的应用形态，它是一个轻量级的应用，可以在微信中直接使用，无需下载安装。
+published: true
+tags: ["小程序", "微信小程序", "Frontend"]
+---
+
+## 介绍
+
+### 知识储备
+
+ 你需要具备的基础能力
+这不是0基础教程，你需要首先具备html、css和一些JavaScript知识
+ 
+
+### 小程序是什么
+
+微信是中国使用量最大的手机 App 之一，市场极大。2017年，微信正式推出了小程序，允许外部开发者在微信内部运行自己的代码，开展业务，截止2020年6月，小程序数量已经超过了550万个。 
+小程序可以视为**只能用微信打开和浏览的*网站***。 小程序和网页的技术架构是几乎一样的，用到的 JavaScript脚本语言和 CSS 样式表也是一样的，只是网页的 HTML 标签被稍微修改成了 WXML 标签。所以，小程序页面**本质上就是网页**。
+
+### 小程序和h5的区别
+
+​网页开发**渲染线程和脚本线程**是互斥的，这也是为什么长时间的脚本运行可能会导致页面失去响应，而在小程序中，二者是分开的，分别运行在不同的线程中。网页开发者可以使用到各种浏览器暴露出来的 `DOM API`，进行 DOM 选中和操作。而如上文所述，小程序的逻辑层和渲染层是分开的，逻辑层运行在 JSCore 中，并没有一个完整浏览器对象，因而缺少相关的DOM API和BOM API。这一区别导致了前端开发非常熟悉的一些库，例如 jQuery、 Zepto 等，在小程序中是无法运行的。同时 JSCore 的环境同 NodeJS 环境也是不尽相同，所以一些 NPM 的包在小程序中也是无法运行的。 
+ 
+总结来说，小程序和WEB开发在语言上相通，但是内核不相通。
+ 
+
+### 注册微信小程序
+
+前往[微信公众平台](https://mp.weixin.qq.com/)，注册小程序。 
+点击“小程序”进入注册。 
+![1654647638272.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h30ixlbx1vj31h60r1av6.jpg) 
+填写一个尚未在公众平台注册过的邮箱，完成如下设置后，点击注册。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h30iy6ykd8j31b40obwid.jpg) 
+此时，腾讯会给你的这个邮箱发一条验证码，点击链接验证即可。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h30izq1uw9j312f0hfq4n.jpg) 
+填写主体信息，选择“个人”。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h30j2ycznij30zm0lxadh.jpg) 
+填写管理员信息，进行身份验证（很快！） 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h30j3outvej30fq09j0te.jpg) 
+您也可以[用已经存在的公众号注册小程序](https://zhuanlan.zhihu.com/p/67229997) 
+*完成注册后，进入管理界面。*
+点击设置，拉到最下边，获取AppID（重要）并记录下来。 
+![1654648210458.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h30j7xbqs2j31hc0oaafy.jpg) 
+![1654648266364.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h30j8g0vtsj31eu0k2wgn.jpg) 
+在基本设置中完善小程序信息，类别随意选择。 
+ caution
+您不需要进行微信验证，这是花钱的。是商业性App需要的东西。 
+ 
+
+进入[微信开发工具下载界面](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)下载微信开发工具。选择Stable版即可。 
+*不出意外的话，您的电脑应该是64位*。 
+ 🔔
+建议不要安装在C盘。
+ 
+安装完成后，打开。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h30je6f15rj30rh0kzafp.jpg) 
+
+### 添加开发者
+
+在微信小程序管理平台上，选择添加协同开发者。 
+![1656488604399.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5qqeux5j31h20riguk.jpg) 
+为所有人添加权限。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5sw3josj31au0mvq5e.jpg) 
+
+### 创建小程序
+
+如图，打开微信开发者工具，新建一个小程序，确定好小程序的工程名、路径，填写刚刚记录下来的AppID，后端服务不用管，一般刚注册时是没有云开发的。选择下面的空白模板。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p6ne0hkxj30rb0km7a5.jpg) 
+注意，一定要使用空白模板！ 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pdh1cqthj30r40k9whv.jpg) 
+如下，工程就建立好了： 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p3zrm789j31hc0scdr7.jpg) 
+
+### 小程序的结构
+
+小程序包含一个描述整体程序的 app 和多个描述各自页面的 page。 
+一个小程序**主体部分**由三个文件组成，必须放在项目的根目录，如下： 
+
+app.js : 小程序逻辑 
+app.json : 小程序公共配置 
+app.wxss : 小程序公共样式表，所有的页面都要遵循这个里面的css配置 
+
+***
+一个小程序页面由四个文件组成，分别是： 
+
+js :页面逻辑 
+wxml :页面结构 
+json :页面配置 
+wxss :页面样式表 
+
+### 微信开发IDE界面
+
+![1656486090139.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p4jlnkf2j31h80senon.jpg)
+
+### Hello World
+
+#### 新建页面
+
+下面将通过实际操作，帮助你写一个Hello World Demo！ 
+先在Pages文件夹上右键-新建文件夹。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p480hqofj30w70h4431.jpg) 
+然后在这个文件夹上新建页面，命名为Hello World。 
+![1656485390575.jpg](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p472wwimj30ye0gmjyp.jpg) 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p48w6k4sj30tu0feadv.jpg) 
+如此，系统就自动生成了一个页面的四个必须文件。 
+![1656485523918.jpg](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p49eu3kbj30cl03zmxr.jpg) 
+***
+
+#### 将页面设置为主页
+
+找到app.json。 
+![1656485625116.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p4b4rnooj31h00nzx4h.jpg) 
+app.json的pages配置项集合的第一条就是默认的主页。 
+我们把刚刚自动生成的helloworld页面配置移到最前面。 
+![1656485765307.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p4dht0lqj30yy0ej16y.jpg) 
+注意，配置项的最后一条末尾必须**没有**逗号。 
+按住ctrl+s，保存工程，自动编译，左边的模拟器就会将刚刚设置的页面渲染出来。 
+
+#### 编写wxml代码
+
+删掉原有的代码。将右边的编辑区清空。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p4n35pj2j31fj0oxwop.jpg) 
+让我们把原有的**div**想象成**view**，编写下面的嵌套盒子。 
+
+```html
+<view>
+ <p>Hello World!</p>
+</view>
+```
+
+Ctrl+s保存，在左边的渲染器中可以看到新写的代码。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p4pksg94j318w0icq9m.jpg) 
+
+***
+
+#### 编写wxss代码
+
+简单的代码wxml代码似乎有点空洞，那我们开始写css（wxss）吧！ 
+修改wxml代码，为盒子添加class类。 
+
+```html
+<view class="text_box">
+ <p class="p1">Hello World!</p>
+</view>
+```
+
+打开helloworld.wxss文件，编写样式代码。 
+
+```css
+.text_box{
+ width: 100%;
+ height: 300rpx;
+ display: flex;
+ justify-content: center;
+ margin-top: 100rpx;
+}
+.p1{
+ font-size: 70rpx;
+ color: aqua;
+}
+```
+
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p4vnvdo3j312r0fe46m.jpg) 
+保存文件之后左边的模拟器刷新渲染，可以看到新的样式。
+
+ caution 注意单位rpx
+为了更好的适配不同的屏幕大小，所以小程序使用相对单位 `rpx` ，小程序的屏幕宽固定为750rpx（即750个物理像素），在所有设备上都是如此，无论在iPhone13pro上还是iPhone 13 Mini上都是如此。1rpx=（screenWidth / 750）px，其中**screenWidth**为手机屏幕的实际的宽度（单位px），例如iphone6的screenWidth=375px，则在iphone6中1rpx=0.5px。在后面的开发中，请**广泛使用rpx**。
+ 
+
+到这里，准备操作就做完了。
+
+
+​在上一章中，我们开始了一个Hello World项目。你可能留意到了这个项目里边生成了不同类型的文件: 
+
+- json 后缀的 JSON 配置文件 
+- wxml 后缀的 WXML 模板文件 
+- wxss 后缀的 WXSS 样式文件 
+- js 后缀的 JS 脚本逻辑文件 
+接下来我们分别看看这4种文件的作用。 
+
+## 小程序文件类型
+
+### JSON
+
+**Json**全称**J**ava**S**cript **O**bject **N**otation(JavaScript对象表示法)。 
+JSON 是一种数据格式，并不是编程语言，在小程序中，JSON扮演的静态配置的角色。
+
+我们可以看到在项目的根目录有一个 app.json 和 project.config.json，此外在 pages/logs 目录下还有一个 logs.json，我们依次来说明一下它们的用途。 
+
+#### Json语法
+
+JSON文件都是被包裹在一个大括号中 `{}`，通过 `key-value` 的方式来表达数据。JSON的 Key 必须包裹在一个双引号中，在实践中，编写 JSON 的时候，忘了给 Key 值加双引号或者是把双引号写成单引号是常见错误。 
+
+JSON的值只能是以下几种数据格式，其他任何格式都会触发报错，例如 JavaScript 中的 undefined。 
+
+- 数字，包含浮点数和整数
+- 字符串，需要包裹在双引号中
+- Bool值，true 或者 false
+- 数组，需要包裹在方括号中 `[]`
+- 对象，需要包裹在大括号中 `{}`
+- Null
+还需要注意的是 JSON 文件中**无法使用注释**，试图添加注释将会引发报错。 
+
+#### 全局配置 app.json
+
+ danger
+重要内容
+ 
+app.json 是当前小程序的全局配置，包括了小程序的所有页面路径、界面表现、底部 tab 等。一个示例 app.json 配置内容如下： 
+
+```json
+{
+ "pages": [
+  //配置小程序的配置信息
+  "pages/index/index",  //主页，第一条是主页
+  "pages/logs/index" //其他页面
+  ···
+ ],
+ "window": {
+  //配置小程序的顶部栏样式和底部栏样式
+  "navigationBarTitleText": "Demo",
+ },
+ "tabBar": {
+  // 配置底部导航栏的跳转关系
+  "list": [{
+   "pagePath": "pages/index/index",
+   "text": "首页"
+  }, {
+   "pagePath": "pages/logs/index",
+   "text": "日志"
+  }]
+ },
+ "networkTimeout": {
+  // 延时信息，不重要
+  "request": 10000,
+  "downloadFile": 10000
+ },
+}
+```
+
+我们简单说一下这个配置各个项的含义: 
+
+- `pages`字段 —— 用于描述当前小程序所有**页面路径**，这是为了让微信客户端知道当前你的小程序页面定义在哪个目录。 
+- `window`字段 —— 定义小程序所有页面的**顶部背景颜色，文字颜色定义**等。 
+- `tabbar`字段 —— 底部栏的跳转关系 
+
+#### 单个页面xxx.json
+
+如果你整个小程序的风格是蓝色调，那么你可以在 app.json 里边声明顶部颜色是蓝色即可。实际情况可能不是这样，可能你小程序里边的每个页面都有不一样的色调来区分不同功能模块，因此我们提供了 page.json，让开发者可以独立定义每个页面的一些属性，例如刚刚说的顶部颜色、是否允许下拉刷新等等。 
+单个页面的json在每个页面中决定当前页面的配置信息，详细配置信息参考[这里](https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/page.html)。 
+**示例**： 
+
+```json title="xxx.json"
+{
+ "navigationBarBackgroundColor": "#ffffff",
+ "navigationBarTextStyle": "black",
+ "navigationBarTitleText": "微信接口功能演示",
+ "backgroundColor": "#eeeeee",
+ "backgroundTextStyle": "light"
+}
+```
+
+以上这些配置中有冲突的地方会**覆盖**app.json的配置项。也就是说，对于单个页面，页面的json优先级大于全局json。 
+
+#### 工具配置 project.config.json
+
+主要是记录微信开发工具的配置情况，对实际小程序没有意义，忽略。 
+
+### wxml模板文件
+
+在WEB开发中，网页编程采用的是 HTML + CSS + JS 这样的组合，其中 HTML 是用来描述当前这个页面的**结构**，CSS 用来描述页面的**样式**，JS 通常是用来处理这个页面和用户的**交互**。 
+
+同样道理，在小程序中也有同样的角色，其中 WXML 充当的就是类似 HTML 的角色。打开 pages/index/index.wxml，你会看到以下的内容: 
+
+```html
+<view class="container">
+ <view class="userinfo">
+  <button wx:if="{{!hasUserInfo && canIUse}}"> 获取头像昵称 </button>
+  <block wx:else>
+   <image src="{{userInfo.avatarUrl}}" background-size="cover"></image>
+   <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+  </block>
+ </view>
+ <view class="usermotto">
+  <text class="user-motto">{{motto}}</text>
+ </view>
+</view>
+```
+
+WXML和 HTML 非常相似，WXML 由标签、属性等等构成。下面是二者不同的地方：
+
+- 标签名字有点不一样
+
+往往写 HTML 的时候，经常会用到的标签是 `div`, `p`, `span`，开发者在写一个页面的时候可以根据这些基础的标签组合出不一样的组件，例如日历、弹窗等等。换个思路，既然大家都需要这些组件，为什么我们不能把这些常用的组件包装起来，大大提高我们的开发效率。 
+
+从上边的例子可以看到，小程序的 `WXML` 用的标签是 `view`, `button`, `text` 等等，这些标签就是小程序给开发者包装好的基本能力，我们还提供了地图、视频、音频等等组件能力。 
+
+- 多了一些 wx:if 这样的属性以及 `{{ }}` 这样的表达式
+
+在网页的一般开发流程中，我们通常会通过 JS 操作 DOM (对应 HTML 的描述产生的树)，以引起界面的一些变化响应用户的行为。例如，用户点击某个按钮的时候，JS 会记录一些状态到 JS 变量里边，同时通过 DOM API 操控 DOM 的属性或者行为，进而引起界面一些变化。当项目越来越大的时候，你的代码会充斥着非常多的界面交互逻辑和程序的各种状态变量，显然这不是一个很好的开发模式，因此就有了 `MVVM` 的开发模式（例如 React, Vue），提倡把渲染和逻辑分离。简单来说就是不要再让 JS 直接操控 DOM，**JS 只需要管理状态即可**，然后再通过一种模板语法来描述状态和界面结构的关系即可。 
+
+#### 数据绑定
+
+小程序的框架也是用到了上述这个思路，如果你需要把一个 Hello World 的字符串显示在界面上。 
+
+WXML 是这么写 : 
+
+```html
+<text>{{msg}}</text>
+```
+
+在js中管理msg对应的数据：
+
+```js
+this.setData({ msg: "Hello World" })
+```
+
+当某个函数功能中需要修改页面显示的东西，执行下面的语句： 
+
+```js
+this.setData({ msg: "nihao" })
+```
+
+此时Hello World会变为nihao。 
+这种`{{}}`方法被称为`插值语法`，它广泛应用于vue等MVVM框架中。 
+
+#### 列表渲染
+
+当有多条数据的时候，实现类似C语言中的`for`循环功能。 
+
+```html
+<!--wxml-->
+<view wx:for="{{array}}"> {{item}} </view>
+
+```
+
+```js
+// page.js
+Page({
+ data: {
+  array: [1, 2, 3, 4, 5]
+ }
+})
+```
+
+以上的代码将实现类似于下面的功能：
+
+```c
+for (int i=0;i<5;i++){
+  cout<<i+1;
+}
+```
+
+#### 条件渲染
+
+通过对变量的控制，来决定是否渲染某些内容。 
+
+```html
+<!--wxml-->
+<view wx:if="{{view == 'WEBVIEW'}}"> WEBVIEW </view>
+<view wx:elif="{{view == 'APP'}}"> APP </view>
+<view wx:else="{{view == 'MINA'}}"> bingo </view>
+```
+
+```js
+// page.js
+Page({
+ data: {
+  view: 'MINA'
+ }
+})
+```
+
+在上述的代码中，将会显示`bingo`。 
+同样用C++做比方： 
+
+```c
+if (strcmp(view,"MINA")==0){
+  cout<<"bingo";
+}
+```
+
+#### 模板
+
+帮助你复杂的代码只写一次，下次调用只用传数据即可。 
+
+```html
+<!--wxml-->
+<template name="staffName">
+ <view>
+  FirstName: {{firstName}}, LastName: {{lastName}}
+ </view>
+</template>
+
+<template is="staffName" data="{{...staffA}}"></template>
+<template is="staffName" data="{{...staffB}}"></template>
+<template is="staffName" data="{{...staffC}}"></template>
+```
+
+```js
+// page.js
+Page({
+ data: {
+  staffA: {firstName: 'Hulk', lastName: 'Hu'},
+  staffB: {firstName: 'Shang', lastName: 'You'},
+  staffC: {firstName: 'Gideon', lastName: 'Lin'}
+ }
+})
+```
+
+用C++打比方，就是将操作封装在函数中了： 
+
+```c
+void Template(string firstname,string lastname){
+  cout<<"FirstName"<<firstname<<endl;
+  cout<<"LastName" <<lastName<<endl;
+}
+int main(){
+  Template("Shang","You");
+  return 0;
+}
+```
+
+### wxss
+
+相当于css，用于定制样式。 
+WXSS 具有 CSS 大部分的特性，小程序在 WXSS 也做了一些扩充和修改。 
+ danger
+重要内容
+ 
+
+- 新增了尺寸单位。在写 CSS 样式时，**开发者需要考虑到手机设备的屏幕会有不同的宽度和设备像素比**，采用一些技巧来换算一些像素单位。WXSS 在底层支持新的尺寸单位 **rpx** ，**开发者可以免去换算的烦恼**，只要交给小程序底层来换算即可，由于换算采用的浮点数运算，所以运算结果会和预期结果有一点点偏差。 
+
+- 提供了全局的样式和局部样式。和前边 app.json, page.json 的概念相同，你可以写一个 app.wxss 作为全局样式，会作用于当前小程序的所有页面，局部页面样式 page.wxss 仅对当前页面生效。 
+
+此外 WXSS 仅支持部分 CSS 选择器。 
+
+### Javascript
+
+一个服务仅仅只有界面展示是不够的，还需要和用户做交互：响应用户的点击、获取用户的位置等等。在小程序里边，我们就通过编写 JS 脚本文件来处理用户的操作。 
+
+```html
+<view>{{ msg }}</view>
+<button bindtap="clickMe">点击我</button>
+```
+
+点击 button 按钮的时候，我们希望把界面上 msg 显示成 "Hello World"，于是我们在 button 上声明一个属性: bindtap ，在 JS 文件里边声明了 clickMe 方法来响应这次点击操作： 
+
+```js
+Page({
+ clickMe: function() {
+  this.setData({ msg: "Hello World" })
+ }
+})
+```
+
+## Git 协作
+
+
+### 前言
+
+上一篇章我们讲解了微信小程序开发的准备工作，但是在日常开发中，我们肯定不是一个人单独开发，而是团队合作开发。但是问题是，当我们多个人共同开发一个项目时，怎么把大家的合起来呢？ 
+
+ 是这样吗？
+**串行工作**：每个人负责一个模块，在这个人书写自己的模块时，其他人闲着，在这个人写好代码后，把代码打包，压缩包发送给下一个人。 
+**并行工作**：多人同时进行编码，写好之后进行合并。 
+ 
+你平时是怎么操作的呢？实际上，显然是并行工作的效率高，但是怎么达到这个目的呢？答案就是，**代码托管**。我们将代码放在某个平台的仓库里上，每个协作者在仓库中**创建一个属于自己的分支**（branch），并将代码**拷贝一份副本在本地**，在本地进行自己部分的编码和测试工作，在编码完成后，把这个工程推送（Push）到仓库中自己的分支里，并向主分支（main）发起**合并请求**（pull request），在管理员审核过后，就可以自动比较二者不一样的地方，进行合并（Merge）。 
+
+ 举个栗子
+比如，老师新出了一张试卷，但是老师不想自己得到答案，因此她安排A、B、C三位学霸来做这套试卷。分别将这三个同学的试卷记为a、b、c。假设老师那里有一张空白试卷m。那么老师就是一个**仓库**。这张试卷m就是**主分支**（branch main），试卷a、b、c就是另外三个**子分支**。老师安排A同学做选择题，B同学做填空题，C做大题，在A做完选择题后，他将卷子交给老师（这叫提交**合并请求**），老师看了之后觉得没问题，就把A的答案誊抄到空白卷m上（这叫**合并**），B做完填空题后，手比较痒，就另外做了选择题，他也把卷子交给老师，老师看了之后，发现B的选择题答案和A的不一样（这叫产生了**冲突**），老师经过仔细判断之后发现A写的是对的，就保留A的选择题答案，忽略B的选择题答案（这叫**解决冲突**），然后将B的填空题**合并上去**。C做完大题之后交给老师，老师经过审核发现没有冲突的地方，因此也把C的试卷**合并**到m中。 
+***
+我们可以得出以下结论：
+
+>1. 总有人来扮演老师的角色，负责审核和解决冲突。 
+>2. 做题时A、B、C三位协作者可以同时做试卷，不受其他人影响。
+ 
+
+ 
+建议好好掌握这一技能，版本管理是程序员必备的技能之一。
+ 
+
+### 微信开发者代码管理
+
+进入[微信开发者代码管理](https://git.weixin.qq.com/users/authorize#wechat_redirect),使用微信登入。 
+点击-创建项目。 
+![1656487766997.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5cep9bmj31ex0lrdjs.jpg) 
+为小程序命名。可以先设置为私有。
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5enj7goj318d0nljv2.jpg) 
+创建成功。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5fja2otj31940o3dnk.jpg) 
+复制上面那一串HTTPS URL。 
+在微信开发工具右上角点击版本管理。 
+![1656488029563.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5gro6fnj31hc0shwwe.jpg) 
+初始化Git仓库。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5hhbq59j30vw0cfabw.jpg) 
+点击设置-添加远程仓库。 
+![1656488146508.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5is8gnij31bw0o3q6q.jpg) 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5jhto0gj31bc0okaen.jpg) 
+在**网络与认证**中选择添加用户名和密码。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5jy0x7kj31bc0nbwo5.jpg) 
+在微信代码管理平台中设置密码和用户名。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5l3kunnj31h20qetff.jpg) 
+填到IDE中。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5lta073j30wm0ht7a2.jpg) 
+然后，选择push，将现在的代码上传到代码管理平台。 
+![1656488443112.jpg](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5o3lncyj31bi0oewj4.jpg) 
+上传成功后，代码管理平台出现了已经上传的代码。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5p5oxjtj319t0o60zp.jpg) 
+
+### 不同成员创建不同分支
+
+除项目管理员以外，其他开发者均不允许直接推送到主要分支，而应该推送到另外的分支，然后提交合并。这里建议所有成员均建一个自己的分支，每次自己的代码编写好后将代码推送到自己的分支，然后再提交合并请求。 
+下面将讲解**团队成员**推送代码和提交合并的过程。 
+先**拉取**。 
+![1656489958556.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p6ea1y9tj316c0nkgql.jpg) 
+这样有利于把别人的修改拉到自己本地的代码中。 
+勾选修改，查看这些修改的状态。
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p5ybhk1lj31c90odn3f.jpg) 
+如果这些修改前面并没有出现Conflict（黄色的C），冲突的字样，那么表示可以正常提交合并，否则，请先处理冲突。 
+在下面添加修改评论，然后提交。 
+![1656489217658.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p61eup22j31e40ny45a.jpg) 
+然后推送代码。 
+第一次推送，请新建一个分支，之后的提交就提交到这个分支即可。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p62y2ausj31br0nzag7.jpg) 
+可以看到，已经出现了我们新的分支及其代码。 
+![1656489419386.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p64urs63j30p30dcq68.jpg) 
+
+### 提交合并请求
+
+在上面把自己的代码上传后，就可以添加合并请求了。
+![1656489473350.jpg](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p660qdsej31gg0olq8t.jpg) 
+选择将自己的分支合并到master分支。 
+![1656489545823.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p671oitbj31790dx0xv.jpg) 
+然后**比较两个分支**。 
+填写相关信息，将代码分配给管理员审核。 
+![1656489662505.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p69k6qgfj317p0nun2y.jpg) 
+然后选择提交，合并会被阻止，因为管理员还没同意。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p6a862hfj310t0mr44r.jpg)
+管理员添加评审意见。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p6b6da41j30s30kqn1k.jpg) 
+就可以正常合并啦！ 
+
+***
+至此，这一章节也结束了。 
+ caution 注意
+冲突往往难以避免，但是先记得一个准则，写之前**先拉取**再推送。
+ 
+
+## 逻辑层结构
+
+
+### 什么是小程序框架
+
+为了微信小程序能够正常运行在微信环境中，小程序研发出了小程序框架。整个小程序框架系统分为两部分：逻辑层（App Service）和 视图层（View）。小程序提供了自己的**视图层**描述语言 WXML 和 WXSS，以及基于 JavaScript 的**逻辑层**框架，并在视图层与逻辑层间提供了数据传输和事件系统，让开发者能够专注于数据与逻辑。简单来说，视图层就是渲染你看得到的东西，逻辑层提供了数据绑定。 
+这里同样是用上一章的例子： 
+
+```html
+<!-- This is our View -->
+<view> Hello {{name}}! </view>
+<!-- 插值语法 -->
+<button bindtap="changeName"> Click me! </button>
+<!-- 按钮 -->
+```
+
+```js
+// This is our App Service.
+// This is our data.
+var helloData = {
+ name: 'Weixin'
+}
+
+// Register a Page.
+Page({
+ data: helloData,
+ changeName: function(e) {
+  // sent data change to view
+  this.setData({
+   name: 'MINA'
+  })
+ }
+})
+```
+
+[点击可预览上述代码的效果](https://developers.weixin.qq.com/s/l0gLEKmv6gZa) 
+
+开发者通过框架将逻辑层数据中的 name 与视图层的 name 进行了绑定，所以在页面一打开的时候会显示 Hello Weixin!；
+当点击按钮的时候，视图层会发送 changeName 的事件给逻辑层，逻辑层找到并执行对应的事件处理函数；
+回调函数触发后，逻辑层执行 setData 的操作，将 data 中的 name 从 Weixin 变为 MINA，因为该数据和视图层已经绑定了，从而视图层会自动改变为 Hello MINA。
+
+### 逻辑层
+
+逻辑层主要是JavaScript在发挥作用。 
+
+#### “注册”小程序
+
+ 
+这里的注册是不同于前面提到的去小程序网站注册小程序，而是在一个生命周期中去声明这个小程序的存在。 
+ 
+每个小程序都需要在 app.js 中调用 App 方法注册小程序实例，绑定生命周期回调函数、错误监听和页面不存在监听函数等。 
+
+```js
+// app.js
+App({
+ onLaunch (options) {
+  // 在加载小程序时运行这段逻辑.
+ },
+ onShow (options) {
+  // 当页面渲染时运行这段逻辑.
+ },
+ onHide () {
+  // 当小程序隐藏运行这段逻辑.
+ },
+ onError (msg) {
+  // 当错误发生时运行这段逻辑
+  console.log(msg)
+ },
+ globalData: 'I am global data'  // 全局公共数据，某些数据很多页面都要使用，就可以将它放在这里
+})
+```
+
+ note
+例如计协小程序中上一个页面的数据转存到下一个页面就可以借助这个方法。
+ 
+
+在单个页面中，可以像下面这样调用全局的数据。 
+
+```js
+// xxx.js
+const appInstance = getApp()
+console.log(appInstance.globalData) // I am global data
+```
+
+#### 注册页面
+
+指在小程序的生命周期中注册一个页面，发生于跳转到这一页面时。 
+
+```js
+//index.js
+Page({
+ data: {
+  text: "This is page data." //页面数据
+ },
+ onLoad: function(options) {
+  // 页面创建时执行
+ },
+ onShow: function() {
+  // 页面出现在前台时执行
+ },
+ onReady: function() {
+  // 页面首次渲染完毕时执行
+ },
+ onHide: function() {
+  // 页面从前台变为后台时执行
+ },
+ onUnload: function() {
+  // 页面销毁时执行
+ },
+ onPullDownRefresh: function() {
+  // 触发下拉刷新时执行
+ },
+ onReachBottom: function() {
+  // 页面触底时执行
+ },
+ onShareAppMessage: function () {
+  // 页面被用户分享时执行
+ },
+ onPageScroll: function() {
+  // 页面滚动时执行
+ },
+ onResize: function() {
+  // 页面尺寸变化时执行
+ },
+ onTabItemTap(item) {
+  // tab 点击时执行（自定义函数）
+  console.log(item.index)
+  console.log(item.pagePath)
+  console.log(item.text)
+ },
+ // 事件响应函数，自定义函数
+ viewTap: function() {
+  this.setData({
+   text: 'Set some data for updating view.' // 给text变量赋值
+  }, function() {
+   // this is setData callback
+  })
+ }
+})
+```
+
+### 页面生命周期
+
+比较复杂，知道有这个东西即可。
+![1](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20220714092413.png) 
+
+### 页面路由
+
+微信小程序框架使用数据结构中**栈**的方式维护每个页面的路由。 
+ info 什么是栈
+栈（stack）又名堆栈，它是一种运算受限的线性表。限定仅在表尾进行插入和删除操作的线性表。这一端被称为栈顶，相对地，把另一端称为栈底。向一个栈插入新元素又称作进栈、入栈或压栈，它是把新元素放到栈顶元素的上面，使之成为新的栈顶元素；从一个栈删除元素又称作出栈或退栈，它是把栈顶元素删除掉，使其相邻的元素成为新的栈顶元素。一句话概括就是，一个竖着的容器，先进后出。 
+![1](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20220714093137.png)
+ 
+小程序路由栈的表现： 
+![1](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20220714094407.png) 
+几种小程序路由方式： 
+初始化-小程序打开的第一个页面-路由后：onLoad, onShow 
+打开新页面-调用API-[wx.navigateTo](https://developers.weixin.qq.com/miniprogram/dev/api/route/wx.navigateTo.html) 
+>使用组件-`<navigator open-type="navigateTo"/>` 路由前：onHide 路由后：onLoad, onShow 
+
+页面重定向-调用API-`wx.redirectTo` 
+>使用组件-`<navigator open-type="redirectTo"/>` 路由前：onUnload 路由后：onLoad, onShow 
+
+页面返回-调用API-`wx.navigateBack` 
+>使用组件-`<navigator open-type="navigateBack">` 
+用户按左上角返回按钮-路由前：onUnload 路由后：onShow 
+
+Tab切换-调用API `wx.switchTab` 
+>使用组件`<navigator open-type="switchTab"/>` 
+>用户切换-Tab
+
+重启动-调用API `wx.reLaunch` 
+>使用组件 `<navigator open-type="reLaunch"/>` 路由前：onUnload 路由后：onLoad, onShow 
+
+Tab 切换对应的生命周期（以 A、B 页面为 Tabbar 页面，C 是从 A 页面打开的页面，D 页面是从 C 页面打开的页面为例）： 
+![1](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20220714095352.png) 
+
+**注意事项**： 
+
+- navigateTo, redirectTo 只能打开非 tabBar 页面。
+- switchTab 只能打开 tabBar 页面。
+- reLaunch 可以打开任意页面。
+- 页面底部的 tabBar 由页面决定，即只要是定义为 tabBar 的页面，底部都有 tabBar。
+- 调用页面路由带的参数可以在目标页面的onLoad中获取。
+
+## 页面配置
+
+
+### 前言
+
+上一节我们讲了如何利用微信git进行代码管理。这一节我们来讲讲基本的界面配置。 
+前面说过，小程序实质上就是web网页，一个web网页需要什么东西构成呢？ 
+我们以下面这个web网页为例： 
+![1656491368011.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p72ol7kjj31hc0r9ti8.jpg) 
+我们把这个网站分解为Head、Tabbar、内容三个部分，这个是一般的网站的构成之一。 
+然后我们再拿出一张小程序图。 
+![1656491523500.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p75mgddhj30e60r279b.jpg) 
+我们可以发现，也可以将其划分为相同的三个部分。 
+那么我们快开始配置吧！ 
+
+### Tabbar
+
+Tabbar是小程序底部的切换按钮，用于主界面之间的切换。 
+在 `app.json` 文件中配置tabbar。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p7g4nl5xj30xr0hfdqu.jpg) 
+
+```json
+"tabBar": {
+  "color": "#ff0000", //字体颜色
+  "selectedColor": "#ffff00", //选中时字体的颜色
+  "backgroundColor": "#1697eb", //tab背景色
+  "borderStyle": "black", //tabBar盒子上面的border颜色，只支持black 与 white
+  "list": [
+   {
+    "pagePath": "pages/tabOne/tabOne", //此处路径要写不带 ‘/’的，比如Helloworld文件，我们要写的路径就是 pages/helloworld/helloworld
+    "text": "首页",      //tab名字
+    "iconPath": "image/icon_API.png", //tab图标
+    "selectedIconPath": "image/icon_API_HL.png" //选中时的tab图标
+   },
+   {
+    "pagePath": "pages/tabTwo/tabTwo",
+    "text": "中间页面",
+    "iconPath": "image/icon_API.png",
+    "selectedIconPath": "image/icon_API_HL.png"
+   },
+   {
+    "pagePath": "pages/tabThree/tabThree",
+    "text": "第三个页面",
+    "iconPath": "image/icon_API.png",
+    "selectedIconPath": "image/icon_API_HL.png"
+   }
+  ],
+  "position": "bottom", //tabBar的位置 top 或 bottom
+  "custom": false //自定义tabBar时为true
+ }
+```
+
+ 效果如下： 
+![1656492435503.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p7l698ktj30bp0mttb0.jpg)
+ 
+
+### 设置顶部文字
+
+在 `app.json` 中设置顶部title。 
+
+```json
+//统一配置Title
+  "window": {
+  "backgroundTextStyle": "light",//浅色模式
+  "navigationBarBackgroundColor": "#fff",
+  "navigationBarTitleText": "首页",//这里是你要修改的文字
+  "navigationBarTextStyle": "black"
+ }
+```
+
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p7powrm3j3095018dfm.jpg)
+
+或者在单独页面的 `xxx.json` 中设置单独页面的title。 
+
+```json
+ "navigationBarTitleText": "首页",
+ "navigationBarBackgroundColor": "white",
+ "navigationBarTextStyle": "black"
+```
+
+## 图片资源
+
+
+### 插入本地图片
+
+首先，将图片文件放入 `miniprogram\images` 文件夹中。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p8byeedzj30pw0bgacv.jpg) 
+然后在小程序代码编辑窗书写wxml代码,注意图片路径。 
+
+```html
+<image src="../../images/1.jpg"></image>
+```
+
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p8cuk8emj31240d7qbj.jpg) 
+
+ caution
+注意，小程序中没有`<img>`标签，因此请使用`<image>`标签。
+ 
+
+### 插入云图片
+
+ 小程序对程序包的限制
+微信小程序要求在没有分包的情况下，小程序的包大小不超过 `2M`,因此这就意味着，你不能在小程序文件夹中放过多图片。那么必要的图片都放在哪呢？你可以使用微信的云开发云存储，将文件放到云存储中进行调用(会产生相关费用），或者使用别的图床工具，例如 `微博图床` （完全免费）。
+ 
+
+在这里，比如我要将图片放入云存储中（云存储的开通合使用将在之后讲解）。 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p8od820xj315a0o2qh7.jpg) 
+这里有张待添加的图片。我们复制中间的连接，以相同的方式把将其写进wxml代码中。 
+
+```html
+<image src="cloud://nannan-1g1q4u2i02398ecf.6e61-nannan-1g1q4u2i02398ecf-1311679880/iPhone 13 Pro Max 1.png"></image>
+```
+
+如果使用微博图床。首先将图片上传到图床窗口： 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p8r4lj5ej30r20iuwm8.jpg) 
+然后复制图片连接，以同样的方式插入wxml代码中。 
+
+```html
+<image src="https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3p8r4lj5ej30r20iuwm8.jpg"></image>
+```
+
+## 组件库
+
+### 为什么要使用组件库？
+
+虽然建议初学者都使用原生进行开发，以便于熟悉语言和架构，但是对于学习时间紧、急于拿出成果的开发者来说，组件库是一个更好的选择（也可以说它是一个**框架**）。程序员做的事就是让后来的程序员更加轻松，因此，诞生了许多组件库。当然，这里说的组件库只是UI组件库，必须和vue、react等js框架区分开。 
+
+ 怎么理解UI组件库
+我们用房屋装修作为例子。你的房子里面需要一些家具。假如你前往宜家家居购买一些家具，比如沙发、床、桌子等，那么这时我们就可以把宜家比喻成一个装修组件库。你只需要把沙发从宜家里面拿出来，放到你的家里，你就完成了一个沙发的构建。但是，如果你不使用类似的组件库而只使用原生呢？就相当于如果你需要一个沙发，你就需要**从锯木头、织布开始**，慢慢地依靠自己造出这个沙发。 
+***
+UI组件库就是这样，如果你需要一个搜索框，你只需要将它调用出来，而不是自己去写嵌套结构。因此使用UI组件库能够帮你减少很多css代码和html代码的书写。
+ 
+
+#### 选择一个组件库
+
+小程序方面，由于其生态良好性，因此它也有很多组件库，请看[这篇文章](https://blog.csdn.net/wangtong0211/article/details/121514961) ，它介绍了很多主流的小程序组件库。 
+本文选择使用[Vant Weapp](https://vant-contrib.gitee.io/vant-weapp/#/home),请马上收藏这个文档。Vant是**有赞**前端团队基于有赞统一的规范实现的 Vue、React、微信小程序组件库，提供了一整套 UI 基础组件和业务组件。
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9gy1h3pcghicqsj30m50913zl.jpg) 
+***
+选好组件库之后，*建议团队里的设计人员*也按照这个选定的框架进行设计，很多设计软件提供组件库原型的下载。例如即时设计-[vant设计规范](https://js.design/resourceDetails?id=61e12437fe494725c30c9bae) 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pcmbq9orj31hc0s6100.jpg)
+
+### 下载安装vant
+
+#### 步骤一
+
+**使用npm安装** 
+
+ 
+这个方法要求你的电脑里安装了node.js环境，如果没有请看[电脑配置npm环境](https://blog.csdn.net/ZHANGYANG_1109/article/details/121229581)。这个不会的话，可以给我留个言，我来写一个文档。这个工具以后也会用到，大家可以花点时间给装上。
+ 
+打开微信IDE里的终端。 
+![1656503085963.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pcpvrxzjj31hc0rikbg.jpg) 
+输入npm指令安装。 
+
+```npm
+## 通过 npm 安装
+npm i @vant/weapp -S --production
+```
+
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pdn1waaij30tv0kvgqo.jpg) 
+
+#### 步骤二
+
+安装后，修改 app.json，将 app.json 中的 "style": "v2" 去除，小程序的新版基础组件强行加上了许多样式，难以覆盖，不关闭将造成部分组件样式混乱。 
+
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pdpbrdjmj313w0ggwmh.jpg) 
+
+#### 步骤三
+
+然后修改 project.config.json，需要手动在 project.config.json 内添加如下配置，使开发者工具可以正确索引到 npm 依赖的位置。 
+
+```npm
+{
+ ...
+ "setting": {
+  ...
+  "packNpmManually": true,
+  "packNpmRelationList": [
+   {
+    "packageJsonPath": "./package.json",
+    "miniprogramNpmDistDir": "./miniprogram/"
+   }
+  ]
+ }
+}
+```
+
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pdrenwchj30zb0fr49i.jpg) 
+
+#### 步骤四
+
+**构建npm包** 
+点击工具-构建npm。 
+![1656505382742.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pdtoydpbj30lj0gtjyi.jpg)
+
+ 
+经过上面的操作之后，就可以快乐地进行接口调用啦！
+ 
+
+### 开始开发
+
+俗话说，程序员就是API调用师（bushi），那么我们就来快乐地调用API吧！ 
+
+使用如下的tabbar配置,这还没用到vant： 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3peuacmhwj30uk0o7n9y.jpg) 
+ 效果如下 
+![1ac24299f941b48589dd43480b59001.jpg](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pexijkhuj30u01t0wfi.jpg) 
+ 
+
+#### 调用一个日历选择组件
+
+现在我们想要在首页上加一个日历！ 
+首先，我们到vant的文档找到日历所在位置，然后查看调用方式。 
+![1656507890592.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pf16yd6mj31h70otwpz.jpg) 
+他告诉我们要先声明组件，好，那我们就声明组件。 
+在app.json或index.json中引入组件。如果在app.json中引用，就可以全局使用，如果在某个界面的index.json中引用，则只能那个页面使用，这里我们在app.json中声明组件。 
+
+这里官方文档有点问题，实际上得引入两个组件。 
+
+```json
+"usingComponents": {
+ "van-calendar": "@vant/weapp/calendar/index",
+ "van-cell": "@vant/weapp/cell/index"
+}
+```
+
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pfeh2hjmj31ax0i7wqh.jpg)
+
+然后我们在主页,index.wxml中调用这个组件。 
+
+```html
+<van-cell title="选择单个日期" value="{{ date }}" bind:click="onDisplay" />
+<van-calendar show="{{ show }}" bind:close="onClose" bind:confirm="onConfirm" />
+
+```
+
+然后在index.js中加入逻辑代码，这些都是从文档上直接copy的。 
+
+```js
+Page({
+ data: {
+  date: '',
+  show: false,
+ },
+
+ onDisplay() {
+  this.setData({ show: true });
+ },
+ onClose() {
+  this.setData({ show: false });
+ },
+ formatDate(date) {
+  date = new Date(date);
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+ },
+ onConfirm(event) {
+  this.setData({
+   show: false,
+   date: this.formatDate(event.detail),
+  });
+ },
+});
+
+```
+
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pf720j3aj31910hpqcb.jpg) 
+
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pf8e7er6j313n0jeqex.jpg) 
+
+ 实现效果如下
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pfgrych0j30bp0n3jsz.jpg)
+ 
+
+ 
+怎么样？有没有觉得非常的简单方便，就能写一个很复杂的日历组件啦？
+ 
+
+#### 调用一个开关组件
+
+我们再来举一个例子，调用一个开关组件。 
+
+同样，添加app.json代码。 
+
+```json
+"usingComponents": {
+ "van-switch": "@vant/weapp/switch/index"
+}
+```
+
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pfjfbq06j31420imtlp.jpg) 
+
+然后在index.wxml中引用它。 
+
+```html
+<van-switch checked="{{ checked }}" bind:change="onChange" />
+```
+
+在index.js中添加逻辑代码，注意，切不可直接复制粘贴，要将需要的代码补充到应该有的地方。 
+
+```js
+Page({
+ data: {
+  checked: true,
+ },
+
+ onChange({ detail }) {
+  // 需要手动对 checked 状态进行更新
+  this.setData({ checked: detail });
+ },
+});
+
+```
+
+前面带红色断点的是我这次添加的内容： 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pfoxh855j30qr0lv47q.jpg) 
+效果如图： 
+![image.png](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/img/006SHRs9ly1h3pfoab3csj30bg05974g.jpg) 
+
+ info 结语
+好了，这就是本节的内容了，vant-ui组件库是一个非常齐全的组件库，经过上面两个例子相信你已经能够触类旁通，使用组件库里的组件，构造出你想要的页面了.
+ 
+
+
+## 数据库交互
+
+在本章节中，我们将了解微信小程序如何去拿后端数据库的数据，一般而言，小程序后端有下面两种方式： 
+
+- 微信云开发，接口丰富、便捷，易上手，缺点是要付费，数据掌握在别人手中。 
+- 自己的后端。技术难度高，但是可控。 
+
+本章节先介绍小程序与后端服务器交互的办法。 
+
+### 向服务器推送数据
+
+这里使用小程序提供的HTTP请求来和服务器建立连接并传递数据。 
+`POST方法`详见[HTTP报文格式](https://czhan.netlify.app/docs/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E5%BA%94%E7%94%A8%E5%B1%82#http%E6%8A%A5%E6%96%87%E6%A0%BC%E5%BC%8F)。 
+使用`POST`方法发起请求，在页面js中的代码如下： 
+
+```js
+wx.request({
+   url : "https://www.",
+   // 服务器地址
+   method: "POST",
+   data: {
+    name: this.data.name,  
+    phone: this.data.phone, 
+    brand: this.data.brand, 
+    modelnumber: this.data.modelnumber,  
+    description: this.data.description,  
+    isStudent: JSON.stringify(this.data.isStudent),  //将布尔类型转为json字符串
+    id: this.data.id, 
+    class: this.data.class, 
+    fileList: this.data.fileList,  
+   },
+   header: {
+    "Content-Type": "application/x-www-form-urlencoded"
+   },
+   success: function (res) {
+    console.log(res.data);
+    wx.navigateBack({
+     delta: 1 //小程序关闭当前页面返回上一页面
+    })
+    wx.showToast({
+     title: '提交完成！',
+     icon: 'success',
+     duration: 2000
+    })
+   },
+  })
+```
+
+### 向服务端请求数据
+
+```js
+Page({
+ data: {
+  // 创建数据容器
+  list: []
+ },
+ onLoad: function (options) {
+  wx.request({
+   url: 'https://test.com', // 服务器地址
+   header: {
+    'content-type': 'application/json'
+   },
+   success: res => {
+    console.log(res.data)  // 控制台打印
+    this.setData({
+     list: res.data  // 赋值
+    })
+   }
+  })
+ },
+})
+```
+
+然后通过`列表渲染`到wxml界面： 
+
+```html
+<view wx:for="{{list}}" wx:key="index">
+ <view class="item">
+  <view class="number-wrapper">
+   <text class="name">{{item.name}}</text>
+   <view class="count-wrapper">
+    <text class="count">{{item.des}}</text>
+   </view>
+  </view>
+ </view>
+</view>
+```
+
+如此，非常简洁地完成了前后端数据的交互。
+
+## 云开发数据库
+
+### 数据库基础
+
+#### 数据库是干什么的
+
+**数据库**顾名思义，就是**数据**和**库**，即存放数据的仓库。这里面的数据指数字、文本、图片、视频等它们被放在一起，需要使用的时候可以拿出来。在现实生活中，有很多数据库的例子： 
+
+##### 身份证数据库
+
+我们每个人都有一张身份证，身份证上的信息如姓名、生日、性别、籍贯等都是数据库（表）里面存储的内容。在国家机关中，有一个将所有人的信息集中放在一起的仓库，它存储了十四亿条数据，每条数据又包含着姓名、生日、性别、籍贯等数据内容。当你在办理某些业务时，输入身份证号，即可看到你的其他信息，这就是一个常用的数据库查询的例子。此时，每个 **身份证号** 是唯一存在的，就是整个数据库的索引。
+
+##### QQ 数据库
+
+我们常常使用 QQ ，这是一个即时通信工具，实际上，在腾讯公司的技术部门，就有一个大型的数据库，这个数据库包含很多用户的信息，每个用户的信息就是数据库的一条数据，这个数据中有 QQ号、昵称、生日、个性签名等内容。此时，每个 **QQ号** 是唯一存在的，就是整个数据库的索引。
+
+#### 数据库的结构
+
+传统的数据库的结构如下： 
+
+- 数据库（database）
+- 数据表（table）
+- 数据行（row）
+- 字段（field），相当于 Excel 中的列，每个字段都有自己的数据类型。
+
+在上面身份证例子中，整个户籍管理仓库就是一个**数据库**，这个数据库里面，可能有多张**数据表**，比如学籍表、身份证表、驾驶执照表等。以身份证表为例，这个表中存放着14亿条**数据行**，每个数据行标识着一个人。每一行都有一个唯一标识的字段，与其他字段区分开，这个字段就是**身份证号**，还有其他字段，比如姓名、民族、性别字段等。每个字段有不同的数据类型，身份证号数据类型为**长数字**，姓名的数据类型为**字符串**，出生日期的数据类型为**日期**。
+
+##### Excel 类比数据库
+
+![1](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/1661137623618.png)
+
+### 邮箱小程序设计
+
+#### 页面设计
+
+这个小程序设计的主题是**送信**和**收信**，所以仅安排了三个简单的界面，即 
+
+- 注册界面 
+![1](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20220822111150.png)
+- 写信界面 
+![2](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20220822111211.png)
+- 收信界面 
+![3](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20220822111227.png)
+
+#### 数据库设计
+
+在这个简单的小程序中，我们需要存储**用户信息**和**信件信息**。因此我们的数据库中需要两个**数据表**，**用户信息**数据表中需要存储用户的头像、昵称、ID，**信件信息**需要存储信件的收件人、内容和发件人ID。两个数据库可以通过**昵称（收件人姓名）**联系起来。 
+
+![2](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/db819.png)
+
+### 编程实现
+
+#### 页面实现
+
+##### TabBar
+
+```json filename="app.json"
+  "tabBar": {
+    "list": [{
+      "pagePath": "pages/index/index",
+      "text": "注册"
+    }, {
+      "pagePath": "pages/dend/index",
+      "text": "发信"
+    }, {
+      "pagePath": "pages/receive/index",
+      "text": "收信"
+    }]
+  },
+```
+
+##### 注册页面
+
+包含登录按钮，姓名输入框以及注册按钮。 
+
+```html filename="index.wxml"
+<!--index.wxml-->
+<view class="container">
+ <!-- 头像 -->
+ <view ><image class="avatar" src="{{avatar}}"></image></view>
+ <button bindtap="Login">点击使用微信登录</button>
+ <input bindinput="bindKeyInput" type="text" class="inputBox" placeholder="填写你的姓名"/>
+ <button style="margin-top: 20rpx;" bindtap="Yes">注册</button>
+</view>
+```
+
+##### 写信页面
+
+```html filename="index.wxml"
+<!--pages/dend/index.wxml-->
+<view class="container">
+ <strong>发信</strong>
+ <input bindinput="inputRecer" type="text" class="inputBox" placeholder="填写收件人"/>
+ <input bindinput="inputContent" type="text" class="inputBox" placeholder="填写内容"/>
+ <button bindtap="Sendit">发送</button>
+</view>
+```
+
+##### 收信页面
+
+这里需要使用列表渲染。 
+
+```html filename="index.wxml"
+<view class="container">
+ <strong>收件箱</strong>
+ <!-- 列表渲染 -->
+ <view class="Mailcard" wx:for='{{MailList}}' wx:key='index'>
+  <view style="display:block">内容：{{item.content}} </view>
+   <view style="display:block">收件人：{{item.rece}}</view>
+ </view>
+</view>
+```
+
+#### 数据库创建
+
+##### 创建集合
+
+打开云开发控制台，在数据库中创建两个集合。分别取名`TestBase`和`Mails`，分别存储用户信息和信件信息。 
+
+![1](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/1661138837333.png)
+
+ caution
+图中其他数据库集合和本例子无关，请不用理会。
+ 
+
+##### 设置读写权限
+
+在集合页面，设置**数据权限**为**所有用户可读，仅创建者可读写**。
+
+![2](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20220822113001.png)
+
+如此，数据库创建就完成了。 
+
+#### 注册功能
+
+##### 需求分析
+
+在页面注册时，我们需要要求用户填写自己的姓名，再通过微信登录获取用户的**openid**作为唯一的标识。然后将拿到的信息与已存在的数据库比对，如果这个用户注册过，就提示注册过了，如果没有，就向数据库`TestBase`添加一条新的用户数据。 
+
+##### 用户登录
+
+使用微信提供的 API 获取用户登录，并得到其头像。 
+
+```js
+ Login(e) {
+  // 微信登录
+  var that = this
+   //调用登录接口
+   wx.login({
+    success: function () {
+     wx.getUserInfo({
+      success: function (res) {
+      }
+     })
+    }
+   })
+   wx.getUserProfile({
+    desc:'获取用户信息',
+    success: (res) => {
+     // 获取userInfo的状态数据
+     console.log(res)
+     this.setData({
+      // 获取头像
+      avatar: res.userInfo.avatarUrl,
+      isLogin:1
+     })
+    },
+   })
+ },
+```
+
+##### 获取openid
+
+由于微信直接提供的 openid 是秘密的，因此我们必须要解密之后才能使用 openid ，这里就要借助云函数进行实现了。 
+
+在 cloudfuctions 文件夹创建云函数 `getOpenId` ，图中其他的函数不需要理会，与本例子无关。 
+![1](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/1661139486387.png) 
+
+在 `getOpenId` 的 index 文件中创建 openid 解析函数，如下： 
+
+```js
+// 云函数入口文件
+const cloud = require('wx-server-sdk')
+cloud.init({ // 初始化云开发环境
+ env: cloud.DYNAMIC_CURRENT_ENV // 当前环境的常量
+})
+const db = cloud.database()
+// 云函数入口函数
+exports.main = async (event, context) => {
+ const wxContext = cloud.getWXContext()
+ // 返回当前用户的身份信息，用于数据库记录和查询
+ return {
+  event,
+  openid: wxContext.OPENID,
+  fromopenid: wxContext.FROM_OPENID,
+  appid: wxContext.APPID,
+  unionid: wxContext.UNIONID,
+ }
+}
+```
+
+##### 云函数调用
+
+回到页面的 index.js 文件，在文件中调用这个云函数。 
+
+```js
+async getOpenId() {
+  const {
+   result: {
+    // 创建调用结果
+    openid,
+    fromopenid
+   }
+  } = await (await this.cloud()).callFunction({
+    // 声明要调用的云函数
+   name: 'getOpenId'
+  }).catch(e => {
+   let flag = e.toString()
+   flag = flag.indexOf('FunctionName') == -1 ? flag : '请在cloudfunctions文件夹中getOpenId上右键，创建部署云端安装依赖，然后再次体验'
+   wx.hideLoading()
+   wx.showModal({
+    content: flag, // "网络服务异常，请确认网络重新尝试！"
+    showCancel: false
+   })
+   throw new Error(flag)
+  })
+  // 返回解密结果
+  if (openid !== "") return openid
+  return fromopenid
+ },
+```
+
+然后我们尝试登录，查看是否正常获取了 openid ： 
+
+![1](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/1661142373099.png) 
+
+如图，已经获取到了数据容器中。 
+
+##### 填写姓名
+
+使用 input 以及其自带的响应事件，创建输入框。 
+
+```html
+<input bindinput="bindKeyInput" type="text" class="inputBox" placeholder="填写你的姓名"/>
+```
+
+```js
+data: {
+  //...
+  // 输入内容
+  inputValue: "占位姓名",
+  //...
+ },
+bindKeyInput: function (e) {
+  this.setData({
+    inputValue: e.detail.value
+  })
+},
+```
+
+##### 写入数据库
+
+在上面的步骤中，我们已经得到了用户的 openid 以及用户填写的姓名，现在，我们要把注册信息写到数据库中。 
+
+首先，为**注册**按钮绑定事件。 
+
+先调用获取 openid 函数，得到 openid （上面只创建了功能，并没有调用） 。
+
+```js
+  this.getOpenId().then(async openid => {
+   console.log("OpenID: " + openid)
+   this.setData({
+    UserID: openid
+   })
+  })
+```
+
+接着，初始化云环境： 
+
+```js
+  const db = wx.cloud.database({
+   // 在下面填写你的云开发 ID
+   env: ''
+  })
+```
+
+然后在数据表中判断这个 ID 是否已经注册过，这就需要用到 `db.where.get` API。让我们看一下官方是如何解释这个方法的： 
+
+> Collection.**where**(condition: Object): Collection 
+
+指定查询条件，返回带新查询条件的新的集合引用 
+
+**参数** 
+condition: Object 
+查询条件 
+
+**返回值** 
+Collection 
+
+在这里，我们使用 where 去**查询**这个 openid 是否已经存在。 
+
+```js
+db.collection('TestBase').where({
+   // 筛选条件
+   _openid: this.data.UserID
+  }).get().then(ress => {
+    // 如果存在 如何处理
+  })
+```
+
+可以通过 `data.length` 来判断数据行是否为空，如果已经存在，那么我们就应该要提示**用户已注册**： 
+
+```js
+   if (ress.data.length != 0) {
+    wx.showModal({
+     title: '抱歉',
+     content: '用户已存在',
+    })
+   }
+```
+
+如果不为空，我们就要使用 `db.collection('').add` 方法添加数据： 
+
+```js
+    db.collection('TestBase').add({
+     // data 字段表示需新增的 JSON 数据,在这里向数据库写入数据
+     data: {
+      // 让 id 标识为用户唯一的 openid
+      _id: this.data.UserID,
+      // 头像
+      Avatar:this.data.avatar,
+      // 姓名
+      Name:this.data.inputValue
+     },
+     success: function (res) {
+      // res 是一个对象，其中有 _id 字段标记刚创建的记录的 id
+      console.log(res)
+      wx.showModal({
+       title: '成功',
+       content: '上传成功',
+      })
+     }
+    })
+```
+
+我们执行一下，观察数据库中是否已经添加了新的数据： 
+
+![1](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/1661143877017.png)
+
+显然，这里已经增加了一条新的用户数据。 
+
+#### 数据库调用步骤
+
+经过上面的例子，我们可以总结出数据库调用的步骤： 
+
+##### 一、初始化云环境
+
+```js
+cloud.init({ // 初始化云开发环境
+ env: cloud.DYNAMIC_CURRENT_ENV // 当前环境的常量
+})
+```
+
+##### 二、声明数据库
+
+```js
+  const db = wx.cloud.database({
+   // 在下面填写你的云开发 ID
+   env: ''
+  })
+```
+
+##### 三、调用API进行处理
+
+比如上面的查询和新增，实际上，数据库有**增删改查**等能力，这在微信小程序文档中有详细的说明，也可以参考[这篇文章](https://www.w3cschool.cn/weixinapp/weixinapp-hyko2zdp.html)
+
+#### 写信功能
+
+##### 需求分析
+
+在写信功能中，我们需要指定收件人，以及写入信的内容，这里定义了两个输入框，用于获取这两个内容。获取得到这些信息之后，我们首先要到**用户数据表**中判断这个收件人是否为我们的用户，如果不是，那么就提示，如果是，就把这封信写入到**信件数据表**中。 
+
+##### 文本框信息获取
+
+```js
+ data: {
+  Content:'',
+  Rece:'',
+  RecrID:''
+ },
+ inputContent: function (e) {
+  this.setData({
+   Content: e.detail.value
+  })
+ },
+ inputRecer: function (e) {
+  this.setData({
+   Rece: e.detail.value
+  })
+ },
+```
+
+##### 判断是否填写了内容
+
+在**发送**按钮点击事件中进行判断。 
+
+```js
+  if(this.data.Content===''|this.data.Rece===''){
+   wx.showModal({
+    title: '注意',
+    content: '请先输入完整内容',
+   })
+  }
+```
+
+##### 判断是否存在这个收信人
+
+同样是调用 where 方法来判断数据表中是否有这个收件人数据： 
+
+```js
+db.collection('TestBase').where({
+   // 筛选条件
+   Name:this.data.Rece
+  }).get().then(ress => {
+
+  })
+```
+
+这里这个函数返回了一个数据 ress ,这个数据中包含了数据库中这个 `Name` 用户对应的所有数据，我们可以使用 `ress.data[0]` 得到它。我们通过 `console.log` 方法打印出 `ress` 的内容。现在我们看看控制台输出的 ress 究竟是什么： 
+
+![1](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20220822130552.png)
+
+显然，它返回了一个 Array 数组，这个数组只有一个元素，即 `data[0]` ，这个元素中返回了四个参数，我们需要的是这个 `_openid` 参数，它表示了收件人的唯一标识。因此可以通过`ress.data[0]` 得到它，并把它放到临时的容器中。 
+
+```js
+db.collection('TestBase').where({
+   // 筛选条件
+   Name:this.data.Rece
+  }).get().then(ress => {
+   // 判断返回的data长度是否为0，如果为0的话就证明数据库中没有存在该数据，然后进行添加操作
+   // 得到了对应姓名的 openid
+   // highlight-start
+   console.log(ress);
+   this.setData({
+    RecrID:ress.data[0]._openid
+   })
+   // highlight-end
+   if (ress.data.length === 0) {
+    wx.showModal({
+     title: '抱歉',
+     content: '用户不存在',
+    })
+    return;
+   }
+   else{
+    // 用户存在，添加信件数据,另一个数据库
+   }
+  })
+```
+
+##### 写入信件数据
+
+与写入用户数据十分类似，不再赘述： 
+
+```js
+// 用户存在，添加信件数据,另一个数据库
+db.collection('Mails').add({
+  // data 字段表示需新增的 JSON 数据,在这里向数据库写入数据
+  data: {
+  // 收件人姓名
+  rece: this.data.Rece,
+  // 收件人id
+  receID:this.data.RecrID,
+  // 新建内容
+  content:this.data.Content
+  },
+  success: function (res) {
+  // res 是一个对象，其中有 _id 字段标记刚创建的记录的 id
+  console.log(res)
+  wx.showModal({
+    title: '成功',
+    content: '上传成功',
+  })
+  }
+})
+```
+
+#### 收信
+
+##### 需求分析
+
+收信时，我们需要拿着自己的**姓名**去信件数据库逐一匹配，如果是发给自己的信，就拿出来，其他的不管。然后通过微信能力列表渲染到界面。 
+
+##### 数据库比对
+
+同样是使用 `where` 方法进行比对，将通过比对 `openid` 就可以得到只属于自己的内容： 
+
+```js
+onShow: function () {
+  var that=this;
+  const db = wx.cloud.database({
+   // 填写你的云开发 ID
+   env: 'nannan-1g1q4u2i02398ecf'
+  })
+  // 在数据库里面添加新表 TestBase
+  db.collection('Mails').where({
+   // 筛选条件，这样查询之后只会获取发给自己的信息，空着就行，不用填参数
+   _openid:''
+  }).get().then(ress => {
+   console.log(ress)
+   that.setData({
+    MailList:ress.data
+   })
+  })
+ },
+```
+
+为什么在 **onShow** 函数中进行？因为我们希望，每次打开这个页面就去更新我们获得的数据信息。进行这个步骤之后，数据容器 `MailList` 就得到了全部属于我的信件。
+
+##### 列表渲染
+
+我们看看 `MailList` 中有什么： 
+
+![1](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/1661145984741.png)
+
+这与云开发数据库中的信息能够对上： 
+
+![2](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20220822132659.png)
+
+除了一条为张三的数据外，所有 aaa 的数据都获取下来了。 
+
+然后列表渲染： 
+
+```html
+ <view class="Mailcard" wx:for='{{MailList}}' wx:key='index'>
+  <view style="display:block">内容：{{item.content}} </view>
+   <view style="display:block">收件人：{{item.rece}}</view>
+ </view>
+```
+
+实现结果： 
+![2](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20220822132807.png)

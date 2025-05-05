@@ -119,7 +119,8 @@ export const TableOfContents: React.FC = () => {
   return (
     // Ensure sidebar sticks to the top and doesn't overlap content
     <aside className="sticky top-24 hidden lg:block w-64 flex-shrink-0 ml-16 self-start">
-      <nav>
+      {/* Add max-h and overflow-y-auto here */}
+      <nav className="max-h-[calc(100vh-6rem-2rem)] overflow-y-auto pr-4"> {/* Adjust 6rem based on actual top offset (top-24) and 2rem for bottom padding */}
         <h3 className="text-sm font-semibold text-zinc-900 mb-2 uppercase tracking-wider">On this page</h3>
         <ul>
           {headings.map((heading) => (

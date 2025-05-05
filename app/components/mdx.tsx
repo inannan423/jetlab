@@ -1,4 +1,6 @@
 // @ts-nocheck
+"use client";
+
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -159,6 +161,15 @@ const components = {
 				className,
 			)}
 			{...props}
+		/>
+	),
+	caution: ({ className, ...props }) => (
+		<div
+			className={clsx(
+				"mt-6 border-l-4 border-yellow-500 bg-yellow-100 p-4 text-yellow-800", // Example styling
+				className,
+			)}
+			{...props} // Pass children and other props
 		/>
 	),
 	Image,

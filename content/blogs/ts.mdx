@@ -1,0 +1,1167 @@
+---
+title: TypeScript 简明教程
+date: "2023-01-15"
+description: TypeScript 是 JavaScript 的一个超集，它添加了可选的静态类型和基于类的面向对象编程。
+published: true
+tags: ["TypeScript","Frontend"]
+---
+
+## 介绍
+
+> 任何可以使用 JavaScript 来编写的优秀的大型应用程序，最终都会由 TypeScript 编写。 —— 韩骏
+
+### 编程语言类型
+
+- 动态类型语言（Dynamically Typed Language），如 JavaScript、Python、Ruby 等
+- 静态类型语言（Statically Typed Language），如 Java、C#、C++ 等
+
+### TypeScript 是什么
+
+TypeScript 是 JavaScript 的一个超集，主要提供了类型系统和对 ES6-ES10 的支持。TypeScript 由 Microsoft 开发，是 JavaScript 的一个开源语言。
+
+### 为什么要使用 TypeScript
+
+- 代码更加健壮，更少的 Bug ，在编译阶段就能发现大部分错误，减少线上 Bug
+- 函数或者类的参数类型更加明确，代码本身就是一种文档
+- 更好的 IDE 支持，包括代码提示、类型提示、自动补全等
+- 包容性更好，TypeScript 是 JavaScript 的超集，可以很好的兼容 JavaScript 代码
+
+**缺点**：增加了学习成本，需要学习 TypeScript 的语法，需要编译成 JavaScript 才能运行。
+
+### 安装 TypeScript
+
+需要先安装 Node.js，然后使用 npm 安装 TypeScript。
+
+```bash
+npm install -g typescript
+```
+
+检查是否安装成功
+
+```bash
+tsc -v
+```
+
+`tsc` 即 TypeScript Compiler，是 TypeScript 的编译器。
+
+### Hello World
+
+新建一个 `hello.ts` 文件，输入以下代码：
+
+```ts
+function hello(person: string) {
+  // 指定 person 参数类型为 string
+  return 'Hello, ' + person;
+}
+
+hello('TypeScript');
+```
+
+编译成 JavaScript 文件：
+
+```bash
+tsc hello.ts
+```
+
+会生成一个 `hello.js` 文件，内容如下：
+
+```js
+function hello(person) {
+  return 'Hello, ' + person;
+}
+
+hello('TypeScript');
+```
+
+如果传入的参数不是字符串:
+
+```ts
+hello(123);
+```
+
+编译时会报错：
+
+```bash
+tsc hello.ts
+hello.ts:2:12 - error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+```
+
+我们会发现，编译后的 JavaScript 文件中没有类型信息，这是因为 TypeScript 本质上是开发时的工具，编译后的 JavaScript 文件是为了在浏览器中运行的，所以不需要类型信息。
+
+## 基本类型
+
+### 基础类型
+
+- 布尔值（Boolean）
+- 数字（Number）
+- 字符串（String）
+- 数组（Array）
+- 长整型（BigInt）
+- Symbol
+- Null
+- Undefined
+
+#### 布尔值（Boolean）
+
+```ts
+let isDone: boolean = false;
+```
+
+#### 数字（Number）
+
+ES6 提供了二进制和八进制数值的新的写法，分别用前缀 0b（或 0B）和 0o（或 0O）表示。
+
+```ts
+let decLiteral: number = 6;
+let hexLiteral: number = 0xf00d;
+let binaryLiteral: number = 0b1010;
+let octalLiteral: number = 0o744;
+```
+
+#### 字符串（String）
+
+```ts
+let name: string = 'bob';
+name = 'smith';
+```
+
+另外还可以使用模板字符串，它可以定义多行文本和内嵌表达式。这种字符串是被反引号包围，并且以 `${ expr } `这种形式嵌入表达式。
+
+```ts
+let name: string = `Gene`;
+let age: number = 37;
+let sentence: string = `Hello, my name is ${ name }. I'll be ${ age + 1 } years old next month.`;
+```
+
+#### 数组（Array）
+
+```ts
+let list: number[] = [1, 2, 3];
+let list: Array<number> = [1, 2, 3];
+```
+
+#### 长整型（BigInt）
+
+```ts
+const max: bigint = 9007199254740991n;
+```
+
+#### Symbol
+
+```ts
+let sym1 = Symbol();
+let sym2 = Symbol('key');
+```
+
+#### Null
+
+```ts
+let n: null = null;
+```
+
+#### Undefined
+
+```ts
+let u: undefined = undefined;
+```
+
+### Any
+
+在 TypeScript 中，任何类型都可以赋值给 any 类型，而 any 类型也可以赋值给任何类型。
+
+```ts
+let notSure: any = 4;
+notSure = 'maybe a string instead';
+notSure = false; // okay, definitely a boolean
+```
+
+### 联合类型
+
+联合类型（Union Types）表示取值可以为多种类型中的一种。
+
+```ts
+let myFavoriteNumber: string | number = 'seven';
+myFavoriteNumber = 'seven';
+myFavoriteNumber = 7;
+```
+
+但是，访问联合类型的属性或方法时，只能访问此联合类型的所有类型里共有的属性或方法，不能访问其他类型的属性或方法。
+
+### 数组
+
+```ts
+let fibonacci: number[] = [1, 1, 2, 3, 5];
+```
+
+或者使用数组泛型，泛型将在后面介绍。
+
+```ts
+let fibonacci: Array<number> = [1, 1, 2, 3, 5];
+```
+
+类数组：
+
+```ts
+function sum() {
+  let args: {
+    [index: number]: number;
+    length: number;
+    callee: Function;
+  } = arguments;
+}
+```
+
+类数组不是数组类型，比如 arguments。常见的类数组都有自己的接口定义，如 IArguments, NodeList, HTMLCollection 等，类数组不具备数组的一些方法，比如 push，pop 等，所以在 TypeScript 中，类数组只能用接口表示。
+
+### 元组（Tuple）
+
+元组（Tuple）合并了不同类型的对象，比如一个数组合并了多种类型的对象。
+
+```ts
+let xcatliu: [string, number] = ['Xcat Liu', 25];
+```
+
+## 接口
+
+
+Interface 接口可以用来定义对象的类型。
+
+### 功能
+
+- 描述对象的形状（Shape）
+- 对类（Class）进行抽象
+- Duck Typing（鸭子类型），即如果一个对象有某些属性，那么就可以认为它是某种类型
+
+### 接口定义
+
+```ts
+interface Person {
+  name: string;
+  age: number;
+}
+
+let tom: Person = {
+  name: 'Tom',
+  age: 25,
+};
+```
+
+倘若不一致：  
+
+```ts
+interface Person {
+  name: string;
+  age: number;
+}
+
+let tom: Person = {
+  name: 'Tom',
+};
+```
+
+那么会报错：  
+
+```ts
+Type '{ name: string; }' is not assignable to type 'Person'.
+  Property 'age' is missing in type '{ name: string; }' but required in type 'Person'.
+```
+
+### 可选属性
+
+当然，也可以定义可选属性：  
+
+```ts
+interface Person {
+  name: string;
+  age?: number;
+}
+
+let tom: Person = {
+  name: 'Tom',
+};
+```
+
+由于可选属性的存在，那么就不会报错了。  
+
+### 只读属性
+
+```ts
+interface Person {
+  readonly id: number;
+  name: string;
+  age?: number;
+}
+
+let tom: Person = {
+  id: 89757,
+  name: 'tom',
+  age:10,
+};
+
+tom.id = 9527;
+```
+
+上述代码会报错：  
+
+```ts
+Cannot assign to 'id' because it is a read-only property.
+```
+
+## 函数
+
+
+> 函数时一等公民，可以作为参数传递，也可以作为返回值返回。
+
+### 函数定义
+
+```ts
+function add(x: number, y: number): number {
+  return x + y;
+}
+
+let result = add(1, 2);
+```
+
+第一、第二个 `number` 表示参数类型，第三个 `number` 表示函数的返回值类型。
+
+如果过多或过少的参数，那么会报错：
+
+```ts
+function add(x: number, y: number): number {
+  return x + y;
+}
+
+let result = add(1);
+```
+
+```ts
+Type '(x: number) => number' is not assignable to type '(x: number, y: number) => number'.
+  Types of parameters 'x' and 'x' are incompatible.
+    Type 'number' is not assignable to type 'string'.
+```
+
+### 可选参数
+
+```ts
+function add(x: number, y?: number): number {
+  return y ? x + y : x;
+}
+
+let result = add(1);
+```
+
+可选参数只能放在最后，否则会报错：
+
+```ts
+function add(x?: number, y: number): number {
+  return y ? x + y : x;
+}
+
+let result = add(1);
+```
+
+```ts
+Type '(x?: number, y: number) => number' is not assignable to type '(x: number, y?: number) => number'.
+  Types of parameters 'x' and 'x' are incompatible.
+    Type 'number' is not assignable to type 'number | undefined'.
+```
+
+### 函数表达式
+
+```ts
+const add = function (x: number, y: number): number {
+  return x + y;
+};
+
+let result = add(1, 2);
+```
+
+### 箭头函数
+
+在 ES6 中，可以使用箭头函数，简化函数表达式的定义：
+
+```ts
+const add = (x: number, y: number): number => {
+  return x + y;
+};
+
+let result = add(1, 2);
+```
+
+### 类型推断
+
+在 TypeScript 中，如果没有明确指定类型，那么 TS 会自动推断出一个类型：
+
+```ts
+const add = (x: number, y: number) => {
+  return x + y;
+};
+
+let result = add(1, 2);
+```
+
+此时，`result` 的类型会被推断为 `number`。
+
+## 类
+
+### 面向对象
+
+- 类（class）：抽象的概念，是一类事物的抽象，是一类事物的模板，是一类事物的蓝图
+- 对象（object）：具体的事物，是类的实例，是类的具体表现
+- 面向对象（OOP）：是一种编程思想，是一种解决问题的思路和方法，有三大特征：封装、继承、多态
+
+### 类的定义
+
+```ts
+class Animal {
+  name: string;
+  constructor(name: string) {
+    this.name = name;
+  }
+  run() {
+    return `${this.name} is running`;
+  }
+}
+```
+
+上面的代码定义了一个类 `Animal`，它包含了两个成员：`name` 和 `run`。其中，`name` 是一个实例属性，`run` 是一个实例方法。注意，**实例属性必须有初始值或者在构造函数中被初始化**。
+
+`constructor` 是构造函数，它会在类被实例化的时候被调用，用来初始化实例属性。上面的代码中，`constructor` 接受一个 `name` 参数，然后把它赋值给 `name` 实例属性，这个过程是在实例化的时候自动完成的。
+
+我们可以创建一个 `Animal` 的实例：
+
+```ts
+const snake = new Animal('lily');
+console.log(snake.run()); // lily is running
+```
+
+:::tip ts-node
+ts-node 是一个 TypeScript 的执行环境，可以直接在命令行中运行 TypeScript 代码，不需要编译成 `js` 文件。如果你使用的是 `ts-node`，那么你可以直接在命令行中运行上面的代码，不需要编译成 `js` 文件。实际上是 `ts-node` 帮我们编译成了 `js` 文件，然后再执行的。
+:::
+
+### 类的继承
+
+```ts
+class Dog extends Animal {
+  bark() {
+    return `${this.name} is barking`;
+  }
+}
+```
+
+然后调用 `Dog` 的实例方法：
+
+```ts
+const xiaobao = new Dog('xiaobao');
+console.log(xiaobao.run()); // xiaobao is running
+console.log(xiaobao.bark()); // xiaobao is barking
+```
+
+还可以重写构造函数：
+
+```ts
+class Cat extends Animal {
+  constructor(name) {
+    super(name);
+    console.log(this.name);
+  }
+  run() {
+    return 'Meow, ' + super.run();  // 注意这里的 super
+  }
+}
+
+const maomao = new Cat('maomao');
+console.log(maomao.run()); // Meow, maomao is running
+```
+
+在构造函数中，必须使用 `super` 调用父类的构造函数，否则会报错。这是因为子类实例的创建，是基于父类实例的创建的，如果不调用 `super`，子类实例就得不到 `this` 对象，而 `this` 对象是实例化类时最为重要的一个环节。
+
+### 类的修饰符
+
+TypeScript 中有三种修饰符：`public`、`protected`、`private`。
+
+#### public
+
+`public` 修饰符是默认的修饰符，可以省略不写。`public` 修饰符修饰的属性或方法是**公有的**，可以在任何地方被访问到。
+
+```ts
+class Animal {
+  public name: string;
+  public constructor(name: string) {
+    this.name = name;
+  }
+  public run() {
+    return `${this.name} is running`;
+  }
+}
+
+const snake = new Animal('lily');
+// 更新 name 属性
+snake.name = 'lucy'; // 正确
+```
+
+#### praivate
+
+`private` 修饰符修饰的属性或方法是**私有的**，不能在声明它的类的外部访问。**在子类中也是不允许访问的**。
+
+```ts
+class Animal {
+  private name: string;
+  public constructor(name: string) {
+    this.name = name;
+  }
+  public run() {
+    return `${this.name} is running`;
+  }
+}
+
+const snake = new Animal('lily');
+// 更新 name 属性
+snake.name = 'lucy'; // 报错
+```
+
+#### protected
+
+`protected` 修饰符修饰的属性或方法是**受保护的**，它和 `private` 类似，区别是它在**子类中也是允许被访问的**。
+
+```ts
+class Animal {
+  protected name: string;
+  public constructor(name: string) {
+    this.name = name;
+  }
+  public run() {
+    return `${this.name} is running`;
+  }
+}
+
+// 更新 name 属性
+snake.name = 'lucy'; // 报错
+
+
+// 在子类中访问
+
+class Dog extends Animal {
+  bark() {
+    return `${this.name} is barking`;   // 正确
+  }
+}
+
+const xiaobao = new Dog('xiaobao');
+console.log(xiaobao.bark()); // xiaobao is barking
+```
+
+#### readonly
+
+`readonly` 修饰符修饰的属性**只读**，不能被修改。由于 `readonly` 修饰符修饰的属性是**只读**的，所以必须在声明时或构造函数中被初始化。被它修饰的属性和方法被称为静态属性和方法。
+
+```ts
+class Animal {
+  public readonly name: string;
+  public constructor(name: string) {
+    this.name = name;
+  }
+}
+
+const snake = new Animal('lily');
+// 更新 name 属性
+snake.name = 'lucy'; // 报错
+```
+
+下面是一个静态方法的例子：
+
+```ts
+class Animal {
+  public static categories: string[] = ['mammal', 'bird'];
+  public static isAnimal(a) {
+    return a instanceof Animal;
+  }
+}
+
+console.log(Animal.categories); // ['mammal', 'bird']
+```
+
+### 类和接口
+
+接口可以对类的一部分行为进行抽象，只要类实现了接口中的方法，就可以认为它实现了这个接口。  
+
+在下面的例子中，`car` 和 `cellphone` 都实现了 `Radio` 接口，所以它们都有 `switchRadio` 方法。我们可以把 `Radio` 接口看成是一个规范，只要满足这个规范的类都可以实现这个接口。
+
+```ts
+class Car{
+    switchRadio(trigger: boolean) {
+        // ...
+    }
+}
+
+class Cellphone {
+    switchRadio(trigger: boolean) {
+        // ...
+    }
+}
+```
+
+实现 `Radio` 接口:  
+
+```ts
+interface Radio {
+    switchRadio(trigger: boolean): void;
+}
+```
+
+在 `Car` 和 `Cellphone` 类中使用 implements 关键字实现 `Radio` 接口:  
+
+```ts
+class Car implements Radio {
+    switchRadio(trigger: boolean) {
+        // ...
+    }
+}
+
+class Cellphone implements Radio {
+    switchRadio(trigger: boolean) {
+        // ...
+    }
+}
+```
+
+备注：如果不实现 `Radio` 接口中的 `switchRadio` 方法，那么 `Car` 类就会报错。  
+
+可以实现多个接口，用逗号隔开:  
+
+```ts
+interface Radio {
+    switchRadio(trigger: boolean): void;
+}
+
+interface Battery {
+    checkBatteryStatus(): void;
+}
+
+class cellPhone implements Radio, Battery {
+    switchRadio(trigger: boolean) {
+        // ...
+    }
+
+    checkBatteryStatus() {
+        // ...
+    }
+}
+```
+
+甚至可以将接口继承自另一个接口:  
+
+```ts
+interface Radio {
+    switchRadio(trigger: boolean): void;
+}
+
+interface Battery {
+    checkBatteryStatus(): void;
+}
+
+interface RadioWithBattery extends Radio {
+    checkBatteryStatus(): void;
+}
+
+class cellPhone implements RadioWithBattery {   // 这里只用写 RadioWithBattery 接口就可以了
+    switchRadio(trigger: boolean) {
+        // ...
+    }
+
+    checkBatteryStatus() {
+        // ...
+    }
+}
+```
+
+## 枚举
+
+### 数字枚举
+
+```ts
+enum Direction {
+  Up = 1,
+  Down,
+  Left,
+  Right,
+}
+```
+
+枚举成员会被赋值为从 0 开始递增的数字，同时也会对枚举值到枚举名进行反向映射：
+
+```ts
+console.log(Direction.Up); // 1
+console.log(Direction[1]); // Up
+```
+
+当然我们可以手动赋值：
+
+```ts
+enum Direction {
+  Up = 10,
+  Down,
+  Left,
+  Right,
+}
+```
+
+此时，`Up` 为 10，`Down` 为 11，依次类推。
+
+它会被编译为：
+
+```js
+var Direction;
+(function (Direction) {
+  Direction[(Direction["Up"] = 10)] = "Up";
+  Direction[(Direction["Down"] = 11)] = "Down";
+  Direction[(Direction["Left"] = 12)] = "Left";
+  Direction[(Direction["Right"] = 13)] = "Right";
+})(Direction || (Direction = {})); // 这里的 Direction || (Direction = {}) 是为了防止重复声明
+```
+
+### 字符串枚举
+
+```ts
+enum Direction {
+  Up = "UP",
+  Down = "DOWN",
+  Left = "LEFT",
+  Right = "RIGHT",
+}
+```
+
+假如从服务器获取到的数据是 `UP`，那么我们可以通过 `Direction.Up` 来获取到 `UP`。
+
+```ts
+const value = "UP";
+if (value === Direction.Up) {
+  // ...
+}
+```
+
+### 常量枚举
+
+```ts
+const enum Direction {
+  Up,
+  Down,
+  Left,
+  Right,
+}
+```
+
+使用常量枚举可以提升性能，因为它会在编译阶段被移除。  
+
+```ts
+const enum Direction {
+  Up,
+  Down,
+  Left,
+  Right,
+}
+
+const value=1;
+if (value === Direction.Up) {
+  // ...
+}
+```
+
+编译后：
+
+```js
+const value = 1;
+if (value === 0 /* Up */) {
+  // ...
+}
+```
+
+## 泛型
+
+> 泛型是 TypeScript 中最难理解的概念之一，但是它也是 TypeScript 中最强大的特性之一。泛型提供了一种在定义函数、接口或类的时候，不预先指定具体类型的方式。
+
+### 为什么需要泛型
+
+如果用 js 来实现一个函数来 return 传入的参数，那么就是这样的：
+
+```js
+function identity(arg) {
+  return arg;
+}
+```
+
+那么在 ts 中，我们应该怎样写呢？  
+
+```ts
+function identity(arg: number): number {
+  return arg;
+}
+```
+
+但是这样写的话，我们就只能传入 number 类型的参数了，如果我们想传入 string 类型的参数呢？  
+
+用 `any` 类型来实现：
+
+```ts
+function identity(arg: any): any {
+  return arg;
+}
+```
+
+但是这会导致我们丢失一些信息，比如传入的参数类型和返回的参数类型应该是相同的。如果我们传入一个数字，我们只知道任何类型的值都有可能被返回。例如：  
+
+```ts
+let output :string = identity(123);
+```
+
+上面的例子中，我们传入了一个数字，但是却返回了一个字符串，这行代码不会报错，但是也不会得到我们想要的结果。  
+
+**这时候，我们就可以使用泛型了。**  
+
+```ts
+function identity<T>(arg: T): T {
+  return arg;
+}
+```
+
+这里的 T 是我们创建的泛型的名称，我们可以在函数体中使用这个泛型。实质上它是一个占位符，我们可以传入任何类型的参数，比如：  
+
+```ts
+let output = identity('myString'); // type of output will be 'string'
+```
+
+这里还涉及了类型推论，因为我们传入了一个字符串，所以编译器会自动推断出我们的参数类型为 string，而不是 any。
+
+如果我们想要的和传入的参数类型不一样：  
+
+```ts
+function loggingIdentity<T>(arg: T): T {
+  return arg;
+}
+
+const res:string = loggingIdentity(123);
+```
+
+这里会报错，因为我们传入的参数类型是 number，但是我们想要的参数类型是 string。
+
+下面是一个更复杂的例子：  
+
+```ts
+function swap<T, U>(tuple: [T, U]): [U, T] {
+  return [tuple[1], tuple[0]];
+}
+
+swap([7, 'seven']); // ['seven', 7]
+swap([true, 123]); // [123, true]
+```
+
+这里我们传入了一个元组，然后返回了一个元组，但是元组中的类型是反过来的。
+
+### 泛型约束
+
+有下面一个例子：  
+
+```ts
+function loggingIdentity<T>(arg: T): T {
+  console.log(arg.length);  // Error: T doesn't have .length
+  return arg;
+}
+```
+
+这里会报错，因为我们传入的参数可能没有 length 属性，所以我们需要对传入的参数进行指定。  
+
+```ts
+function loggingIdentity<T>(arg: T[]): T[] {
+  console.log(arg.length);  // Error: T doesn't have .length
+  return arg;
+}
+
+const res = loggingIdentity([1, 2, 3]);
+```
+
+但是我们可以进一步的优化，我们可以使用泛型约束来实现：  
+
+```ts
+interface Lengthwise {
+  length: number;
+}
+
+function loggingIdentity<T extends Lengthwise>(arg: T): T {
+  console.log(arg.length);  // Now we know it has a .length property, so no more error
+  return arg;
+}
+
+const res = loggingIdentity([1, 2, 3]);
+const res2 = loggingIdentity({length: 10, value: 3});
+const res3 = loggingIdentity('123'); 
+const res4 = loggingIdentity(123); // Error, number doesn't have a .length property
+```
+
+上面的代码表示传入的参数必须包含 length 属性。否则会报错。
+
+### 类和接口中的泛型
+
+#### 类
+
+我们同样可以在类和接口中使用泛型。我们要实现一个队列类，它有一个 push 方法和一个 pop 方法，我们可以使用数组来实现：  
+
+```ts
+class Queue {
+  private data = [];
+  push(item) {
+    return this.data.push(item);
+  }
+  pop() {
+    return this.data.shift();
+  }
+}
+
+const queue = new Queue();
+queue.push(1);
+queue.push('str');
+console.log(queue.pop().toFixed()); // 1 ,toFix()方法是number类型的方法
+console.log(queue.pop().toFixed()); // Error, toFix()方法是number类型的方法，但是这里是string类型
+```
+
+在上面的例子中，我们可以看到，我们可以向队列中添加任何类型的数据，但是当我们调用 pop 方法的时候，我们只能得到 any 类型的数据，这样就会导致我们调用 any 类型的方法的时候会报错。我们希望在任何时候，我们推入和弹出的数据类型是一致的。  
+
+```ts
+class Queue<T> {
+  private data = [];
+  push(item: T) {
+    return this.data.push(item);
+  }
+  pop(): T {
+    return this.data.shift();
+  }
+}
+
+const queue = new Queue<number>();
+queue.push(1);
+queue.push('str'); // Error, 'str' is not assignable to parameter of type 'number'
+console.log(queue.pop().toFixed()); // 1 ,toFix()方法是number类型的方法
+
+const queue2 = new Queue<string>();
+queue2.push('str');
+queue2.push(1); // Error, 1 is not assignable to parameter of type 'string'
+console.log(queue2.pop().length); // 3 ,length是string类型的方法
+```
+
+#### 接口
+
+我们可以使用接口来定义一个类的结构，我们可以使用泛型来定义一个接口的结构。  
+
+```ts
+interface KeyPair<T, U> {
+  key: T;
+  value: U;
+}
+
+let kp1: KeyPair<number, string> = { key: 123, value: 'str' }; // OK
+let kp2: KeyPair<string, number> = { key: 'str', value: 123 }; // OK
+let kp3: KeyPair<number, string> = { key: 123, value: 123 }; // Error, 123 is not assignable to type
+```
+
+前面提到数组初始化的时候，我们可以使用泛型来定义数组的类型，我们也可以使用泛型来定义数组的结构。  
+
+```ts
+let arr: Array<number> = [1, 2, 3];
+let arr2: Array<string> = ['1', '2', '3'];
+```
+
+同样也可使用泛型来描述一个函数类型。  
+
+```ts
+interface IPlus<T> {
+  (a: T, b: T): T;
+}
+
+function plus(a: number, b: number): number {
+  return a + b;
+}
+
+function connect(a: string, b: string): string {
+  return a + b;
+}
+
+const a: IPlus<number> = plus;
+const b: IPlus<string> = connect;
+```
+
+## 类型别名和断言
+
+
+### 类型别名
+
+类型别名（Type Aliases）是 TypeScript 1.9 版本中引入的新特性，它可以给一个类型起一个新的名字。  
+
+```ts
+type PlusType = (x: number, y: number) => number;
+
+function add(x: number, y: number): number {
+  return x + y;
+}
+
+const add2: PlusType = add;
+```
+
+另一个例子：
+
+```ts
+type NameResolver = () => string;
+type NameOrResolver = string | NameResolver;
+function getName(n: NameOrResolver): string {
+  if (typeof n === "string") {
+    return n;
+  } else {
+    return n();
+  }
+}
+```
+
+### 类型断言
+
+类型断言（Type Assertion）可以用来手动指定一个值的类型。  
+
+```ts
+function getLength(input: string | number): number {
+  const str = input as String;  // 类型断言，注意这里的写法，String 不是 string，这里是一个对象
+  if (str.length) {
+    return str.length;
+  } else {
+    const number = input as Number;
+    return number.toString().length;
+  }
+}
+```
+
+或者可以这样写：  
+
+```ts
+function getLength(input: string | number): number {
+  const str = <string>input;  // 类型断言
+  if (str.length) {
+    return str.length;
+  } else {
+    const number = <number>input;
+    return number.toString().length;
+  }
+}
+```
+
+### 声明文件
+
+声明文件（Declaration Files）是一个全局的概念，它是用来描述一个库的 API 的，比如 jQuery、React、Vue 等等。  
+
+例如，我们想使用 jQuery，那么我们需要引入 jQuery 的声明文件：  
+
+```ts
+// index.ts
+import $ from 'jquery';
+declare var jQuery: (selector: string) => any;
+```
+
+可以将这个文件命名为 `index.d.ts`，然后在 `tsconfig.json` 中配置 `"include": ["index.d.ts"]`。在别的文件中就可以使用 jQuery 了。  
+
+```ts
+// index.ts
+import $ from 'jquery';
+jQuery('#foo');
+```
+
+实际上，jQuery 的声明文件已经在 `@types/jquery` 中了，我们可以直接安装使用：  
+
+```ts
+npm install @types/jquery --save-dev
+```
+
+这里的 `@types` 是一个 npm 包，它包含了很多第三方库的声明文件。包括但不限于：jQuery、React、Vue、Angular、Node 等等。
+
+## 高级特性
+
+### 交叉类型
+
+交叉类型（Intersection Types）是将多个类型合并为一个类型。  
+
+```ts
+interface DogInterface {
+  run(): void;
+}
+
+interface CatInterface {
+  jump(): void;
+}
+
+let pet: DogInterface & CatInterface = {
+  run() {},
+  jump() {}
+};
+```
+
+交叉类型是将多个类型合并为一个类型，这就意味着这个类型拥有了所有类型的特性。
+
+### 类型保护和类型守卫
+
+类型保护（Type Guards）是一些表达式，它们会在运行时检查以确保在某个作用域里的类型。  
+
+```ts
+function add(first: string | number, second: string | number) {
+  if(typeof first === 'string' || typeof second === 'string') {
+    return `${first}${second}`;
+  }
+    return first + second;
+}
+```
+
+这段代码具体来说，就是在 `add` 函数中，我们使用了类型保护，它的作用是在运行时检查 `first` 和 `second` 的类型，如果是 `string` 类型，就执行拼接字符串的操作，否则就执行加法操作。  
+
+或者看下面这个例子:  
+
+```ts
+interface IA {
+    a1:1,
+    a2:2
+}
+
+interface IB {
+    b1:1,
+    b2:2
+}
+
+function fn1(obj:IA|IB){
+    if(obj.a1){
+        console.log(obj.a1)
+    }else{
+        console.log(obj.b1)
+    }
+}
+```
+
+这段代码执行时，会报错，因为 `obj` 的类型是 `IA | IB`，而 `obj.a1` 和 `obj.b1` 都可能不存在，所以会报错。  
+
+我们可以使用类型保护来解决这个问题:  
+
+```ts
+interface IA {
+    a1:1,
+    a2:2
+}
+
+interface IB {
+    b1:1,
+    b2:2
+}
+
+// 他的返回值是一个类型谓词
+function getIsIA(obj:IA|IB):obj is IA{
+    return (obj as IA).a1;
+}
+
+function fn1(obj:IA|IB){
+    if(getIsIA(obj)){
+        console.log(obj.a1)
+    }else{
+        console.log(obj.b1)
+    }
+}
+```

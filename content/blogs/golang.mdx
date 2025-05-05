@@ -1,0 +1,2869 @@
+---
+title: Go 语言快速入门
+date: "2023-12-10"
+description: Go 语言是一种开源编程语言，旨在提高编程效率。本文将介绍 Go 语言的基本语法和特性。
+published: true
+tags: ["Go", "编程语言", "速查"]
+---
+
+## The Go Programming Language
+
+![](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/motorcycle.svg)
+
+### 介绍
+
+Go 语言是一门并发支持、垃圾回收的编译型系统编程语言，旨在创造一门具有静态类型、高效、可移植、可靠性和简单的编程语言。
+
+Go 由 Robert Griesemer, Rob Pike, Ken Thompson 在 2007 年 9 月开始设计和实现，后来还加入了 Ian Lance Taylor, Russ Cox 等人，并最终于 2009 年 11 月开源，在 2012 年早些时候发布了 Go 1 稳定版本。现在 Go 的开发已经是完全开放的，并且拥有一个活跃的社区。
+
+Go 依托于 Google ，被认为是未来极具潜力的语言之一。它已经被很多大厂使用。
+
+### 特性
+
+- 自动垃圾回收
+- 更丰富的内置类型
+- 函数多返回值
+- 错误处理
+- 内存安全
+
+### 官网
+
+[https://golang.org/](https://golang.org/)
+
+## 基础
+
+### 环境搭建
+
+#### 下载安装包
+
+[下载地址](https://golang.org/dl/)
+
+下载完成后，可以使用 `go version` 查看版本信息。
+
+```bash
+$ go version
+go version go1.15.6 darwin/amd64
+```
+
+### 环境变量
+
+Go 语言中环境变量主要有两个：
+
+- `GOROOT`：Go 语言的安装目录。`GOROOT/src` 目录下的函数都可以被导入和使用。例如 `fmt.Println`。
+- `GOPATH`：除了 Go 语言的安装目录外的源码目录，同样可以调用目录下的函数。
+
+可以使用 `go env` 查看环境变量。
+
+```bash
+$ go env GOROOT
+/usr/local/go
+$ go env GOPATH
+/Users/username/go
+```
+
+可以使用 `export` 命令设置环境变量。
+
+```bash
+$ export GOROOT=/usr/local/go
+$ export GOPATH=/Users/username/go
+```
+
+### IDE
+
+通常使用 GoLand 进行开发。下载地址：[GoLand](https://www.jetbrains.com/go/)
+
+### Go 的跨平台
+
+Java 一直遵循一次编译，到处运行的原则，虽然 Go 不是一次编译，到处运行的语言，但是能做到**一次编写，到处运行**。这是因为 Go 不像 Java 拥有自己的虚拟机，Go 语言的编译器会将 Go 代码编译成机器码，然后直接运行在操作系统上。虽然牺牲了一定的便利性，但是保障了性能。
+
+Go 语言会区分运行程序的操作系统，主要通过**操作系统**和**CPU 架构**来区分。
+
+```bash
+$ go env GOOS
+windows
+$ go env GOARCH
+amd64
+```
+
+常见的 Goos 和 Goarch 如下：
+
+| GOOS | GOARCH | 说明 |
+| --- | --- | --- |
+| darwin | amd64 | Mac OS |
+| linux | amd64 | Linux |
+| windows | amd64 | Windows |
+
+可以使用 `go tool dist list` 查看所有支持的操作系统和 CPU 架构。
+
+```bash
+$ go tool dist list
+```
+
+我们无需进行任何显式的操作，Go 语言会自动识别当前的操作系统和 CPU 架构，然后编译成对应的可执行文件。
+
+不过当我们尝试在 MacOS 上编译 Windows 的可执行文件时，需要进行一些额外的操作。
+
+```bash
+$ export GOOS=windows GOARCH=amd64
+$ go build hello.go
+```
+
+如果要恢复原来的运行状态，需要对这两个变量进行清空。
+
+```bash
+$ export GOOS= GOARCH=
+```
+
+### 编译执行过程
+
+我们通过 `go help build` 查看编译命令的帮助信息。
+
+```bash
+$ go help build
+- a
+    force rebuilding of packages that are already up-to-date.
+- n
+    print the commands but do not run them.
+...
+```
+
+有三个值得我们关注的参数：
+
+- `-n`：打印编译的详细过程，但不执行。相当于预览。
+- `-x`：打印编译的详细过程，并执行。
+- `--work`：打印编译的详细过程，并且保留生成的中间文件和目录，方便我们进行调试。
+
+```bash
+$ go build -x hello.go
+WORK=/var/folders/28/1z5z1j7d7zq7z1z7z1z7z1z7z1z7z1z/T/go-build1234567890
+mkdir -p $WORK/b001/
+cat >$WORK/b001/_gomod_.go << 'EOF' ## internal
+packagefile command-line-arguments=/Users/username/Libraries/Caches/go-build/12/34567890abcdefg
+packagefile fmt=/usr/local/go/src/fmt.a
+packagefile runtime=/usr/local/go/src/runtime.a
+...
+...
+...
+packagefile runtime=/usr/local/go/src/path.a
+modinfo "0w\xaf\x1f\x.."
+EOF
+mkdir -p $WORK/b001/exe/
+cd .
+/usr/local/go/pkg/tool/darwin_amd64/compile -o $WORK/b001/exe/hello -trimpath $WORK -p main -complete -buildid 1234567890abcdefg -D _/Users/username/Libraries/Caches/go-build -I $WORK/b001 -pack ./hello.go
+/usr/local/go/pkg/tool/darwin_amd64/link -o $WORK/b001/exe/a.out -L $WORK/b001 -extld=clang -buildmode=exe -buildid=1234567890abcdefg $WORK/b001/exe/hello
+mv $WORK/b001/exe/a.out hello
+```
+
+### 快速开始
+
+#### Hello World
+
+```bash
+$ mkdir hello
+$ cd hello
+$ go mod init hello
+go: creating new go.mod: module hello
+```
+通过 `go mod init` 命令初始化一个新的模块，会在当前目录下生成一个 `go.mod` 文件，内容如下：
+
+```go
+module hello
+
+go 1.15
+```
+
+然后创建一个 `hello.go` 文件，内容如下：
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, World!")
+}
+```
+运行 `go run hello.go`，可以看到输出结果：
+
+```bash
+$ go run hello.go
+Hello, World!
+```
+
+#### Main 函数
+
+Go 程序的入口是 `main` 函数。
+
+Go 程序执行时，将先从 fmt 包中导入 `Println` 函数以及其他的函数，并在 main 函数中调用。
+
+#### 编译
+
+```bash
+$ go build
+$ ./hello
+Hello, World!
+```
+这里 `go build` 命令会生成一个可执行文件，然后执行该文件。
+
+在 Windows 系统下，会生成一个 `hello.exe` 文件，然后执行该文件。
+
+### 注释和转义符
+
+#### 注释
+
+Go 语言中的注释有两种，分别是单行注释和多行注释。
+
+单行注释以 `//` 开头，多行注释以 `/*` 开头，以 `*/` 结尾。
+
+```go
+// 这是单行注释
+
+/*
+这是多行注释
+*/
+```
+
+不过不推荐使用多行注释，Go 在源代码中均使用单行注释。
+
+#### 转义符
+
+Go 语言中的转义符有以下几种：
+
+| 转义符 | 含义 |
+| --- | --- |
+| `\r` | 回车符（返回行首） |
+| `\n` | 换行符（直接跳到下一行的同列位置） |
+| `\t` | 制表符 |
+| `\\` | 反斜杠 |
+| `\'` | 单引号 |
+| `\"` | 双引号 |
+
+转义符的使用十分麻烦，推荐使用后面的[原义字符](#原义字符)。
+
+### 原义字符
+
+类似于 JS 中的模板字符串，Go 语言中也有原义字符。
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    a := `"hello
+    world"`
+    fmt.Println(a)
+}
+```
+
+输出结果：
+
+```bash
+"hello
+    world"
+```
+
+### Go 的分号
+
+Go 语言中的语句结尾不需要分号，如果写了分号，编译器会自动忽略。
+
+### fmt 格式化字符
+
+| 格式化字符 | 含义 |
+| --- | --- |
+| %v | 值的默认格式 |
+| %+v | 类似 %v，但输出结构体时会添加字段名 |
+| %#v | 值的 Go 语法表示 |
+| %T | 值的类型的 Go 语法表示 |
+| %% | 百分号 |
+| %b | 二进制表示 |
+| %c | 相应 Unicode 码点所表示的字符 |
+| %d | 十进制表示 |
+| %o | 八进制表示 |
+| %q | 单引号围绕的字符字面值，由 Go 语法安全地转义 |
+| %x | 十六进制表示，字母形式为小写 a-f |
+| %X | 十六进制表示，字母形式为大写 A-F |
+| %U | Unicode 格式：U+1234，等同于 "U+%04X" |
+| %e | 科学计数法表示 |
+| %E | 科学计数法表示 |
+| %f | 浮点数表示 |
+| %F | 等价于 %f |
+| %g | 根据情况选择 %e 或 %f 以产生更紧凑的（无末尾的 0）输出 |
+| %G | 根据情况选择 %E 或 %F 以产生更紧凑的（无末尾的 0）输出 |
+| %s | 字符串表示 |
+
+### 运算符
+
+#### 算术运算符
+
+| 运算符 | 含义 |
+| --- | --- |
+| + | 相加 |
+| - | 相减 |
+| * | 相乘 |
+| / | 相除 |
+| % | 求余 |
+
+#### 关系运算符
+
+| 运算符 | 含义 |
+| --- | --- |
+| `==` | 相等 |
+| `!=` | 不等 |
+| `>` | 大于 |
+| `<` | 小于 |
+| `>=` | 大于等于 |
+| `<=` | 小于等于 |
+
+#### 逻辑运算符
+
+| 运算符 | 含义 |
+| --- | --- |
+| `&&` | 逻辑与 |
+| `||` | 逻辑或 |
+| `!` | 逻辑非 |
+
+#### 位运算符
+
+| 运算符 | 含义 |
+| --- | --- |
+| `&` | 按位与 |
+| `|` | 按位或 |
+| `^` | 按位异或 |
+| `<<` | 左移 |
+| `>>` | 右移 |
+
+#### 赋值运算符
+
+| 运算符 | 含义 |
+| --- | --- |
+| `=` | 简单赋值 |
+| `+=` | 相加后赋值 |
+| `-=` | 相减后赋值 |
+| `*=` | 相乘后赋值 |
+| `/=` | 相除后赋值 |
+| `%=` | 求余后赋值 |
+| `<<=` | 左移后赋值 |
+| `>>=` | 右移后赋值 |
+| `&=` | 按位与后赋值 |
+| `\|=` | 按位或后赋值 |
+| `^=` | 按位异或后赋值 |
+
+#### 其他运算符
+
+| 运算符 | 含义 |
+| --- | --- |
+| `&` | 取地址 |
+| `*` | 取指针的值 |
+| `++` | 自增 |
+| `--` | 自减 |
+| `.` | 结构体成员 |
+
+### 命令行参数的接收
+
+Go 中可以通过 `os` 包来接收命令行参数。
+
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+)
+
+func main() {
+    for i, arg := range os.Args {
+        fmt.Printf("arg[%d]: %s\n", i, arg)
+    }
+}
+```
+
+执行 `go run main.go hello world`，可以看到输出结果：
+
+```bash
+arg[0]: /var/folders/28/1z5z1j7d7zq7z1z7z1z7z1z7z1z7z1z/T/go-build1234567890/b001/exe/main
+arg[1]: hello
+arg[2]: world
+```
+
+这是顺序获得命令行参数的方法，实际上还能通过参数名来获取参数。
+
+```go
+package main
+
+import (
+    "flag"
+    "fmt"
+)
+
+func main() {
+    var name = flag.String("name", "everyone", "The greeting object.") // 参数名，默认值，参数说明
+    flag.Parse()  // 解析参数
+    fmt.Println("Hello, ", *name) // *name 表示获取 name 的值, 如果直接使用 name 会输出指针地址
+}
+```
+
+执行 `go run main.go -name=world`，可以看到输出结果：
+
+```bash
+Hello, world
+```
+
+## 变量与数据类型
+
+### 变量与常量
+
+#### 变量（Variable）
+
+变量即一段或多段内存空间，用于存储数据。
+
+Go 语言中的变量声明格式为：
+
+```go
+var 变量名 变量类型
+```
+例如：
+
+```go
+var a int
+var b string
+var c bool
+a = 1
+b = "hello"
+c = true
+var d int = 2
+// Go 具有类型推导，可以不指定类型
+var d = 2 // int
+var e string = "world"
+var f bool = false
+// 类型推导
+var g = 3 // int
+// 简短声明
+h:= 4 // int
+// 避免对已声明的变量进行重复声明
+h:= 5 // 报错
+```
+输出结果：
+
+```bash
+fmt.Print("a=%v, b=%v, c=%v\n", a, b, c)
+fmt.Print("d=%v, e=%v, f=%v\n", d, e, f)
+fmt.Print("g=%v, h=%v\n", g, h)
+```
+此处使用了 `fmt.Print` 函数，`%v` 为占位符，表示输出变量的值。
+
+当然，可以同时声明多个变量：
+
+```go
+var a, b, c int
+a, b, c = 1, 2, 3
+var d, e, f int = 4, 5, 6
+var g, h, i = 7, 8, 9
+j, k, l := 10, 11, 12
+```
+
+对于不同类型的变量必须要分开声明，但是 var 关键字可以共享。
+
+```go
+var (
+    a int = 1
+    b string = "hello"
+    c bool = true
+)
+```
+
+在 Go 中，一个变量只进行了声明而没有赋值，那么它的值就是该类型的零值。以下是 Go 中的一些零值：
+
+- 整型的零值是 0
+- 浮点型的零值是 0.0
+- 布尔型的零值是 false
+- 字符串的零值是 ""
+- 数组的零值是一个全是零值的数组
+- 接口（interface）、切片（slice）、通道（channel）、字典（map）、指针（pointer）、函数（func）的零值是 nil（空指针）
+- 结构体的零值是每个字段都是零值
+
+#### 常量（Constant）
+
+常量即固定值，不可修改。
+
+Go 语言中的常量声明格式为：
+
+```go
+const 常量名 常量类型 = 常量值
+```
+
+例如：
+
+```go
+const a int = 1
+const b string = "hello"
+const c bool = true
+```
+
+还有一种写法
+
+```go
+const (
+    a int = 1
+    b string = "hello"
+    c bool = true
+)
+```
+
+还可以使用 `iota` 来简化常量的定义：
+
+```go
+const (
+    a = iota  // 0
+    b // 1
+    c // 2
+)
+```
+
+`iota` 是一个特殊的常量，它的值默认为 0，每次使用后自动加 1。第一行使用后，后面行可以省略 `iota`。
+
+`iota` **计数不会中断**：
+
+```go
+const (
+    a = iota  // 0
+    b // 1
+    c = 100 // 100
+    d = iota // 3
+    e // 4
+)
+```
+
+但是如果在中断后不再使用 `iota`，则会重新计数：
+
+```go
+const (
+    a = iota  // 0
+    b // 1
+    c = 100 // 100
+    d // 100， 未显式赋值，将使用最近的赋值
+    e = 200 // 200
+    f // 200
+)
+```
+
+`iota` 需要谨慎使用，因为如果插入一个值将会产生骨牌效应，例如数据库中一张表使用枚举值表示状态，如果插入一个状态，将会导致后面的状态值全部改变，这将与之前的业务表达不符。例如：
+
+```go
+cosnt {
+    INIT = iota
+    START
+    STOP
+    PAUSE
+    FINISH
+}
+```
+
+在数据库中，上述的状态值分别对应 0、1、2、3、4。当某天程序员需要在 `START` 和 `STOP` 之间插入一个状态，例如为 `RUNNING`，那么 `STOP` 的值将变为 3，`PAUSE` 的值将变为 4，`FINISH` 的值将变为 5。这将导致数据库中的状态值全部改变，这是不可接受的。
+
+最佳使用 `iota` 的场景是在枚举类型中，例如：
+
+```go
+const (
+    MONDAY = iota
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
+)
+```
+
+但是如果我们希望从 1 开始计数，可以使用占位符 `_`：
+
+```go
+const (
+    _ = iota
+    MONDAY
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
+)
+```
+
+当然也可以使用 `iota+1`：
+
+```go
+const (
+    MONDAY = iota + 1
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
+)
+```
+
+#### 全局变量/常量
+
+变量通常的作用域为当前代码块，如果想要在整个包中使用，可以使用全局变量。全局变量和函数具有相同的作用域。
+
+全局变量的声明格式为：
+
+```go
+var 变量名 变量类型
+```
+
+注意，全局变量的声明不能使用 `:=`，只能使用 `var`。
+
+#### 全局跨包变量/常量
+
+如果想要在其他包中使用全局变量，需要将变量名首字母大写。
+
+例如：
+
+```go
+// demo/note/note.go
+package note
+
+var Note string = "hello"
+```
+
+```go
+// demo/main.go
+
+import (
+    "demo/note"
+    "fmt"
+)
+
+func main() {
+    fmt.Println(note.Note)
+}
+```
+
+#### 没有多余的局部变量
+
+Go 语言中，如果声明了一个局部变量，但是没有使用，编译器会报错。
+
+```go
+func main() {
+    var a int
+}
+```
+
+这里声明了一个变量 `a`，但是没有使用，编译器会报错。这是因为 Go 力求保持代码整洁。
+
+全局变量不会出现这种情况，未使用的全局变量不会报错。
+
+常量也可以不使用，不会报错。这是因为常量在编译器就已经决定，导致的副作用较小。
+
+### 基本数据类型
+
+Go 中，所有的值类型变量常量都会在声明时被分配空间并赋予默认值。
+
+bit： 位，计算机中最小的数据单位，只有 0 和 1 两种状态。
+Byte：字节，计算机中基本的存储单位，1 Byte = 8 bit。
+
+#### 整型
+
+整型分为有符号整型和无符号整型。有符号整型包括 int8、int16、int32、int64 和 int。无符号整型包括 uint8、uint16、uint32、uint64 和 uint。
+
+| 类型     | 位数    | 取值范围                                       |
+|--------|-------|--------------------------------------------|
+| int8   | 8     | -128 ~ 127                                 |
+| uint8  | 8     | 0 ~ 255                                    |
+| int16  | 16    | -32768 ~ 32767                             |
+| uint16 | 16    | 0 ~ 65535                                  |
+| int32  | 32    | -2147483648 ~ 2147483647                   |
+| uint32 | 32    | 0 ~ 4294967295                             |
+| int64  | 64    | -9223372036854775808 ~ 9223372036854775807 |
+| uint64 | 64    | 0 ~ 18446744073709551615                   |
+| int    | 32/64 | 与操作系统有关，根据操作系统的位数决定                        |
+| uint   | 32/64 | 与操作系统有关                                    |
+
+为什么有了这么多版本的 int 和 unit 之后，还要设计单独的 int 和 unit 类型呢？
+- 能够避免选择，程序员通常并不关注数据长度的具体大小，如果 32 或者 64 都可以满足需求，那么就可以使用 int 或者 unit。
+- 提升效率。CPU 按照自己的字长（word size）的整数倍来处理数据肯定是效率最高的，所以 int 和 unit 会根据 CPU 的字长来选择 32 或者 64 以提升效率。
+
+```go
+var a int8 = 1
+var b uint8 = 2
+var c int16 = 3
+var d int = 4
+```
+
+支持二进制、八进制、十进制、十六进制的表示方式：
+
+```go
+var a int = 0b1010 // 二进制
+var b int = 0O12 // 八进制
+var c int = 10 // 十进制
+var d int = 0xA // 十六进制
+```
+
+精度转换：
+
+```go
+// 低精度转高精度
+var a int8 = 1
+var b int16 = int16(a)
+var c int32 = int32(b)
+var d int64 = int64(c)
+var e int = int(d)
+// 高精度转低精度
+var f int = 1
+var g int64 = int64(f)
+var h int32 = int32(g)
+var i int16 = int16(h)
+var j int8 = int8(i)
+```
+
+#### 浮点型
+
+浮点型分为单精度浮点型和双精度浮点型。单精度浮点型为 float32，双精度浮点型为 float64。
+
+| 类型    | 位数  |
+|-------|-----|
+| float32 | 32 |
+| float64 | 64 |
+
+```go
+var a float32 = 1.1
+var b float64 = 2.2
+```
+
+**浮点型将导致精度丢失**
+
+> 在计算机中，整数是能够准确表达的，因为十进制整数转化为二进制是因为所有的整数的基石 1 是能够通过二进制准确表达的，**但是浮点数的小数部分利用 2 的幂次方来表示**，例如 2 的 -1 次方表示 0.5，2 的 -2 次方表示 0.25，但是 0.1 无法通过有限的二进制数来准确表示，这就导致了浮点数的精度丢失。
+
+浮点数在计算机中表示示意如下：
+
+- IEEE 32
+
+| 符号位 | 指数位 | 尾数位 |
+|------|------|------|
+| 1bit | 8bit | 23bit |
+
+- IEEE 64
+
+| 符号位 | 指数位 | 尾数位 |
+|------|------|------|
+| 1bit | 11bit | 52bit |
+
+不同于 Int 和 Uint 类型，Go 语言中没有 float 关键字来声明 32 位的浮点数或者与平台匹配的浮点数，只有 float32 和 float64。这可能是因为浮点数并不能准确表达一个数字，所以在这里程序员需要关注精度，所以需要明确声明。
+
+由于精度缺失，浮点数不能使用 `==` `>` `<` 来比较，而应使用 big 包中的函数。
+
+```go
+import "math/big"
+
+func main() {
+    a := 3.14
+    b := 3.14
+    result := big.NewFloat(a).Cmp(big.NewFloat(b))
+
+    if result == 0 {
+        fmt.Println("a == b")
+    } else if result == 1 {
+        fmt.Println("a > b")
+    } else {
+        fmt.Println("a < b")
+    }
+}
+```
+
+#### 字符型
+
+| 类型    | 位数  | 取值范围 |
+|-------|-----|------|
+| byte | 8  |      |
+| rune | 32  |      |
+
+```go
+var a byte = 'a'
+var b rune = 'b'
+// 格式化打印字符
+fmt.Printf("%c\n", a)
+// 直接打印字符
+fmt.Println(b)
+// 强制转换为字符串
+fmt.Println(string(a))
+```
+这里的 `byte` 和 `rune` 都是别名，实际上是 `uint8` 和 `int32` 来存储的。
+
+#### 布尔型
+
+| 类型 | 位数 |
+|-------|-----|
+| bool | 1 |
+
+```go
+var a bool = true
+var b bool = false
+```
+
+#### 字符串
+
+字符串是一串固定长度的字符连接起来的字符序列。
+
+```go
+var a string = "hello"
+var b string = "world"
+```
+
+字符串在内存中存储时，实际上是一个字节数组 `[]byte`，每个字符占用一个字节。字符串的长度是字符的个数，而不是字节数。
+
+字符串的长度可以通过 `len` 函数获取，但是其用于获得变量的实际的存储空间，即底层字节数组的长度。
+
+```go
+package main
+
+import {
+  "fmt"
+}
+
+func main{
+  s:= "字符串"
+
+  len:= len(s)
+  fmt.Println(len) // 9
+
+  for i:= 0; i < len; i++ {
+    fmt.Printf("%c\n", s[i])
+  }
+}
+```
+执行结果：
+
+```bash
+9
+E5 AD 97 E7 AC A6 E4 B8 B2
+```
+
+在这里打印的“字符串”的长度为 9，这对应每个汉字使用 3 个字节来存储。打印出来的内容也不是字符本身，而是字符的 UTF-8 编码。
+
+#### rune 类型
+
+如果我们希望以自然语言的视角来处理字符串，我们需要使用 `rune` 类型。
+
+```go
+package main
+
+import {
+  "fmt"
+}
+
+func main{
+  s:= "字符串"
+
+  fmt.Println(utf8.RuneCountInString(s)) // 3
+
+  for _, r:= range s {
+      fmt.Printf("%T, %X\n", r, r)
+  }
+}
+```
+
+打印结果：
+
+```bash
+3
+int32, 5B57
+int32, 7B26
+int32, 4E32
+```
+
+#### 复数
+
+| 类型    | 位数  | 取值范围 |
+|-------|-----|------|
+| complex64 | 64  |      |
+| complex128 | 128  |      |
+
+```go
+var a complex64 = 1 + 2i
+var b complex128 = 3 + 4i
+```
+
+#### 辨认数据类型
+
+Go 语言中可以使用 `reflect` 包来辨认数据类型。
+
+```go
+import "reflect"
+
+func main() {
+    var a int = 1
+    var b string = "hello"
+    var c bool = true
+    var d float32 = 1.1
+    var e float64 = 2.2
+    var f byte = 'a'
+    var g rune = 'b'
+    var h complex64 = 1 + 2i
+    var i complex128 = 3 + 4i
+
+    fmt.Println(reflect.TypeOf(a))
+    fmt.Println(reflect.TypeOf(b))
+    fmt.Println(reflect.TypeOf(c))
+    fmt.Println(reflect.TypeOf(d))
+    fmt.Println(reflect.TypeOf(e))
+    fmt.Println(reflect.TypeOf(f))
+    fmt.Println(reflect.TypeOf(g))
+    fmt.Println(reflect.TypeOf(h))
+    fmt.Println(reflect.TypeOf(i))
+}
+```
+## 数组和指针
+
+### 数组
+
+数组是一种数据结构，用于存储固定长度的相同类型的元素。
+
+#### 数组的声明
+
+Go 语言中数组的声明格式为：
+
+```go
+var 数组名 [数组长度]数组类型
+```
+
+示例如下：
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    a := [3]int{1, 2, 3}
+    // 或
+    var b [3]int
+    b = [3]int{4, 5, 6}
+    // 或
+    var c [3]int = [3]int{7, 8, 9}
+}
+```
+
+#### 访问数组
+
+数组的访问方式为 `数组名[索引]`。
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    a := [3]int{1, 2, 3}
+    fmt.Println(a[0]) // 1
+    fmt.Println(a[1]) // 2
+    fmt.Println(a[2]) // 3
+}
+```
+
+#### 数组传入函数
+
+数组作为参数传入函数时，会传入数组的副本，而不是数组的指针。
+
+```go
+package main
+
+import "fmt"
+
+func modify(a [3]int) {
+    a[0] = 4
+    fmt.Println(a) // [4 2 3]
+}
+
+func main() {
+    a := [3]int{1, 2, 3}
+    modify(a)
+    fmt.Println(a) // [1 2 3]
+}
+```
+
+**这表明，数组作为参数传入函数时，数组将被全量复制，而不是传入原数组的指针**。
+
+#### 数组无法改变大小
+
+Go 语言中的数组是固定长度的，无法改变大小。这是因为数组在内存中是连续存储的，如果改变大小，将会导致内存的重新分配，这将导致性能问题。
+
+#### 修改数组的值
+
+数组的值可以通过索引来修改。
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    a := [3]int{1, 2, 3}
+    a[0] = 4
+    fmt.Println(a) // [4 2 3]
+}
+```
+
+### 指针
+
+#### 指针的基本概念
+
+在许多语言如 Python、Java 中，指针概念被屏蔽，但是在 Go 语言中，指针被保留了下来。
+
+指针是存储另一个变量的内存地址的变量。
+
+```go
+var a int = 1
+var b *int = &a
+```
+
+这里的 `*int` 表示指向 `int` 类型的指针，`&a` 表示变量 `a` 的内存地址。
+`&` 表示取地址符，`*` 表示取指针的值。
+
+一个例子：
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    var a = 65336
+    fmt.Println("值类型 a 的值为：", a)
+
+    var b = 65336
+    var c = &b
+    fmt.Println("指针类型 c 的值为：", c)
+}
+```
+
+输出结果：
+
+```bash
+值类型 a 的值为： 65336
+指针类型 c 的值为： 0xc0000b6010
+```
+
+在上述案例中，c 得到的值是通过 `&` 符号（取地址符）得到的，这个值是一个内存地址，因此打印的结果是一个内存地址。
+
+#### 为什么区分指针和值类型
+
+如我们在数组中提到的，数组作为参数传入函数时，会传入数组的副本，而不是数组的指针。同样地，传入的参数都会被复制：
+
+```go
+func tryChange(account Account) {
+    account.Modify()
+}
+```
+
+但是上面的代码中，`account` 是一个结构体，结构体是值类型，所以 `account` 会被复制一份，而不是传入的指针。如果我们想要修改原始的 `account`，这将无法实现。
+
+所以，我们可以使用指针来传递参数：
+
+```go
+func tryChange(account *Account) {
+    account.Modify()
+}
+```
+
+这样，`account` 就是一个指针，指向原始的 `account`，这样就可以修改原始的 `account`。
+
+在 Java 中，对于对象类型的参数传入函数时都默认传入的是指针。
+
+## 切片（Slice）
+
+正如上面数组提到的，数组是固定长度的，无法改变大小。但是这无法满足大多数的需求，所以 Go 语言中提供了切片。**切片可以看作大小可变的数组**。
+
+### 切片的原理
+
+切片在底层封装了一个数组指针，打开 `slice.go` 文件可以看到：
+
+```go
+type slice struct {
+    array unsafe.Pointer
+    len   int
+    cap   int
+}
+```
+
+- `array`：指向数组的指针
+- `len`：切片的长度，即切片中元素的个数
+- `cap`：切片的容量，本质上是底层数组的长度
+
+切片的内部结构的示意图如下：
+
+```
+     +-------+-------+-------+
+Slice| array |  len  |  cap  |
+     +-------+-------+-------+
+          |
+          v
+     +-------+-------+-------+-------+-------+-------+
+Array|   1   |   2   |   3   |   4   |   5   |   6   |
+     +-------+-------+-------+-------+-------+-------+
+```
+
+### 切片的声明和定义
+
+切片的声明和定义格式为：
+
+```go
+var 切片名 []切片类型
+```
+
+与数组的声明类似，但是不需要指定切片的长度。
+
+可以调用 `make` 函数来创建切片：
+
+```go
+s:= make([]int, 5, 10)
+
+fmt.Println(len(s)) // 5
+fmt.Println(cap(s)) // 10
+```
+
+`make` 函数适用于创建对象的通用方法，例如创建切片、字典、通道等。在这里第一个参数是类型，第二个参数是长度，第三个参数是容量。
+
+
+### 切片的访问
+
+切片的访问方式与数组类似，通过索引来访问。
+
+```go
+s:= make([]int, 5, 10)
+
+s[0] = 1
+s[1] = 2
+
+for i:= 0; i < len(s); i++ {
+  fmt.Println(s[i])
+}
+```
+
+执行结果：
+
+```bash
+1
+2
+0
+0
+0
+```
+
+这表示，未经初始化的切片的值为当且类型的[零值](#变量与常量)。
+
+如果使用 `for-range` 循环，可以更加简洁地访问切片：
+
+```go
+s:= make([]int, 5, 10)
+
+s[0] = 1
+s[1] = 2
+
+for _, v:= range s {
+  fmt.Println(v)
+}
+```
+
+`for-range` 循环是由切片的长度而非容量决定的。
+
+### 拓展切片长度
+
+我们能否通过索引来拓展切片的长度呢？
+
+```go
+s:= make([]int, 5, 10)
+
+for i:= 0; i < 10; i++ {
+  s[i] = i
+}
+
+fmt.Println(s)
+```
+
+执行结果：
+
+```bash
+panic: runtime error: index out of range [5] with length 5
+```
+
+不行。Go 抛出了错误提示，表示索引超出了切片的长度（越界）。
+
+正确的做法是使用 `append` 函数：
+
+```go
+s:= make([]int, 5, 10)
+
+for i:= 0; i < len(s); i++ {
+  s[i] = i
+}
+
+s = append(s, 5, 6, 7, 8, 9)
+```
+
+`append` 函数第一个参数为切片，后面的参数为要追加的元素。追加后的切片长度为原始切片长度加上追加的元素的个数。使用 append 函数时，如果将返回值传递给原始切片，那么原始切片将被替换，但如果传递给其他变量，那么原始切片将不会被替换。
+
+```go
+s:= make([]int, 5, 10)
+
+for i:= 0; i < len(s); i++ {
+  s[i] = i
+}
+
+a:= append(s, 5, 6, 7, 8, 9)
+
+fmt.Println(s) // [0 1 2 3 4]
+fmt.Println(a) // [0 1 2 3 4 5 6 7 8 9]
+```
+
+### 拓展切片容量
+
+切片的容量是底层数组的长度，当新的元素超出容量时，Go 会重建底层的数组。
+
+```go
+s:= make([]int, 5, 10)
+
+for i:= 0; i < len(s); i++ {
+  s[i] = i
+}
+
+fmt.Println(len(s)) // 5
+
+s = append(s, 5, 6, 7, 8, 9)
+
+fmt.Println(len(s)) // 10
+
+fmt.Println(cap(s)) // 10
+
+// 打印指针
+fmt.Printf("%p\n", s) // 0xc0000b6010
+
+// 继续追加
+s = append(s, 10)
+
+fmt.Println(len(s)) // 11
+
+fmt.Println(cap(s)) // 20
+
+// 打印指针
+fmt.Printf("%p\n", s) // 0xc0000b60b0
+```
+
+可以观察得到，当切片的容量不足时，Go 会重新分配底层数组，并将原始切片的值复制到新的切片中。这也导致了切片的指针发生了变化。
+
+### 利用数组创建切片
+
+```go
+a:= [5]int{1, 2, 3, 4, 5}
+
+s:= a[1:3]
+
+m:= a[:3]
+
+n:= a[1:]
+
+k:= a[:]
+
+fmt.Println(s) // [2 3]
+fmt.Println(m) // [1 2 3]
+fmt.Println(n) // [2 3 4 5]
+fmt.Println(k) // [1 2 3 4 5]
+```
+
+`array[m:n]` 表示从数组的第 `m` 个元素到第 `n-1` 个元素，`array[:n]` 表示从数组的第一个元素到第 `n-1` 个元素，`array[m:]` 表示从数组的第 `m` 个元素到最后一个元素，`array[:]` 表示整个数组。
+
+这和 Python 中的切片操作类似。
+
+进一步观察底层，让我们打印数组 a、切片 s、切片 m、切片 n、切片 k 的指针：
+
+```go
+fmt.Printf("%p\n", a) // 0xc0000b6010
+fmt.Printf("%p\n", s) // 0xc0000b6018
+fmt.Printf("%p\n", m) // 0xc0000b6010
+fmt.Printf("%p\n", n) // 0xc0000b6018
+fmt.Printf("%p\n", k) // 0xc0000b6010
+```
+
+可以看出切片 s 的底层数组比原数组地址增长了 8 个字节，而切片 m 和切片 k 的底层数组地址和原数组地址相同，这是因为切片 m 和切片 k 的起始索引为 0。之所以是 8 个字节是因为运行环境是 64 位的，一个 int 类型占用 8 个字节。
+
+### 利用切片创建切片
+
+```go
+s:= make([]int, 5, 10)
+
+for i:= 0; i < len(s); i++ {
+  s[i] = i
+}
+
+m:= s[1:3]
+
+n:= s[:3]
+
+fmt.Println(m) // [1 2]
+fmt.Println(n) // [0 1 2]
+```
+
+同样地，切片 m 和切片 n 的底层数组地址和原切片地址不同，切片 m 的底层数组地址比原切片地址增长了 8 个字节，而切片 n 的底层数组地址和原切片地址相同。
+
+### 切片元素的修改
+
+由于可能多个切片共享同一个底层数组，所以修改一个切片的元素可能会影响到其他切片。
+
+```go
+s := []int{1, 2, 3, 4, 5}
+
+m := s[1:3]
+
+m[0] = 6
+
+fmt.Println(s) // [1 6 3 4 5]
+fmt.Println(m) // [6 3]
+```
+## Map
+
+Map（映射）是一种键值对的数据结构，和切片中的有序存储不同，Map是无序的。Map 的主要优势在于能够通过 key 快速检索到对应的 value。
+
+### 声明和创建
+
+- 通过 var 声明一个 map
+
+```go
+var mapName map[keyType]valueType
+```
+
+`keyType` 是键的类型，`valueType` 是值的类型。
+
+- 通过 make 创建一个 map
+
+```go
+mapName := make(map[keyType]valueType)
+```
+
+### 元素的添加
+
+```go
+mapName[key] = value
+```
+
+如：
+
+```go
+var m map[string]int
+
+m["one"] = 1
+m["two"] = 2
+```
+
+### 元素的遍历
+
+```go
+for key, value := range mapName {
+    fmt.Println(key, value)
+}
+```
+
+### 元素查找
+
+若元素存在，则返回对应的值，否则返回零值。
+
+```go
+charCountMap := make(map[string]int)
+
+charCountMap["a"] = 1
+charCountMap["b"] = 2
+
+fmt.Println(charCountMap["a"]) // 1
+fmt.Println(charCountMap["c"]) // 0
+```
+
+但是返回 0 值就出现了问题，因为 0 有可能是元素的值。为了区分元素是否存在，可以使用多返回值的方式：
+
+```go
+value, ok := charCountMap["c"]
+
+if ok {
+    fmt.Println(value)
+} else {
+    fmt.Println("key not found")
+}
+```
+
+### 元素的删除
+
+```go
+delete(mapName, key)
+```
+
+该函数不会返回任何与执行结果相关的信息，如果 key 不存在，也不会抛出异常。
+
+### 存储结构\*
+
+#### hmap
+
+Map 的查找效率非常高。Map 的数据结构主要采用 hmap 结构，其中 hmap 结构体定义如下：
+
+```go
+type hmap struct {
+    count int // 元素个数
+    flags uint8
+    B     uint8 // 桶的数量，意味着有 2^B 个桶
+    noverflow uint16  // 溢出桶的数量
+    hash0 uint32  // 随机数种子
+
+    buckets    unsafe.Pointer // Map 底层是一个桶的数组，buckets 指向第一个桶的指针
+    oldbuckets unsafe.Pointer // 扩容时，buckets 指向旧的桶数组
+    nevacuate  uintptr // 扩容时，已经迁移的桶的数量(迁移进度)
+    extra      *mapextra
+}
+```
+
+分区、分桶操作往往出现于数据库设计和变成语言中，本质上都是对 Key 进行哈希运算，然后将哈希值映射到不同的桶中（运算获得桶号）。
+
+以 B=4 为例，会产生 16 个桶。一个 key 值将先进行 hash 运算，然后对获得 hash 值取前 B 位，得到的结果就是桶号。
+
+#### 桶
+
+桶在 Go 语言中主要使用 `bmap` 结构体表示，定义如下：
+
+```go
+type bmap struct {
+    tophash [bucketCnt]uint8
+}
+```
+
+在编译期，bmap 会被追加字段：
+
+```go
+type bmap struct {
+    tophash [bucketCnt]uint8
+    // 以下字段在编译期追加
+    // keys    [8]keytype
+    // values  [8]valuetype
+    // overflow *[]*bmap
+    // pad     uintptr
+}
+```
+
+一个桶的示意如下：
+
+```
+        +----------------------------+
+tophash |64|15|17|135|156|171|201|138|
+        +----------------------------+
+        |            key0            |
+        +----------------------------+
+        |            key1            |
+        +----------------------------+
+        |            key2            |
+        +----------------------------+
+        |            ....            |
+        +----------------------------+
+        |            key7            |
+        +----------------------------+
+        |           value0           |
+        +----------------------------+
+        |           ......           |
+        +----------------------------+
+        |           value7           |
+        +----------------------------+
+overflow|             nil            |
+        +----------------------------+
+```
+
+而在一个 hmap 中将包含多个桶。
+
+#### 元素定位
+
+例如 key 为 "key1" ，假设获得的哈希值为：
+
+```
+00001111 | 0000111101101100100011110010100100010010110010101010 | 0000
+```
+若 B=4 ，则低 4 位（末尾4位）为桶号，即 0000 为桶号，对应的桶为第 0 个桶。
+
+接着取高 8 位 00001111 作为 tophash 的索引，即 `tophash[15]`，若 `tophash[15]` 为 0，则表示桶中没有元素，否则表示桶中有元素。
+
+在上面桶的示意中，索引为 1.
+
+接着计算 `keys[1]` 的内存地址，为 `bmap[0] + 8 + len(key_slot) * 1`，即为 `bmap[0] + 8 + 16 * 1`。
+
+`len(key_slot)` 表示一个 key 所占用的空间。
+
+计算出 `keys[1]` 的值后，与输入的 key 进行比较，若相等，则返回对应的 value。
+
+## 通道
+
+通道（Channel）是 Go 中一个重要的数据结构。Channel 可以视作为**消息队列**和**线程同步**而创建的数据结构。
+
+### 创建通道
+
+通道是一个引用类型，需要使用 `make` 函数来创建：
+
+```go
+ch := make(chan int)
+```
+
+或者：
+
+```go
+ch := make(chan int, 100)
+```
+
+- `chan` 是关键字，表示通道类型。
+- `int` 是通道中元素的类型。
+- `100` 是通道的缓冲区大小，如果不指定，则表示是无缓冲通道。
+
+Channel 可以看作一个消息通道，通道的主要功能是保证数据通过，缓冲区的意义在于缓存数据，以便发送者和接收者之间的速度不一致时能够缓冲一部分数据。如果没有缓冲区，那么需要**读操作**就绪时，**写操作**才能继续，这样就会造成阻塞。这如同一个没有仓库的货站，必须有等待接收货物的车辆，送货的车辆才能顺畅送货，否则送货车辆只能等待。缓冲区可以看作是一个仓库，送货车辆可以把货物放在仓库里，等待接收货物的车辆再从仓库里取货。
+
+### 通道的读写
+
+写入数据：
+
+```go
+ch <- i
+```
+
+读取数据：
+
+```go
+i := <-ch
+```
+
+打印数据：
+
+```go
+count := 5
+
+ch := make(chan int, count)
+
+for i := 0; i < count; i++ {
+    ch <- i
+}
+
+for i := 0; i < count; i++ {
+    fmt.Println(<-ch)
+}
+```
+
+打印结果：
+
+```bash
+0
+1
+2
+3
+4
+```
+
+### 通道的实现原理\*
+
+> `TODO 74`
+
+## 结构体
+
+Go 中的 slice、map 和 channel 等复杂数据类型都有对应的结构体类型，这些结构体类型是 Go 语言内建的类型，可以直接使用。同时我们也可以使用 struct 关键字来定义自己的结构体类型。
+
+### 自定义数据类型
+
+Go 语言中可以使用 type 关键字来定义自定义数据类型。
+
+```go
+type newType existType
+```
+
+新的类型 newType 将继承已存在的类型 existType 的数据结构，同时适用于 existType 的函数也将适用于 newType。但是方法不会继承。
+
+### 结构体的创建
+
+```go
+type newType struct {
+    field1 type1
+    field2 type2
+    ...
+}
+```
+
+例如创建一个 Person 结构体：
+
+```go
+type Person struct {
+    name string
+    age int
+}
+```
+
+这让我们想到了 C 语言中的结构体。
+
+```c
+struct Person {
+    char name[20];
+    int age;
+};
+```
+
+以及 TypeScript 中的接口。
+
+```typescript
+type Person {
+    name: string;
+    age: number;
+}
+```
+
+### 使用结构体
+
+```go
+package main
+
+import "fmt"
+
+type Person struct {
+    Name string
+    Age int
+}
+
+func main() {
+    var p1 = Person{
+        Name: "张三",
+        Age: 18,
+    }
+    fmt.Println(p1)
+}
+```
+
+或者初始时不进行赋值，使用默认值。
+
+```go
+var p1 = Person{}
+p1.Name = "张三"
+p1.Age = 18
+```
+
+可以使用 new 关键字创建一个结构体实例，返回的是一个指向结构体的指针。
+
+```go
+var p2 = new(Person)
+```
+
+### 权限控制
+
+Go 语言中，结构体的字段名首字母的大小写决定了该字段的访问权限。小写的字段名表示私有字段，只能在定义该结构体的包中访问，在其让包中无法访问。
+
+## 流程控制
+
+### 分支控制
+
+#### if
+
+```go
+if 条件 {
+    // do something
+} else if 条件 {
+    // do something
+} else {
+    // do something
+}
+```
+
+这里的条件不需要使用括号括起来。
+
+#### switch
+
+```go
+switch 变量 {
+case 值1:
+    // do something
+case 值2:
+    // do something
+default:
+    // do something
+}
+```
+
+注意，与其他语言不同，Go 中的 `switch` 语句不需要 `break`，一旦条件符合自动终止。
+
+但是如果需要继续执行下一个条件，可以使用 `fallthrough` 关键字。
+
+```go
+switch 变量 {
+case 值1:
+    // do something
+    fallthrough
+case 值2:
+    // do something
+default:
+    // do something
+}
+```
+
+对于相同结论的条件，可以使用逗号分隔。
+
+```go
+switch 变量 {
+case 值1, 值2:
+    // do something
+default:
+    // do something
+}
+```
+
+`case` 中使用布尔表达式是常用的技巧。
+
+```go
+switch {
+case a > 0:
+    // do something
+case a < 0:
+    // do something
+default:
+    // do something
+}
+```
+
+#### 避免嵌套 if
+
+可以使用下面的技巧来避免嵌套 `if`。
+
+- 尽快返回：让条件不满足的分支直接 return。
+
+- 提取函数：将条件判断提取到函数中。
+
+### 循环控制
+
+#### for
+
+Go 中只提供了 `for` 循环，没有 `while` 循环。
+
+但是提供了三种 `for` 循环的写法。
+
+##### 无限循环
+
+```go
+for {
+    // do something
+}
+```
+
+例如：
+
+```go
+for {
+    fmt.Println("Hello, World!")
+}
+```
+
+如果想要终止循环，可以使用 `break` 关键字。
+
+```go
+for {
+    fmt.Println("Hello, World!")
+    break
+}
+```
+
+##### 条件循环
+
+```go
+for 条件 {
+    // do something
+}
+```
+
+例如：
+
+```go
+var i int = 0
+
+for i < 10 {
+    fmt.Println(i)
+    i++
+}
+```
+
+##### 计数循环
+
+```go
+for 初始语句; 条件; 结束语句 {
+    // do something
+}
+```
+
+例如：
+
+```go
+for i := 0; i < 10; i++ {
+    fmt.Println(i)
+}
+```
+
+##### 循环中的控制语句
+
+`break`：终止循环。
+
+`continue`：跳过当前循环，继续下一次循环。
+
+```go
+for i := 0; i < 10; i++ {
+    if i == 5 {
+        continue
+    }
+    fmt.Println(i)
+}
+```
+
+表示当 `i` 等于 5 时，跳过当前循环，继续下一次循环。
+
+#### for-range
+
+`for-range` 可以用来遍历数组、切片、字符串、map 等。
+
+```go
+for index, value := range array {
+    // do something
+}
+```
+
+忽略 `index` 参数:
+
+```go
+for _, value := range array {
+    // do something
+}
+```
+
+### 跳转控制
+
+Go 中可以使用 `label` 和 `goto` 来实现跳转。
+
+```go
+label:
+    // do something
+goto label
+```
+
+例如：
+
+```go
+var i int = 0
+
+label:
+    fmt.Println(i)
+    i++
+    if i < 10 {
+        goto label
+    }
+```
+表示当 `i` 小于 10 时，跳转到 `label` 标签处。
+
+也可以使用 goto 来跳出多层循环。
+
+```go
+for i := 0; i < 10; i++ {
+    for j := 0; j < 10; j++ {
+        if j == 5 {
+            goto breakTag
+        }
+    }
+}
+
+breakTag:
+    fmt.Println("done")
+```
+## 模块和包
+
+- 一个模块（module）可以视作一个项目。一个模块中所有的 Go 文件可以共用一份依赖配置，模块可以看作顶层文件夹。
+- 文件夹：位于模块之下，文件夹可以有若干层级。
+- .go 文件：位于文件夹之下，一个文件夹可以有若干个 .go 文件。
+- 函数：位于 .go 文件之下，一个 .go 文件可以有若干个函数。函数是业务逻辑的实现主体。
+
+### 模块与文件夹
+
+模块是一个独立项目的顶层文件夹，相对于普通的文件夹，模块文件夹有一个配置文件 `go.mod`。
+
+我们可以通过 `go mod init` 命令来初始化一个模块。
+
+```bash
+$ go mod init hello
+go: creating new go.mod: module hello
+```
+
+打开 `go.mod` 文件，可以看到内容如下：
+
+```go
+module hello
+
+go 1.15
+```
+
+分别展示了模块的名称和 Go 的版本。
+
+若我们在 `hello` 文件夹下创建一个 `main.go` 文件，利用 beego 框架创建一个简单的 Web 服务。
+
+```go
+package main
+
+import "github.com/astaxie/beego"
+
+func main() {
+    beego.Run()
+}
+```
+
+在这里：
+
+- `github.com/astaxie/beego` 是一个第三方包，我们可以通过 `go get` 命令来下载。
+
+```bash
+$ go get github.com/astaxie/beego
+```
+
+执行这个命令后，会在 `go.mod` 文件中添加一行：
+
+```go
+require {
+    ...
+    github.com/astaxie/beego v1.12.3
+}
+```
+
+除了这一行之外，还会出现其他的依赖包，这些包是由 beeego 间接引入的。
+
+### 同一包下不同文件中的函数调用
+
+在同一包下的不同文件中，可以直接调用其他文件中的函数：
+
+```go
+// /demo/main.go
+package main
+
+import "fmt"
+
+func main() {
+    printHello()
+}
+
+// /demo/hello.go
+package main
+
+import "fmt"
+
+func printHello() {
+    fmt.Println("Hello, World!")
+}
+```
+
+执行 `go run demo`，可以看到输出结果：
+
+```bash
+$ go run demo
+Hello, World!
+```
+
+或者可以用 `go run .` 来执行当前目录下的所有文件。
+
+注意，这里的 `import "fmt"` 用于导入其他包，`fmt` 并不是包名，而是一个相对路径，意即扫描目录下的所有代码。
+
+### 不同包下的函数调用
+
+在不同包下的文件中，需要通过 `import` 导入其他包，然后通过 `包名.函数名` 的方式调用其他包中的函数：
+
+```go
+// demo/note/note.go
+package note
+
+import "fmt"
+
+func PrintHello() {
+    fmt.Println("Hello, World!")
+}
+```
+
+```go
+// demo/main.go
+package main
+
+import "demo/note"  // 导入 note 包的所在文件夹
+
+func main() {
+    note.PrintHello() // 这里的 note 是导入的包名，不一定和文件夹名一致
+}
+```
+
+注意，包名和文件夹名可以不一致。包名最终是由 `package` 关键字指定的。
+
+### 包的别名
+
+在导入包时，可能会出现包名相同的情况，这时可以使用别名来区分。
+
+```go
+// demo/main.go
+
+import (
+    "fmt"
+    m "demo/note"  // 使用 m 作为别名
+)
+
+func main() {
+    m.PrintHello()
+}
+```
+
+### `init` 函数
+
+在 Go 语言中，每个包中都可以包含一个 `init` 函数，用于在包被导入时执行一些初始化操作。
+
+```go
+// demo/note/note.go
+package note
+
+import "fmt"
+
+func init() {
+    fmt.Println("note 包被导入")
+}
+
+func PrintHello() {
+    fmt.Println("Hello, World!")
+}
+```
+
+```go
+// demo/main.go
+
+import (
+    "fmt"
+    "demo/note"
+)
+
+func main() {
+    fmt.Println("Hello, World!")
+}
+```
+
+执行 `go run main.go`，可以看到输出结果：
+
+```bash
+note 包被导入
+Hello, World!
+```
+
+### 匿名包
+
+在导入包时，如果不需要使用包中的函数，可以使用 `_` 来代替包名。
+
+```go
+// demo/main.go
+
+import (
+    "fmt"
+    _ "demo/note"  // 使用 _ 代替包名
+)
+
+func main() {
+    fmt.Println("Hello, World!")
+}
+```
+
+为什么不使用函数却导入包？这是因为在导入包时，包中的 `init` 函数会被执行，这样可以在 `init` 函数中进行一些初始化操作。
+
+为什么不直接 `import "demo/note"`，而是使用 `_` 代替包名？这是因为 Go 语言中不允许导入包而不使用，使用 `_` 代替包名可以避免这个问题。
+
+## 函数
+
+函数在 Go 语言中地位非常重要。
+
+### 函数的声明
+
+Go 中的函数定义格式为：
+
+```go
+func 函数名(参数列表) (返回值列表) {
+    // do something
+}
+```
+
+例如：
+
+```go
+func add(a int, b int) int {
+    return a + b
+}
+```
+
+如果参数类型相同，可以简写为：
+
+```go
+func add(a, b int) int {
+    return a + b
+}
+
+func main() {
+    fmt.Println(add(1, 2))
+}
+```
+
+Go 支持多个返回值，例如：
+
+```go
+// 求和并求差
+func sumAndSub(a, b int) (int, int) {
+    return a + b, a - b
+}
+
+func main() {
+    sum, sub := sumAndSub(1, 2)
+    fmt.Println(sum, sub)
+}
+```
+和 JS 类似，我们可以通过声明变量的形式来声明函数：
+
+```go
+func main() {
+    add := func(a, b int) int {
+        return a + b
+    }
+    fmt.Println(add(1, 2))
+}
+```
+这个函数被称为匿名函数，因为没有函数名。
+
+### 函数的参数
+
+正如之前提到的，函数的参数传入时的策略是完全复制传入的参数。
+
+对于值类型，传入的是值的拷贝。对于引用类型，传入的是引用的拷贝。在函数中修改值类型的参数不会影响原值，但是修改引用类型的参数会影响原值。
+
+```go
+package main
+
+import "fmt"
+
+func changeElement(arr [5]int) {
+    arr[0] = 10
+}
+
+func changeElementByPointer(arr *[5]int) {
+    arr[0] = 10
+}
+
+func main() {
+    arr := [5]int{1, 2, 3, 4, 5}
+    changeElement(arr)
+    fmt.Println("changeElement:", arr) // [1 2 3 4 5]
+
+    changeElementByPointer(&arr)
+    fmt.Println("changeElementByPointer:", arr) // [10 2 3 4 5]
+}
+```
+
+在考虑修改值时，我们可以依然传入值类型，无非是将修改后的内容返回。
+
+```go
+package main
+
+import "fmt"
+
+func changeElement(arr [5]int) [5]int {
+    arr[0] = 10
+    return arr
+}
+
+func main() {
+    arr := [5]int{1, 2, 3, 4, 5}
+    arr = changeElement(arr)
+    fmt.Println(arr) // [10 2 3 4 5]
+}
+```
+
+### 函数的返回值
+
+Go 中的函数支持多个返回值，例如在这个求最大值和最小值的函数中：
+
+```go
+func maxAndMin(arr []int) (int, int) {
+    max, min := arr[0], arr[0]
+    for _, v := range arr {
+        if v > max {
+            max = v
+        }
+        if v < min {
+            min = v
+        }
+    }
+    return max, min
+}
+
+func main() {
+    arr := []int{1, 2, 3, 4, 5}
+    max, min := maxAndMin(arr)
+    fmt.Println(max, min)
+}
+```
+
+返回的多个值可以被忽略：
+
+```go
+func main() {
+    max, _ := maxAndMin(arr)
+    fmt.Println(max)
+}
+```
+
+我们也可以在返回的声明中提前声明返回值的变量名，这样我们就不用操心需要返回的变量名了：
+
+```go
+func maxAndMin(arr []int) (max int, min int) {  // 这里声明了返回值的变量名
+    max, min = arr[0], arr[0]
+    for _, v := range arr {
+        if v > max {
+            max = v
+        }
+        if v < min {
+            min = v
+        }
+    }
+    return  // 这里不需要再写返回值
+}
+```
+
+很多编程语言不支持多个返回值，然而 Go 天然支持多个返回值。
+
+### 将函数作为变量
+
+有返回值的函数可以被赋值给变量：
+
+```go
+func add(a, b int) int {
+    return a + b
+}
+
+func main() {
+    addFunc := add  // 将 add 函数赋值给 addFunc 变量，变量就具有了函数的功能
+    fmt.Println(addFunc(1, 2))  // 3
+}
+```
+
+这样看上去毫无意义！但是在日常开发中我们常常提到**开闭原则**，即对于扩展我们是开放的，对于修改我们是封闭的。这样的设计可以让我们在不修改原有代码的情况下，扩展功能。试想有这样的场景：
+
+我们希望完成一个 `operate` 函数，这个函数接受两个参数，一个是操作符，一个是操作数，然后根据操作符进行操作。一般来讲我们可以这样写：
+
+```go
+package main
+
+import "fmt"
+
+func add(a, b int) int {
+    return a + b
+}
+
+func sub(a, b int) int {
+    return a - b
+}
+
+func mul(a, b int) int {
+    return a * b
+}
+
+func div(a, b int) int {
+    return a / b
+}
+
+func operate(op string, a, b int) (res int) {
+    switch op {
+      case "+":
+          res = add(a, b)
+      case "-":
+          res = sub(a, b)
+      case "*":
+          res = mul(a, b)
+      case "/":
+          res = div(a, b)
+    }
+    return
+}
+```
+
+现在的代码毫无问题，但是如果我们希望添加一个 `mod` 函数，我们就需要修改 `operate` 函数，这样就违反了开闭原则。我们的修改可能会影响到其他地方，这是我们不希望看到的。
+
+我们可以将函数**暂存到一个 map 中**，然后**根据操作符取出对应的函数**：
+
+```go
+package main
+
+import "fmt"
+
+var operateFuncs make(map[string]func(x, y int) int)  // 定义一个 map，key 为 string，value 为函数(func(x, y int) int)
+
+func init() {
+    operateFuncs["+"] = add
+    operateFuncs["-"] = sub
+    operateFuncs["*"] = mul
+    operateFuncs["/"] = div
+    operateFuncs["%"] = mod
+}
+
+func add(a, b int) int {
+    return a + b
+}
+
+func sub(a, b int) int {
+    return a - b
+}
+
+func mul(a, b int) int {
+    return a * b
+}
+
+func div(a, b int) int {
+    return a / b
+}
+
+func mod(a, b int) int {
+    return a % b
+}
+
+func operate(op string, a, b int) int {
+    if f, ok := operateFuncs[op]; ok {
+        return f(a, b)
+    }
+    return 0
+}
+
+func main() {
+    fmt.Println(operate("+", 1, 2))  // 3
+    fmt.Println(operate("-", 1, 2))  // -1
+    fmt.Println(operate("*", 1, 2))  // 2
+    fmt.Println(operate("/", 1, 2))  // 0
+    fmt.Println(operate("%", 1, 2))  // 1
+}
+```
+
+这样我们就可以在不修改 `operate` 函数的情况下，添加新的操作符。
+
+> 注：上面的 `if f, ok := operateFuncs[op]; ok` 是 Go 语言中的一个特殊写法，`f` 是 `operateFuncs[op]` 的值，`ok` 是一个布尔值，表示是否存在这个值这是 map 会携带的一个返回值。其写法可以拆解为：
+> ```go
+> f, ok := operateFuncs[op]
+> if ok {
+>     return f(a, b)
+> }
+> return 0
+> ```
+
+### 匿名函数和闭包
+
+如果一个函数只在特定位置出现且不用考虑复用，我们可以使用匿名函数。
+
+```go
+func main() {
+    add := func(a, b int) int {
+        return a + b
+    }
+    fmt.Println(add(1, 2))
+}
+```
+
+或者：
+
+```go
+func invoke(f func()) {
+    fmt.Println("before")
+    f()
+    fmt.Println("after")
+}
+
+func main() {
+    invoke(func() {
+        fmt.Println("invoke")
+    })
+}
+
+// before
+// invoke
+// after
+```
+
+闭包是匿名函数的一个重要特性，它会引用外部环境中的变量，其内部操作会对外部环境产生副作用。闭包相当于封装了一个环境。例如可通过闭包修改局部变量的值：
+
+```go
+func main() {
+    i := 0
+    add := func() {
+        i++
+    }
+    add()
+    fmt.Println(i)  // 1
+}
+```
+
+如果变量 i 只与闭包函数有关，那么我们可以抽取闭包函数：
+
+```go
+func getAnonymouseFunc() func() {
+    i := 0
+    return func() {
+        i++
+        fmt.Println(i)
+    }
+}
+
+func main() {
+    add := getAnonymouseFunc()
+    add()  // 1
+    add()  // 2
+}
+```
+
+这与我们想象的不同，我们可能会认为每次调用 `add` 函数都会初始化 `i` 为 0，但是这里我们接连调用两次 `add` 函数，`i` 的值会保留且递增。这里就能凸显**闭包的意义**。
+
+即闭包中的局部变量与普通函数不同，它内部内存分配在堆上，而不是栈上，所以不会随着函数的调用而销毁。由于匿名函数一致引用了 `i`，所以 `i` 的也不会被垃圾回收。正如“闭包”一词所言，它封闭了一个环境，形成了一个独立的小王国，具有**一直驻留在内存的环境变量**的特性。
+
+举一个更贴近实际的例子，当我们需要一个计数器时，例如用户访问一次网站，计数器加一，我们可以使用闭包：
+
+```go
+func counter() func() int {
+    i := 0
+    return func() int {
+        i++
+        return i
+    }
+}
+
+func main() {
+    c := counter()
+    fmt.Println(c())  // 1
+    fmt.Println(c())  // 2
+    fmt.Println(c())  // 3
+}
+```
+
+这和直接使用全局变量有什么区别呢？闭包的好处在于**封装**，我们可以将计数器的逻辑封装在一个函数中，而不用担心外部环境对计数器的影响。
+
+### 强制转换
+
+Go 提供了函数的强制转换语法。
+
+```go
+package main
+
+import "fmt"
+
+type add func(a, b int) int
+
+func addFunc(a, b int) int {
+    return a + b
+}
+
+func main() {
+    var f add = addFunc
+    fmt.Println(f(1, 2))
+}
+```
+
+这里我们定义了一个 `add` 类型，它是一个函数类型，接受两个 `int` 类型的参数，返回一个 `int` 类型的值。然后我们定义了一个 `addFunc` 函数，它符合 `add` 类型的定义。最后我们将 `addFunc` 函数赋值给 `f` 变量，这样 `f` 就具有了 `add` 类型的功能。
+
+假设有下面的函数类型 F1:
+
+```go
+type F1 func(int, int) int
+```
+
+创建一个函数 A1:
+
+```go
+func A1(c,d int) int {
+    return c+d
+}
+```
+
+A1 遵循 F1 的签名。
+
+```go
+a1 := F1(A1)
+a2 := F1(A1)
+```
+通过上面的操作，我们得到了两个函数对象 a1 和 a2，它们都是 F1 类型的。我们可以对 a1 和 a2 分别进行调用:
+
+```go
+fmt.Println(a1(1,2)) // 3
+
+fmt.Println(a2(3,4)) // 7
+```
+
+有了类型和强制转换之后，我们不仅可以像传递普通变量一样传递函数对象，还可与为函数绑定方法，而绑定后的方法可以被函数对象调用，相当于为函数拓展了功能。如：
+
+```go
+type F1 func(a,b int) int
+
+func (f F1) show(a,b,c int) {
+    fmt.Println("Show Called")
+}
+
+func (f F1) calc(a,b,c int) int {
+    f(a,b)
+}
+```
+
+我们为 F1 类型绑定了两个方法 show 和 calc，每个方法具有三个参数，都不能返回值。show 方法只是打印一行信息，而 calc 方法调用了 F1 类型的函数对象。
+
+```go
+package main
+
+import "fmt"
+
+type F1 func(a,b int) int
+
+func (f F1) show(a,b,c int) {
+    fmt.Println("Show Called")
+}
+
+func (f F1) calc(a,b,c int) int {
+    f(a,b)
+    fmt.Println("Calc Called")
+}
+
+func A1(c,d int) int {
+    return c+d
+}
+
+func main() {
+    // 因为 A1 遵循 F1 的签名，所以可以强制转换
+    a1 := F1(A1)
+    // 变量 a1 是 F1 类型的，那么就自动拥有了 F1 类型的方法
+    a1.show(1,2,3)
+    a1.calc(1,2,3)
+}
+```
+
+还是回到之前的加减乘除的例子，四个函数的定义如下：
+
+```go
+func add(a, b int) int {
+    return a + b
+}
+
+func sub(a, b int) int {
+    return a - b
+}
+
+func mul(a, b int) int {
+    return a * b
+}
+
+func div(a, b int) int {
+    return a / b
+}
+```
+
+这四个函数的声明类型是相同的，我们可以定义一个二元运算的函数类型：
+
+```go
+type BinaryOperationFunc func(a, b int) int
+```
+
+然后给该类型绑定一个 calc 方法：
+
+```go
+func (f BinaryOperationFunc) calc(a, b int) int {
+    return f(a, b)
+}
+```
+
+这样我们就可以通过强制转换将四个函数转换为 BinaryOperationFunc 类型，然后调用 calc 方法：
+
+```go
+package main
+
+import "fmt"
+
+type BinaryOperationFunc func(a, b int) int
+
+func (f BinaryOperationFunc) calc(a, b int) int {
+    return f(a, b)
+}
+
+func add(a, b int) int {
+    return a + b
+}
+
+func sub(a, b int) int {
+    return a - b
+}
+
+func mul(a, b int) int {
+    return a * b
+}
+
+func div(a, b int) int {
+    return a / b
+}
+
+func main() {
+    addFunc := BinaryOperationFunc(add)
+    subFunc := BinaryOperationFunc(sub)
+    mulFunc := BinaryOperationFunc(mul)
+    divFunc := BinaryOperationFunc(div)
+
+    fmt.Println(addFunc.calc(1, 2))  // 3
+    fmt.Println(subFunc.calc(1, 2))  // -1
+    fmt.Println(mulFunc.calc(1, 2))  // 2
+    fmt.Println(divFunc.calc(1, 2))  // 0
+}
+```
+
+这样的话，我们就可以通过一个函数类型来统一管理四个函数，而不用为每个函数定义一个计算方法。
+
+### defer
+
+Go 中的 `defer` 关键字用于延迟执行函数。
+
+```go
+func main() {
+    defer fmt.Println("Hello, World!")
+    fmt.Println("Hello, Go!")
+}
+```
+
+输出结果：
+
+```bash
+Hello, Go!
+Hello, World!
+```
+
+`defer` 关键字会将函数推迟到外层函数返回之后执行。
+
+延迟函数的参数会被立即计算，但是不会被执行。
+
+```go
+func main() {
+    i := 0
+    defer fmt.Println(i)
+    i++
+}
+```
+
+输出结果：
+
+```bash
+0
+```
+
+而不是 1。
+
+## 异常处理
+
+异常是指程序在执行过程中发生的错误，会导臹程序终止。Go 语言提供了一种机制来处理运行时错误，这种机制被称为异常处理。
+
+### 创建异常
+
+Go 内置了一个 `error` 类型，用于表示异常。`error` 类型是一个接口类型，定义如下：
+
+```go
+type error interface {
+    Error() string  // Error 方法，返回异常信息
+}
+```
+
+使用 `errors` 包的 `New` 函数可以创建一个异常：
+
+```go
+package main
+
+import (
+    "errors"
+    "fmt"
+)
+
+func main() {
+    err := errors.New("this is an error")
+    fmt.Println(err)
+}
+```
+
+### 抛出异常
+
+Go 语言没有提供 `throw` 关键字来抛出异常，而是使用 `panic` 函数来抛出异常。`panic` 函数接收一个任意类型的参数，通常是一个字符串，用于描述异常信息。
+
+```go
+func handleError() {
+    panic(errors.New("this is an error"))
+}
+
+func main() {
+
+    fmt.Println("start")
+
+    handleError()
+
+    fmt.Println("end")
+}
+```
+
+输出结果：
+
+```
+start
+panic: this is an error
+
+goroutine 1 [running]:
+main.handleError()
+        /Users/jetzihan/Code/go/src/github.com/jetzihan/go-note/note/golang/error.go:8 +0x3b
+main.main()
+          /Users/jetzihan/Code/go/src/github.com/jetzihan/go-note/note/golang/error.go:13 +0x2d
+exit status 2
+```
+
+### 自定义异常
+
+Panic 函数允许用户自定义异常。
+
+```go
+func panic(v any)
+```
+
+即 panic 函数接收任意类型的参数，可以是任意类型的值。
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    panic("this is an error")
+}
+```
+
+倘若想要携带错误码等更多的信息，可以使用结构体。
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+type MyError struct {
+    Code int
+    Msg  string
+}
+
+func handleError() {
+    e := MyError{Code: 100, Msg: "this is an error"}
+
+    panic(e)
+}
+
+func main() {
+
+    fmt.Println("start")
+
+    handleError()
+
+    fmt.Println("end")
+}
+```
+
+输出结果：
+
+```
+start
+
+panic: (*main.MyError) 0xc0000b2000
+
+goroutine 1 [running]:
+main.handleError()
+        /Users/jetzihan/Code/go/src/github.com/jetzihan/go-note/note/golang/error.go:10 +0x3b
+main.main()
+          /Users/jetzihan/Code/go/src/github.com/jetzihan/go-note/note/golang/error.go:15 +0x2d
+exit status 2
+```
+
+可以看到，输出的异常信息是 `(*main.MyError) 0xc0000b2000`，这是因为 `panic` 函数只能接收字符串类型的参数，没有按照我们希望的方式输出异常信息。我们可以实现 `error` 接口来自定义异常。
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+type MyError struct {
+    Code int
+    Msg  string
+}
+
+func (e MyError) Error() string {
+    return fmt.Sprintf("Code: %d, Msg: %s", e.Code, e.Msg)
+}
+
+func handleError() {
+    e := MyError{Code: 100, Msg: "this is an error"}
+
+    panic(e)
+}
+
+func main() {
+
+    fmt.Println("start")
+
+    handleError()
+
+    fmt.Println("end")
+}
+```
+
+输出结果：
+
+```
+start
+
+panic: Code: 100, Msg: this is an error
+
+goroutine 1 [running]:
+main.handleError()
+        /Users/jetzihan/Code/go/src/github.com/jetzihan/go-note/note/golang/error.go:10 +0x3b
+main.main()
+          /Users/jetzihan/Code/go/src/github.com/jetzihan/go-note/note/golang/error.go:20 +0x2d
+exit status 2
+```
+
+### 捕获异常
+
+Go 语言提供了 `recover` 函数来捕获异常。`recover` 函数只能在 `defer` 函数中调用，用于捕获异常。
+
+```go
+func recover() any
+```
+
+`recover` 函数返回一个 `interface{}` 类型的值，表示捕获的异常信息。如果没有异常被抛出，`recover` 函数返回 `nil`。正确的做法是在 `defer` 函数中调用 `recover` 函数，然后判断返回值是否为 `nil`，如果不为 `nil`，则表示捕获到了异常。
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+func handleError() {
+    panic("this is an error")
+}
+
+func main() {
+
+    fmt.Println("start")
+
+    defer func() {
+        if err := recover(); err != nil {
+            fmt.Println("recover:", err)
+        }
+    }()
+
+    handleError()
+
+    fmt.Println("end")
+}
+```

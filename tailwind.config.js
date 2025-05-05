@@ -6,7 +6,8 @@ module.exports = {
     content: [
 		"./app/**/*.{js,ts,jsx,tsx}",
 		"./mdx-components.tsx",
-		"content/**/*.mdx",
+		"./content/**/*.mdx",
+		"./components/**/*.{js,ts,jsx,tsx}",
 	],
 
 	theme: {
@@ -15,10 +16,10 @@ module.exports = {
     			DEFAULT: {
     				css: {
     					'code::before': {
-    						content: '"'
+    						content: '""'
     					},
     					'code::after': {
-    						content: '"'
+    						content: '""'
     					}
     				}
     			},

@@ -11,7 +11,18 @@ import { Header } from "@/app/components/header";
 const redis = Redis.fromEnv();
 
 export const revalidate = 60;
-export default async function BlogsPage() {
+
+// Define blogs per page
+const BLOGS_PER_PAGE = 20;
+
+export default async function BlogsPage({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) {
+  // Get current page from search params, default to 1
+  const currentPage = Number(searchParams?.page ?? 1);
+
   const views = (
     await redis.mget<number[]>(
       ...allBlogs.map((p) => ["pageviews", "blogs", p.slug].join(":")),
@@ -28,6 +39,16 @@ export default async function BlogsPage() {
         new Date(b.date ?? Number.POSITIVE_INFINITY).getTime() -
         new Date(a.date ?? Number.POSITIVE_INFINITY).getTime(),
     );
+
+  // Calculate pagination variables
+  const totalBlogs = sorted.length;
+  const totalPages = Math.ceil(totalBlogs / BLOGS_PER_PAGE);
+  const startIndex = (currentPage - 1) * BLOGS_PER_PAGE;
+  const endIndex = startIndex + BLOGS_PER_PAGE;
+  const paginatedBlogs = sorted.slice(startIndex, endIndex);
+
+  const hasPrevPage = currentPage > 1;
+  const hasNextPage = currentPage < totalPages;
 
   return (
     <div className="relative pb-16">
@@ -47,7 +68,7 @@ export default async function BlogsPage() {
         </div> */}
         <div className="grid grid-cols-1 gap-4 mx-auto">
           <div className="grid grid-cols-1 gap-4">
-            {sorted
+            {paginatedBlogs // Use paginatedBlogs instead of sorted
               .map((blog) => (
                 <Card key={blog.slug}>
                   <Article blog={blog} views={views[blog.slug] ?? 0} />
@@ -55,6 +76,41 @@ export default async function BlogsPage() {
               ))}
           </div>
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-8">
+            {hasPrevPage ? (
+              <Link
+                href={`/blogs?page=${currentPage - 1}`}
+                className="px-4 py-2 border border-zinc-300 rounded-md text-sm text-zinc-700 hover:bg-zinc-100"
+              >
+                Previous
+              </Link>
+            ) : (
+              <span className="px-4 py-2 border border-zinc-200 rounded-md text-sm text-zinc-400 cursor-not-allowed">
+                Previous
+              </span>
+            )}
+
+            <span className="text-sm text-zinc-600">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            {hasNextPage ? (
+              <Link
+                href={`/blogs?page=${currentPage + 1}`}
+                className="px-4 py-2 border border-zinc-300 rounded-md text-sm text-zinc-700 hover:bg-zinc-100"
+              >
+                Next
+              </Link>
+            ) : (
+              <span className="px-4 py-2 border border-zinc-200 rounded-md text-sm text-zinc-400 cursor-not-allowed">
+                Next
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

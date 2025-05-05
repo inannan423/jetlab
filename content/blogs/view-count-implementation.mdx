@@ -1,0 +1,179 @@
+---
+title: "如何简单高效实现网站和博客浏览量统计？"
+description: "介绍使用 Upstash Redis 和 Next.js API Route 实现网站和博客文章浏览量统计的方法。"
+date: 2024-05-05
+published: true
+tags: ["Next.js", "Redis", "Web开发"]
+---
+
+在这篇博客中，我想分享一下我是如何为我的网站和博客文章实现浏览量统计功能的。
+
+## 技术选型
+
+我选择了以下技术栈来实现这个功能：
+
+*   **[Upstash Redis](https://upstash.com/)**: 一个无服务器的 Redis 服务，非常适合用于计数器这类简单的存储需求，并且有慷慨的免费额度。
+*   **[Next.js API Routes](https://nextjs.org/docs/api-routes/introduction)**: Next.js 内建的 API 功能，可以方便地创建后端接口。
+
+## 实现步骤
+
+### 1. 后端 API (`/pages/api/incr.ts`)
+
+我创建了一个 API 路由 `/pages/api/incr.ts` 来处理浏览量的增加请求。这个 API 主要做了以下几件事：
+
+*   **接收 POST 请求**: 只接受 POST 方法的请求。
+*   **解析请求体**: 从 JSON 请求体中获取 `slug` (页面标识符) 和 `type` (类型，如 "projects" 或 "blogs")。`type` 默认为 "projects"。
+*   **IP 地址去重**:
+    *   获取请求者的 IP 地址。
+    *   对 IP 地址进行 SHA-256 哈希处理，避免直接存储原始 IP。
+    *   使用 Redis 的 `SETNX` (set if not exists) 命令，为每个 `slug` 和哈希后的 IP 创建一个有时效（24小时）的记录。如果记录已存在（表示该 IP 在 24 小时内已访问过此页面），则不增加浏览量，直接返回。
+*   **增加浏览量**: 如果是新的访问，则使用 Redis 的 `INCR` 命令增加对应 `type` 和 `slug` 的浏览量计数。Redis 键的格式类似 `pageviews:blogs:my-first-post` 或 `pageviews:projects:my-cool-project`。
+
+```typescript
+import { Redis } from "@upstash/redis";
+import { NextRequest, NextResponse } from "next/server";
+
+const redis = Redis.fromEnv();
+export const config = {
+  runtime: "edge", // 使用 Edge Runtime 以获得更好的性能
+};
+
+export default async function incr(req: NextRequest): Promise<NextResponse> {
+  if (req.method !== "POST") {
+    return new NextResponse("use POST", { status: 405 });
+  }
+  if (req.headers.get("Content-Type") !== "application/json") {
+    return new NextResponse("must be json", { status: 400 });
+  }
+
+  const body = await req.json();
+  let slug: string | undefined = undefined;
+  let type: string | undefined = "projects"; // 默认为 projects
+
+  if ("slug" in body) {
+    slug = body.slug;
+  }
+  // 检查请求体中是否有 type，没有则使用默认值
+  if ("type" in body && typeof body.type === "string") {
+    type = body.type;
+  }
+
+  if (!slug) {
+    return new NextResponse("Slug not found", { status: 400 });
+  }
+  const ip = req.ip;
+
+  if (ip) {
+    // 哈希 IP 地址
+    const buf = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(ip),
+    );
+    const hash = Array.from(new Uint8Array(buf))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
+    // IP 去重，键格式为 "deduplicate:hash:slug"
+    const isNew = await redis.set(["deduplicate", hash, slug].join(":"), true, {
+      nx: true, // 只在键不存在时设置
+      ex: 24 * 60 * 60, // 过期时间 24 小时
+    });
+    // 如果不是新访问，则直接返回
+    if (!isNew) {
+      return new NextResponse(null, { status: 202 });
+    }
+  }
+
+  // 增加页面浏览量，键格式为 "pageviews:type:slug"
+  await redis.incr(["pageviews", type, slug].join(":"));
+  return new NextResponse(null, { status: 202 });
+}
+
+```
+
+### 2. 前端组件调用
+
+在需要统计浏览量的页面（例如博客文章页或项目详情页），我使用了一个简单的 React 组件，在组件加载时（`useEffect` hook）向后端 API 发送请求。
+
+对于博客页面 (`/app/blogs/[slug]/view.tsx`):
+
+```tsx
+"use client";
+
+import { useEffect } from "react";
+
+export const ReportView: React.FC<{ slug: string }> = ({ slug }) => {
+	useEffect(() => {
+		fetch("/api/incr", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			// 发送 slug 和 type="blogs"
+			body: JSON.stringify({ slug, type: "blogs" }),
+		});
+	}, [slug]); // 依赖 slug，当 slug 变化时重新发送
+
+	return null; // 这个组件不渲染任何 UI
+};
+```
+
+对于项目页面 (`/app/projects/[slug]/view.tsx`):
+
+```tsx
+// filepath: /Users/orangejuice/codes/jetlab/app/projects/[slug]/view.tsx
+"use client";
+
+import { useEffect } from "react";
+
+export const ReportView: React.FC<{ slug: string }> = ({ slug }) => {
+	useEffect(() => {
+		fetch("/api/incr", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			// 只发送 slug，后端 API 会默认为 type="projects"
+			body: JSON.stringify({ slug }),
+		});
+	}, [slug]);
+
+	return null;
+};
+```
+
+后来，我将这个逻辑提取到了一个更通用的组件 `ViewTracker` (`/app/components/view-tracker.tsx`)，这样可以更方便地在不同类型的页面中使用：
+
+```tsx
+// filepath: /Users/orangejuice/codes/jetlab/app/components/view-tracker.tsx
+"use client";
+
+import { useEffect } from "react";
+
+export const ViewTracker = ({ slug, type }: { slug: string; type: string }) => {
+  useEffect(() => {
+    fetch("/api/incr", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ slug, type }), // 同时发送 slug 和 type
+    });
+  }, [slug, type]); // 依赖 slug 和 type
+
+  return null;
+};
+```
+
+## Upstash 免费额度
+
+Upstash 提供了一个免费的 Redis 实例，适合小型项目和个人使用。
+
+[Upstash 免费套餐](https://upstash.com/pricing) 包括 500K 请求和 256MB 存储，足够用于简单的浏览量统计。
+
+如果你的网站流量较大，可以考虑升级到付费套餐，Upstash 的定价相对友好。
+
+
+## 总结
+
+通过结合 Upstash Redis 和 Next.js API Routes，我实现了一个简单、高效且带有 IP 去重功能的浏览量统计系统。这种方法不仅易于实现，而且性能良好，能够轻松应对一定的访问量。

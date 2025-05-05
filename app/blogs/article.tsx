@@ -1,6 +1,6 @@
 import type { Blog } from "@/.contentlayer/generated";
 import Link from "next/link";
-import { Eye } from "lucide-react";
+import { Eye, Bookmark } from "lucide-react"; // Import Tag icon
 
 type Props = {
 	blog: Blog;
@@ -33,6 +33,20 @@ export const Article: React.FC<Props> = ({ blog, views }) => {
 				<p className="z-20 mt-4 text-sm duration-1000 text-zinc-600 group-hover:text-zinc-900">
 					{blog.description}
 				</p>
+				{/* Display Tags */}
+				{blog.tags && blog.tags.length > 0 && (
+					<div className="mt-4 flex flex-wrap gap-2">
+						{blog.tags.map((tag) => (
+							<span
+								key={tag}
+								className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-zinc-200 text-zinc-800"
+							>
+								<Bookmark className="w-3 h-3 mr-1" />
+								{tag}
+							</span>
+						))}
+					</div>
+				)}
 			</article>
 		</Link>
 	);

@@ -1,0 +1,1849 @@
+---
+title: 使用【可交互代码块】一文学会用 React 开发应用程序
+date: "2023-08-21"
+description: 使用【可交互代码块】详细讲解 React 的基本概念和用法，帮助读者快速上手 React 开发。涉及 Next.js、Tailwind CSS、TypeScript 等技术栈。
+published: true
+tags: ["React", "Next.js", "Tailwind CSS", "Frontend"]
+---
+
+import React from 'react'
+import {
+  SandpackLayout,
+  SandpackFileExplorer,
+  SandpackCodeEditor,
+  SandpackPreview,
+  SandpackProvider,
+  Sandpack
+} from '@codesandbox/sandpack-react'
+import { sandpackDark } from '@codesandbox/sandpack-themes'
+import EX1 from '../../data/code/example1'
+import EX2 from '../../data/code/example2'
+import EX3 from '../../data/code/example3'
+
+# 引入
+
+## Node.js
+
+为什么前端需要 Node.js？
+
+前端、Node.js 和 NPM（Node Package Manager）之间有着密切的关系，它们分别是 Web 开发中不同层面的组成部分。
+
+1. **前端：** 前端是指用户在浏览器中看到并与之交互的界面部分，包括 HTML（超文本标记语言）、CSS（层叠样式表）和 JavaScript。前端开发专注于设计和构建用户界面，使其在各种浏览器和设备上具有一致的外观和行为。
+
+2. **Node.js：** Node.js 是一个基于 Chrome V8 JavaScript 引擎的运行时环境，可以用于在服务器端运行 JavaScript。与传统的浏览器端 JavaScript 不同，Node.js 允许开发者使用 JavaScript 来构建服务器端应用程序，处理文件操作、网络通信、数据库访问等任务。Node.js 提供了一种非阻塞的事件驱动模型，使得能够高效地处理大量并发请求。
+
+3. **NPM（Node Package Manager）：** NPM 是 Node.js 生态系统中的包管理工具。它允许开发者在自己的项目中引入、管理和共享代码库（称为包或模块）。通过 NPM，开发者可以轻松地安装、更新和删除依赖项，以及分享自己编写的代码供其他开发者使用。NPM 还允许将项目所需的依赖项记录在一个 `package.json` 文件中，以便其他开发者能够重建项目的开发环境。
+
+得益于 NPM 的出现，开发者可以轻松地在自己的项目中引入、管理和共享代码库，这使得前端开发变得更加高效。例如，有许多优秀的开源 JavaScript 库可以帮助开发者快速构建用户界面，如 React、Vue 和 Angular 等。通过 NPM，开发者可以轻松地将这些库引入到自己的项目中，从而避免重复造轮子。
+
+如今 NPM 有着庞大的开发者社区，拥有超过 100 万个包，每周下载量超过 100 亿次。NPM 也是目前最大的软件注册表，每天有数千名开发者在其中发布新的包。有以下知名的 NPM 包：
+
+- [React](https://www.npmjs.com/package/react)：用于构建用户界面的 JavaScript 库。
+- [Vue](https://www.npmjs.com/package/vue)：用于构建用户界面的 JavaScript 框架。
+- [Element](https://www.npmjs.com/package/element-ui)：基于 Vue 的组件库。
+- [Ant Design](https://www.npmjs.com/package/antd)：基于 React 的组件库。
+
+## Why React ?
+
+> 本章节举例用到的代码，先看看就行，与原生比较。
+
+### 优势
+
+React不同于传统的 html+css+js 的web页面开发模式，它更强调组件化，使用组件的方式聚焦于视图层，借助 jsx 来写高内聚 UI 组件，单向数据流模式使得 UI 组件状态的维护管理更加清晰。
+
+用 react 开发，组件化抽离页面元素，页面实现是相当于是拼装模式，对于页面相似度大的业务，会显得特高效、快捷。
+
+简而言之，更方便。
+
+React 的核心概念是**组件化**。
+
+### React VS 原生
+
+如果要根据数据渲染一张图片，使用原生 JS:
+
+```html
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Test</title>
+  </head>
+  <body>
+    <div id="testDl">
+
+    </div>
+    <button id="testBtn" onclick="test()">点击切换图片</button>
+  </body>
+  <script>
+    // 读取数据
+    var data = {
+      title: "test",
+      img: "https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/jetzihanheadpic.png",
+    };
+    // 获取 dom
+    var dlEle = document.getElementById("testDl");
+    // 刷新节点
+    dlEle.innerHTML =
+      "<dl>" +
+      ' <dt><img src="' +
+      data.img +
+      '" /></dt>' +
+      " <dd>" +
+      data.title +
+      "</dd>" +
+      "</div>";
+    dlEle.style.display = "height:10px;width:10px";
+    test = function () {
+      data.img =
+        "https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20221114090141.png";
+      dlEle.innerHTML =
+        "<dl>" +
+        ' <dt><img src="' +
+        data.img +
+        '" /></dt>' +
+        " <dd>" +
+        data.title +
+        "</dd>" +
+        "</div>";
+    };
+  </script>
+</html>
+```
+
+使用 React：
+
+```jsx
+import { useState } from "react";
+export default function Demo() {
+  const [imgUrl, setImgUrl] = useState(
+    "https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/jetzihanheadpic.png"
+  );
+  function changeImg() {
+    setImgUrl(
+      "https://jetzihan-img.oss-cn-beijing.aliyuncs.com/blog/20221114090141.png"
+    );
+  }
+  return (
+    <div>
+    <img className="w-96 h-96" src={imgUrl} alt="test" />
+    <button onClick={changeImg}>点击切换图片</button>
+    </div>
+  );
+}
+```
+
+从上述两个例子中，可以看出 React 的一些优势：
+
+1. **组件化：** 在 React 中，界面被分解为多个独立的组件，每个组件负责特定的功能。这使得代码更加模块化、可复用和可维护。在原生 JavaScript 的例子中，整个界面逻辑都写在一个 `<script>` 标签中，不够清晰和结构化。
+
+2. **声明式编程：** React 的 JSX 语法使得界面描述更接近于实际的界面结构，让代码更加清晰和易读。相比之下，原生 JavaScript 的例子中，界面逻辑被混合在一堆字符串中，难以理解。
+
+3. **状态管理：** React 的状态管理机制（使用 `useState`）使得状态变化和界面更新更加方便。在原生 JavaScript 的例子中，状态变化需要手动操作 DOM，而在 React 中，状态变化会自动触发界面的更新。
+
+4. **易于维护和扩展：** React 的组件化和模块化的特性使得代码更易于维护和扩展。当需要更改或添加功能时，只需修改或新增相应的组件，不会影响其他部分。而在原生 JavaScript 的例子中，随着功能增加，代码会变得越来越混乱和难以维护。
+
+### React 带来的组件化
+
+组件化是 React 一个更大的特点。当我们开发大型网站时，有很多组件是重复的，因此，将重复的代码抽象成组件就可以很好的提高开发效率。
+
+我们有这样的一个需求，服务端会返回 10 名同学的信息，我们要将它渲染到页面上，你是不是会去写十次代码呢？甚至如果 100 次 100000次 呢？
+
+我们一定会想到循环，循环是一种很好的解决方案，但是循环的时候，我们需要将数据和 HTML 混合在一起，这样的代码可读性很差，而且不利于维护：
+
+```html
+<html>
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      <title></title>
+  </head>
+  <body>
+      <div id="main">
+          <div id="" class="id-w">
+              <div id="">昵称</div>
+              <div id="">时间</div>
+          </div>
+      </div>
+      <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+      <script type="text/javascript">
+          var list = [{
+                  name: "小张",
+                  time: "12:22"
+              },
+              {
+                  name: "小刘",
+                  time: "12:22"
+              },
+              {
+                  name: "小李",
+                  time: "12:22"
+              },
+              {
+                  name: "小孙",
+                  time: "12:22"
+              },
+              {
+                  name: "小周",
+                  time: "12:22"
+              },
+          ]
+          var cent = document.getElementById("main");
+
+          console.log(cent);
+          var str = ''
+          for(var i = 0; i < list.length; i++) {
+              str += "<div id='' class='id-w'>" +
+                  "<div id=''> " + list[i].name + "</div>" +
+                  "<div id=''>" + list[i].time + "</div></div>";
+          }
+          cent.innerHTML = str
+      </script>
+  </body>
+</html>
+```
+
+在 Sandpack 中运行效果如下：
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="static"
+    theme={sandpackDark}
+    files={{
+      '/index.html': {
+        code: EX1
+      }
+    }}
+  >
+    <SandpackLayout>
+      <SandpackFileExplorer />
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+我们可以使用 React 来解决这个问题，React 的组件化思想，可以将重复的代码抽象成组件，这样就可以很好的提高开发效率。
+
+```jsx
+// 模拟的假数据
+const StudentsData = [
+  {
+    name: "John",
+    id: "1",
+  },
+  {
+    name: "Jane",
+    id: "2",
+  },
+  {
+    name: "Jack",
+    id: "3",
+  },
+  {
+    name: "Jill",
+    id: "4",
+  },
+  {
+    name: "Jenny",
+    id: "5",
+  },
+];
+
+function StudentCard(props) {
+  return (
+    <div className="flex flex-col gap-2">
+      <h1 className="text-xl font-bold">ID：{props.id}</h1>
+      <h1 className="text-xl font-bold">Name：{props.name}</h1>
+    </div>
+  );
+}
+
+export default function Students() {
+  return (
+    <div>
+      <h1>Students</h1>
+      {StudentsData.map((student) => {
+        return (
+          <StudentCard name={student.name} id={student.id} key={student.id} />
+        );
+      })}
+    </div>
+  );
+}
+```
+
+在 Sandpack 中运行效果如下：
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      'App.js': {
+        code: EX2
+      }
+    }}
+  >
+    <SandpackLayout>
+      <SandpackFileExplorer />
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+## React 历史
+
+React 是一个由 Facebook 开发的 JavaScript 库，用于构建用户界面。它的历史可以追溯到2011年，以下是 React 的主要历史里程碑：
+
+1. **2011 年：** React 的前身是一个名为 XHP 的项目，由 Facebook 的工程师 Jordan Walke 开发。XHP 是一种将 PHP 与 HTML 结合的技术，旨在提高性能和安全性。在此基础上，Jordan Walke 开始探索如何将这种思想应用到 JavaScript 中。
+
+2. **2013 年：** React 正式发布。最初，React 的主要目标是解决构建复杂且高性能的用户界面所面临的问题。它引入了一种称为 "Virtual DOM" 的概念，通过将真实 DOM 的更改操作优化为虚拟 DOM 中的操作，以提高性能和渲染效率。
+
+3. **2015 年：** React Native 发布。React Native 是基于 React 的框架，用于构建移动应用程序。它允许开发者使用类似于 React 的思维方式来创建原生移动应用，从而在不同平台上共享大部分代码。例如，开发者可以使用 React Native 来构建 iOS 和 Android 应用，而无需学习 Objective-C 或 Swift（用于 iOS）和 Java（用于 Android）。
+
+4. **2016 年：** Facebook 开源 React 的许可证从 BSD+Patents 更改为 MIT 许可证。这一变化消除了一些社区成员对于 BSD+Patents 许可证中潜在法律问题的担忧，进一步促进了 React 社区的增长。
+
+5. **2018 年：** React Hooks 发布。Hooks 是一种使函数组件能够拥有状态和生命周期等特性的方式，它改变了 React 组件的编写方式，使得组件更加简洁和可维护。
+
+6. **至今：** React 在社区中持续发展壮大，成为了构建前端用户界面的首选工具之一。它广泛应用于各种项目，从小型应用到大型企业级应用，还有许多相关的库和工具，如 Redux（用于状态管理）和 React Router（用于路由管理）等。
+
+React 的历史充满了技术创新和演进，它不仅改变了前端开发的方式，还为构建高性能、可维护和可扩展的用户界面提供了强大的工具和思想。
+
+## 本章总结
+
+在本章中，我们简要介绍了 React 的历史，以及它的主要特性和优势。我们还通过一个简单的示例，展示了 React 的组件化思想，在下一章中，我们将了解 React 的基本用法，以及如何使用 React 来构建用户界面。
+
+# 语法基础
+
+## 基本结构
+
+React 代码的基本结果核心就是**函数**，这些函数被称为**组件**。组件是 React 应用的基本构建块，它们描述了你希望在屏幕上看到的内容。
+
+```jsx
+function Welcome(props) {
+  // 得益于 JSX 语法，我们可以在组件中直接使用 HTML 标签，这样就可以很方便地描述界面元素了。
+  return <h1>Hello, {props.name}</h1>;
+}
+```
+
+上面的代码定义了一个名为 `Welcome` 的组件，它接收一个名为 `props` 的参数，并返回一个 React 元素。React 元素是构成 React 应用的最小单位，它描述了你希望在屏幕上看到的内容。
+
+这让我们想到了 C++ 中的函数：
+
+```cpp
+void Welcome(string name) {
+  cout << "Hello, " << name << endl;
+}
+```
+
+只不过有一个很大的区别，React 组件返回的是界面元素，用于渲染到屏幕上，而 C++ 函数只执行一些操作，不返回任何东西，使用 `cout` 将结果输出到屏幕上。
+
+在 React 中，如果一个函数返回的是界面元素，它就可以使用标签的方式调用，就像调用 HTML 标签一样。
+
+```jsx
+function Hello() {
+  return <h1>Hello</h1>;
+}
+
+function App() {
+  return <Hello />; // 调用 Hello 组件
+}
+```
+
+在 React 中，如果一个函数返回的是普通的数据，它就可以使用函数的方式调用。
+
+```jsx
+function Add(a, b) {
+  return a + b;
+}
+
+Add(1, 2); // 3
+```
+
+一个完整的 React 应用，通常会由很多个组件组成，这些组件之间可以相互嵌套，形成一个组件树。
+
+```jsx
+function Hello() {
+  return <h1>Hello</h1>;
+}
+
+function World() {
+  return <h1>World</h1>;
+}
+
+function Word() {
+  return <div>
+    <Hello />
+    <World />
+    </div>;
+}
+
+export default function App() {
+  return <Word />;
+}
+```
+
+`export default` 语句用于对外输出本模块的默认接口，它也代表某个组件或页面的根节点。
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+        '/App.js': { code: EX3, active: true }
+    }}
+  >
+    <SandpackLayout>
+
+[//]: # (<SandpackFileExplorer />)
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+树的结构如下：
+
+```bash
+App
+└── Word
+    ├── Hello
+    └── World
+```
+
+## JSX 语法
+
+### 基本特征
+
+上面的代码中，我们使用了 JSX 语法，它是一种 JavaScript 的语法扩展，可以在 JavaScript 中直接使用 HTML 标签。这样就可以很方便地描述界面元素了。
+
+```jsx
+const element = <h1>Hello, world!</h1>;
+```
+
+注意看，我们曾经在 C++ 中，遇到过 `int`、`string`、`double` 等类型，它们都是一种数据类型，而 JSX 语法中的 `<h1>Hello, world!</h1>` 也是一种特殊的数据类型，它的类型是 `ReactElement`。
+
+当然，作为一个变量，它也可以被赋值给其他变量，也可以作为函数的参数，也可以作为函数的返回值。
+
+```jsx
+const element = <h1>Hello, world!</h1>;
+
+function showElement(element) {
+  return (
+    <div>
+      {element}
+      {element}
+    </div>
+  );
+}
+
+export default function App() {
+  return showElement(element);
+}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+ code: `const element = <h1>Hello, world!</h1>;
+function showElement(element) {
+  return (
+    <div>
+      {element}
+      {element}
+    </div>
+  );
+}
+export default function App() {
+  return showElement(element);
+}
+`,
+        active: true
+}
+    }}
+  >
+    <SandpackLayout>
+
+[//]: # (<SandpackFileExplorer />)
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+最终组成的界面如下：
+
+```html
+<div>
+  <h1>Hello, world!</h1>
+  <h1>Hello, world!</h1>
+</div>
+```
+### 显示动态的数据
+
+有这样一个情况，我们需要显示一个动态的数据，比如说，我们需要显示一个用户的名字，这个名字是从后端获取的，我们不知道它是什么，但是我们知道它一定是一个字符串。我们想根据后端的数据，显示不同的名字。
+
+JSX 为我们提供了一种很方便的方式，就是使用花括号 `{}`，在花括号中，我们可以写任何 JavaScript 表达式，这样就可以根据后端的数据，显示不同的名字了。
+
+```jsx
+export default function App() {
+  const name = 'Josh Perez';
+  return <h1>Hello, {name}</h1>;
+}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `export default function App() {
+    const name = 'Josh Perez';
+    return <h1>Hello, {name}</h1>;
+}
+`,
+        active: true
+      }
+    }}
+  >
+    <SandpackLayout>
+
+[//]: # (<SandpackFileExplorer />)
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+当然，你也可以在花括号中写任何 JavaScript 表达式，比如说，你可以写一个函数调用。
+
+```jsx
+function Add(a, b) {
+  return a + b;
+}
+
+export default function App() {
+  return <h1>1 + 2 = {Add(1, 2)}</h1>;
+}
+```
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `function Add(a, b) {
+    return a + b;
+}
+export default function App() {
+  return <h1>1 + 2 = {Add(1, 2)}</h1>;
+}
+`,
+        active: true
+      }
+    }}
+  >
+    <SandpackLayout>
+
+      [//]: # (<SandpackFileExplorer />)
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+### 列表渲染
+
+有这样一个情况，数据库中有很多用户的名字，我们需要把这些名字都显示出来，这些名字是一个数组，我们不知道它有多少个元素，但是我们知道它一定是一个数组。我们想根据后端的数据，显示名字的列表。
+
+正如我们上面所说的，花括号中可以写任何 JavaScript 表达式，所以我们可以写一个循环语句，来遍历这个数组，然后把数组中的每一个元素都显示出来。
+
+```jsx
+const names = ['Alice', 'Bob', 'Cathy', 'Daisy', 'Ethan'];
+
+export default function App() {
+  return (
+    <div>
+      {names.map(name => (
+        <p>Hello, {name}</p>
+      ))}
+    </div>
+  );
+}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `const names = ['Alice', 'Bob', 'Cathy', 'Daisy', 'Ethan'];
+export default function App() {
+    return (
+        <div>
+        {names.map(name => (
+            <p>Hello, {name}</p>
+        ))}
+        </div>
+    );
+}
+    `,
+            active: true
+        }
+        }}
+    >
+        <SandpackLayout>
+
+        [//]: # (<SandpackFileExplorer />)
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+这让我们想起了 C++ 中的 `for` 循环语句:
+
+```cpp
+const std::vector<std::string> names = {"Alice", "Bob", "Cathy", "Daisy", "Ethan"};
+
+for (const auto& name : names) {
+    std::cout << "Hello, " << name << std::endl;
+}
+```
+这里使用到的是 JS 的 `map` 方法，它和循环语句的作用是一样的，都是遍历数组中的每一个元素，然后执行一些操作。`map` 方法的参数是一个函数，这个函数的参数是数组中的每一个元素，这个函数的返回值是一个新的数组，这个新的数组的元素是这个函数的返回值。像这里返回的就是 JSX 元素的数组。
+
+```js
+const names = ['Alice', 'Bob', 'Cathy', 'Daisy', 'Ethan'];
+
+const elements = names.map(name => <p>Hello, {name}</p>);
+console.log(elements);
+```
+
+最终的结果是这样的：
+
+```js
+[
+  <p>Hello, Alice</p>,
+  <p>Hello, Bob</p>,
+  <p>Hello, Cathy</p>,
+  <p>Hello, Daisy</p>,
+  <p>Hello, Ethan</p>
+]
+```
+
+### 显示对象
+
+对象是一种非常常见的数据类型，我们经常会用到对象。比如说，我们有一个用户的信息，这个用户的信息是一个对象，我们想把这个对象的信息都显示出来。
+
+```jsx
+const xiaoming = {
+  name: 'xiaoming',
+  age: 12
+}
+
+export default function App() {
+  return (
+    <div>
+      <p>name: {xiaoming.name}</p>
+      <p>age: {xiaoming.age}</p>
+    </div>
+  );
+}
+```
+
+这让我们想起了 C++ 中的 `struct` 结构体:
+
+```cpp
+struct Person {
+    std::string name;
+    int age;
+};
+
+Person xiaoming = {"xiaoming", 12};
+
+std::cout << "name: " << xiaoming.name << std::endl;
+std::cout << "age: " << xiaoming.age << std::endl;
+```
+
+当然，我们也可以把对象放到数组中，然后遍历数组，把数组中的每一个对象都显示出来。
+
+```jsx
+const users = [
+  { name: 'xiaoming', age: 12 },
+  { name: 'xiaohong', age: 13 },
+  { name: 'xiaozhang', age: 14 },
+  { name: 'xiaoli', age: 15 },
+  { name: 'xiaowang', age: 16 }
+];
+
+export default function App() {
+  return (
+    <div>
+      {/*
+        这里的 item，index 是规定好的参数顺序，分别表示数组中的元素和元素的下标，可以直接使用
+      */}
+      {users.map((item,index) => (
+        <div>
+          <p>第{index+1}个用户</p>
+          <p>name: {item.name}</p>
+          <p>age: {item.age}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `const users = [
+    { name: 'xiaoming', age: 12 },
+    { name: 'xiaohong', age: 13 },
+    { name: 'xiaozhang', age: 14 },
+    { name: 'xiaoli', age: 15 },
+    { name: 'xiaowang', age: 16 }
+];
+export default function App() {
+  return (
+    <div>
+      {/*
+        这里的 item，index 是规定好的参数顺序，分别表示数组中的元素和元素的下标，可以直接使用
+      */}
+      {users.map((item,index) => (
+        <div>
+          <p>第{index+1}个用户</p>
+          <p>name: {item.name}</p>
+          <p>age: {item.age}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+    `,
+            active: true
+        }
+        }}
+    >
+        <SandpackLayout>
+
+        [//]: # (<SandpackFileExplorer />)
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+### 条件渲染
+
+我们可以根据条件来决定是否显示某个元素，这就是条件渲染。
+
+```jsx
+export default function App() {
+  const [isShow, setIsShow] = useState(true);
+  return (
+    <div>
+      {isShow && <p>我显示出来啦！</p>}
+      <button onClick={() => {
+        setIsShow(!isShow);
+      }}>点击我切换显示状态</button>
+    </div>
+  );
+}
+```
+
+> 这里使用了 `useState` 这个 React 的 Hook，它的作用是创建一个状态，这个状态的值是 `true`，并且提供了一个函数 `setIsShow`，这个函数的作用是修改这个状态的值。`useState` 的参数是这个状态的初始值。后面会详细讲解 Hook。
+
+`&&` 表示逻辑与，只有两个操作数都为真时，结果才为真。这里的 `isShow` 就是一个布尔值，它的值为 `true` 或者 `false`，当它的值为 `true` 时，`{isShow && <p>我显示出来啦！</p>}` 的结果就是 `<p>我显示出来啦！</p>`，当它的值为 `false` 时，`{isShow && <p>我显示出来啦！</p>}` 的结果就是 `false`，也就是什么都不显示。
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `import { useState } from 'react';
+export default function App() {
+    const [isShow, setIsShow] = useState(true);
+    return (
+        <div>
+            {isShow && <p>我显示出来啦！</p>}
+            <button onClick={() => {
+                setIsShow(!isShow);
+            }}>点击我切换显示状态</button>
+        </div>
+    );
+}
+    `,
+            active: true
+        }
+        }}
+    >
+        <SandpackLayout>
+
+        [//]: # (<SandpackFileExplorer />)
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+我们还可以使用三元运算符来实现条件渲染。
+
+```jsx
+export default function App() {
+  const [isShow, setIsShow] = useState(true);
+  return (
+    <div>
+      {isShow ? <p>我显示出来啦！</p> : <p>我被隐藏了！</p>}
+      <button onClick={() => {
+        setIsShow(!isShow);
+      }}>点击我切换显示状态</button>
+    </div>
+  );
+}
+```
+
+`?` 表示三元运算符，它的第一个操作数是一个布尔值，当它的值为 `true` 时，结果就是第二个操作数，当它的值为 `false` 时，结果就是第三个操作数。
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `import { useState } from 'react';
+export default function App() {
+     const [isShow, setIsShow] = useState(true);
+     return (
+          <div>
+                {isShow ? <p>我显示出来啦！</p> : <p>我被隐藏了！</p>}
+                <button onClick={() => {
+                 setIsShow(!isShow);
+                }}>点击我切换显示状态</button>
+          </div>
+     );
+    }
+     `,
+                active: true
+          }
+          }}
+     >
+          <SandpackLayout>
+
+          [//]: # (<SandpackFileExplorer />)
+          <SandpackCodeEditor closableTabs showTabs />
+          <SandpackPreview />
+          </SandpackLayout>
+     </SandpackProvider>
+</div>
+
+### class 和 style
+
+在 React 中，我们可以使用 `className` 来设置元素的 class，使用 `style` 来设置元素的样式。
+
+```jsx
+export default function App() {
+  return (
+    <div>
+      <p className="text-red">我是红色的</p>
+      <p style={{ color: 'blue' }}>我是蓝色的</p>
+    </div>
+  );
+}
+```
+
+`className` 的值是一个字符串，它的值就是元素的 class，`style` 的值是一个对象，它的键是样式的名称，值是样式的值。
+
+`style` 示例写法如下：
+
+```jsx
+{{ color: 'blue' , fontSize: '20px' }}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `export default function App() {
+    return (
+        <div>
+            <p className="text-red">我是红色的</p>
+            <p style={{ color: 'blue' }}>我是蓝色的</p>
+        </div>
+    );
+}
+`,
+            active: true
+        },
+    '/styles.css': {
+      code: `.text-red {
+    color: red;
+}
+`,
+        active: true
+    }
+        }}
+    >
+        <SandpackLayout>
+
+        <SandpackFileExplorer />
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+### 事件
+
+在 React 中，我们可以使用 `onClick` 来监听元素的点击事件:
+
+```jsx
+export default function App() {
+  return (
+    <div>
+      <button onClick={() => {
+        alert('你点击了我！');
+      }}>点击我</button>
+    </div>
+  );
+}
+```
+
+`onClick` 的值是一个函数，当元素被点击时，这个函数就会被调用。也可以将函数单独定义出来，然后传给 `onClick`。
+
+```jsx
+export default function App() {
+  const handleClick = () => {
+    alert('你点击了我！');
+  };
+  return (
+    <div>
+      <button onClick={handleClick}>点击我</button>
+    </div>
+  );
+}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `export default function App() {
+    const handleClick = () => {
+        alert('你点击了我！');
+    };
+    return (
+        <div>
+            <button onClick={handleClick}>点击我</button>
+        </div>
+    );
+}
+`,
+            active: true
+        }
+        }}
+    >
+        <SandpackLayout>
+
+        [//]: # (<SandpackFileExplorer />)
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+组件也可以自定义事件，例如我们可以定义一个 `Button` 组件，它有一个 `onButtonClick` 事件，当按钮被点击时，这个事件就会被调用。
+
+```jsx
+function Button(props) {
+  return (
+    <button onClick={props.onButtonClick}>点击我</button>
+  );
+}
+
+export default function App() {
+  const handleClick = () => {
+    alert('你点击了我！');
+  };
+  return (
+    <div>
+      <Button onButtonClick={handleClick} />
+    </div>
+  );
+}
+```
+
+`Button` 组件的 `onButtonClick` 事件是一个函数，当按钮被点击时，这个函数就会被调用。
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/Button.js': {
+        code: `export default function Button(props) {
+    return (
+        <button onClick={props.onButtonClick}>点击我</button>
+    );
+}
+`,
+            active: true
+        },
+    '/App.js': {
+      code: `import Button from './Button';
+export default function App() {
+    const handleClick = () => {
+        alert('你点击了我！');
+    };
+    return (
+        <div>
+            <Button onButtonClick={handleClick} />
+        </div>
+    );
+}
+`,
+      active: true
+    }
+        }}
+    >
+        <SandpackLayout>
+
+        <SandpackFileExplorer />
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+### 表单
+
+在 React 中，我们可以使用 `input` 元素来创建表单，例如我们可以创建一个输入框，当输入框的值发生变化时，我们可以通过 `onChange` 事件来监听它的变化。
+
+```jsx
+export default function App() {
+  const [value, setValue] = useState('');
+  return (
+    <div>
+      <input value={value} onChange={(e) => {
+        setValue(e.target.value);
+      }} />
+      <p>输入框的值是：{value}</p>
+    </div>
+  );
+}
+```
+
+`input` 元素的 `value` 属性是输入框的值，`onChange` 事件是输入框的值发生变化时调用的函数。
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `import { useState } from 'react';
+export default function App() {
+    const [value, setValue] = useState('');
+    return (
+        <div>
+            <input value={value} onChange={(e) => {
+                setValue(e.target.value);
+            }} />
+            <p>输入框的值是：{value}</p>
+        </div>
+    );
+}
+`,
+            active: true
+        }
+        }}
+    >
+        <SandpackLayout>
+
+        [//]: # (<SandpackFileExplorer />)
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+## Hook
+
+Hook 是 React 16.8 新增的特性，它可以让我们在函数组件中使用状态和其他 React 特性。Hook 往往与生命周期绑定在一起，发挥特定的作用。
+
+### useState
+
+`useState` 是 React 中最基础的 Hook，它可以让我们在函数组件中使用状态。`useState` 接收一个参数，这个参数是状态的初始值，返回一个数组，数组的第一个元素是状态的值，第二个元素是设置状态的函数。
+
+```jsx
+import { useState } from 'react';
+
+export default function App() {
+  const [count, setCount] = useState(0);  // 初始值为 0，count 是状态的值，setCount 是设置状态的函数
+  return (
+    <div>
+      <p>当前的值是：{count}</p>
+      <button onClick={() => {
+        setCount(count + 1);
+      }}>加 1</button>
+    </div>
+  );
+}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `import { useState } from 'react';
+export default function App() {
+    const [count, setCount] = useState(0);
+    return (
+        <div>
+            <p>当前的值是：{count}</p>
+            <button onClick={() => {
+                setCount(count + 1);
+            }}>加 1</button>
+        </div>
+    );
+}
+`,
+            active: true
+        }
+        }}
+    >
+        <SandpackLayout>
+
+        [//]: # (<SandpackFileExplorer />)
+        <SandpackCodeEditor closableTabs showTabs />
+        <SandpackPreview />
+        </SandpackLayout>
+    </SandpackProvider>
+</div>
+
+这时候你会想，我们为什么要使用 `useState` 呢？我们完全可以使用 `let` 来定义一个变量，然后使用 `setState` 来设置它的值。
+
+```jsx
+export default function App() {
+  let count = 0;
+  return (
+    <div>
+      <p>当前的值是：{count}</p>
+      <button onClick={() => {
+        count = count + 1;
+      }}>加 1</button>
+    </div>
+  );
+}
+```
+
+
+
+
+但是这样做是不行的，因为 React 会在每次渲染时重新执行函数组件，这样 `count` 的值就会被重置为 0，而且并不是所有的变量都会触发重新渲染，这是出于性能的考虑，如果所有的变量都会触发重新渲染，那么每次渲染都会非常耗费性能。如下面的执行：
+
+<div className={'my-3'}>
+  <Sandpack
+    template="react"
+    theme={sandpackDark}
+    options={{ showConsole: true, showConsoleButton: true }}
+    files={{
+      '/App.js': {
+        code: `export default function App() {
+    let count = 0;
+    return (
+        <div>
+            <p>当前的值是：{count}</p>
+            <button onClick={() => {
+                count = count + 1;
+                console.log(count);
+            }}>加 1</button>
+        </div>
+    );
+}
+`,
+        active: true
+      }
+    }}
+  >
+  </Sandpack>
+</div>
+
+我们可以看出，每次点击按钮，`count` 的值都会加 1（在控制台显示了），但是页面上的值并没有发生变化，这是因为 `count` 并不会触发重新渲染，所以我们需要使用 `useState` 来定义状态，这样才能让 React 知道 `count` 的值发生了变化，需要重新渲染页面。
+
+### useEffect
+
+`useEffect` 是 React 中的另一个 Hook，它可以让我们在函数组件中执行副作用操作，例如发送网络请求、订阅事件等。`useEffect` 接收一个函数作为参数，这个函数就是我们要执行的副作用操作，它会在每次渲染时执行，如果我们需要在组件卸载时执行一些操作，我们可以在函数中返回一个函数，这个函数就是我们要执行的操作。
+
+举一个例子，比如我们要在页面渲染时获取用户的信：
+
+```jsx
+import { useState, useEffect } from 'react';
+
+export default function App() {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    console.log('执行了 useEffect');
+    // 假设这里是发送网络请求获取用户信息
+    const user = {
+        name: '张三',
+        age: 18
+    };
+    setUser(user);
+  }, []);
+  return (
+    <div>
+        {
+            user ? (
+            <div>
+                <p>用户名：{user.name}</p>
+                <p>年龄：{user.age}</p>
+            </div>
+            ) : '加载中...'
+        }
+        <button onClick={() => {
+            setUser('李四');
+        }}>
+            修改用户名
+        </button>
+    </div>
+  );
+}
+```
+
+<div className={'my-3'}>
+  <Sandpack
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `import { useState, useEffect } from 'react';
+export default function App() {
+    const [user, setUser] = useState(null);
+    useEffect(() => {
+        console.log('执行了 useEffect');
+        const user = {
+            name: '张三',
+            age: 18
+        }; // 假设这里是发送网络请求获取用户信息
+        setUser(user);
+    }, []);
+    return (
+        <div>
+            {
+                user ? (
+                    <div>
+                        <p>用户名：{user.name}</p>
+                        <p>年龄：{user.age}</p>
+                    </div>
+                ) : '加载中...'
+            }
+            <button onClick={() => {
+                setUser({
+                    name: '李四',
+                    age: 20
+                });
+            }}>
+              修改用户名
+            </button>
+        </div>
+    );
+}
+`,
+            active: true
+        }
+        }}
+    options={{ showConsole: true, showConsoleButton: true }}
+    >
+    </Sandpack>
+</div>
+
+我们可以看到，当页面渲染时，控制台会打印出 `执行了 useEffect`，这是因为 `useEffect` 会在每次渲染时执行，如果我们不想在每次渲染时执行，我们可以给 `useEffect` 传递第二个参数，这个参数是一个数组，数组中的值是我们要监听的变量，只有当这些变量发生变化时，才会执行 `useEffect`。比如，创建一个计数器，每次点击按钮，计数器加 1，当计数器的值大于 5 时，我们将其归零：
+
+```jsx
+import { useState, useEffect } from 'react';
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (count > 5) {
+      setCount(0);
+    }
+  }, [count]);
+  return (
+    <div>
+      <p>当前的值是：{count}</p>
+      <button onClick={() => {
+        setCount(count + 1);
+      }}>加 1</button>
+    </div>
+  );
+}
+```
+
+<div className={'my-3'}>
+  <Sandpack
+    template="react"
+    theme={sandpackDark}
+    files={{
+      '/App.js': {
+        code: `import { useState, useEffect } from 'react';
+export default function App() {
+    const [count, setCount] = useState(0);
+    useEffect(() => {
+        console.log('执行了 useEffect');
+        if (count > 5) {
+            console.log('count 大于 5 了');
+            setCount(0);
+        }
+    }, [count]);
+    return (
+        <div>
+            <p>当前的值是：{count}</p>
+            <button onClick={() => {
+                setCount(count + 1);
+            }}>加 1</button>
+        </div>
+    );
+}
+`,
+            active: true
+        }
+        }}
+    options={{ showConsole: true, showConsoleButton: true }}
+    >
+    </Sandpack>
+</div>
+
+我们可以看到，当 `count` 的值大于 5 时，控制台会打印出 `count 大于 5 了`，并且 `count` 的值会被归零。
+
+清除副作用操作：当我们需要在组件卸载时执行一些操作时，我们可以在 `useEffect` 的回调函数中返回一个函数，这个函数就是我们要执行的操作，它会在组件卸载时执行。
+
+```jsx
+import { useState, useEffect } from 'react';
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    console.log('执行了 useEffect');
+    return () => {
+      console.log('组件卸载了');
+    };
+  }, []);
+  return (
+    <div>
+      <p>当前的值是：{count}</p>
+      <button onClick={() => {
+        setCount(count + 1);
+      }}>加 1</button>
+    </div>
+  );
+}
+```
+
+这个操作在一些需要清除的副作用操作中很有用，比如我们在组件中订阅了一个事件，当组件卸载时，我们需要取消订阅，否则会造成内存泄漏。
+
+以上两个就是 React 中最基础的两个 Hook，它们可以让我们在函数组件中使用状态和副作用操作，从此之后我们便可以游刃有余地使用函数组件了。
+
+import EX4 from '../../data/code/nextjs-start'
+import Index from '../../data/code/next-project/index'
+import Logo from '../../data/code/next-project/logo'
+import NavBar from '../../data/code/next-project/NavBar'
+import Article from '../../data/code/next-project/article'
+import Footer from '../../data/code/next-project/footer'
+
+import NewNavbar from '../../data/code/next-project/new-navbar'
+import NewIndex from '../../data/code/next-project/new-index'
+import About from '../../data/code/next-project/about'
+import NavBarWithLink from '../../data/code/next-project/nav-bar-with-link'
+import NewAbout from '../../data/code/next-project/about/index'
+import AboutStyle from '../../data/code/next-project/about/style'
+import NewAboutWithTailwind from '../../data/code/next-project/new-about-with-tailwind'
+
+# 进阶
+
+了解完语法之后，让我们一起在本地启动一个服务，开始 React 之旅。
+
+## 安装 Node.js
+
+React 是一个基于 JavaScript 的库，Node.js 是一个 JavaScript 运行环境，我们需要在本地安装 Node.js，才能运行 React 项目。
+
+Node.js 的安装非常简单，只需要在官网下载安装包，然后一路下一步即可。
+
+[Node.js 官网](https://nodejs.org/en/)，安装时选择 LTS 版本即可。
+
+安装完成后，打开命令行，输入 `node -v`，如果能够输出版本号，说明安装成功。
+
+## 安装 NPM
+
+NPM 不需要刻意安装，Node.js 安装完成后，NPM 也就安装完成了。NPM 作为 Node.js 的包管理工具，我们可以通过 NPM 来安装 React。
+
+打开命令行，输入 `npm -v`，如果能够输出版本号，说明安装成功。
+
+## 使用 React 框架
+
+React 官方建议选择社区中流行的、由 React 驱动的框架。这些框架提供大多数应用和网站最终需要的功能，包括路由、数据获取和生成 HTML。当前，官方已经不推荐原来的 `create-react-app`，而是推荐使用 `Next.js`。接下来，我们就使用 `Next.js` 来创建一个 React 项目。
+
+### 创建项目
+
+打开一个空文件夹，打开 PowerShell.
+
+![创建项目](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/20231121194526.png)
+
+输入以下命令：
+
+```bash
+npx create-next-app
+```
+它会让你填写一些项目：
+
+```bash
+What is your project named? my-app  # 项目名称，随便填写
+Would you like to use TypeScript? No / Yes  # 是否使用 TypeScript，暂时不用，填写 No
+Would you like to use ESLint? No / Yes  # 是否使用 ESLint，暂时不用，填写 No
+Would you like to use Tailwind CSS? No / Yes  # 是否使用 Tailwind CSS，这个填写 Yes
+Would you like to use `src/` directory? No / Yes  # 是否使用 src 目录，我们这里不用，填写 No
+Would you like to use App Router? (recommended) No / Yes  # 是否使用 App Router，我们这里不用，填写 No
+Would you like to customize the default import alias (@/*)? No / Yes  # 是否自定义模块导入别名，我们这里不用，填写 No
+```
+
+![](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/20231121195332.png)
+
+创建完成后，会自动安装依赖，安装完成后，文件夹会有以下文件：
+
+![](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/20231121195427.png)
+
+使用 VSCode 打开项目，可以看到项目的目录结构：
+
+![](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/1700567745811.png)
+
+打开终端：
+
+![](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/20231121195635.png)
+
+输入以下命令，启动项目：
+
+```bash
+npm run dev
+```
+![](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/20231121195757.png)
+
+在浏览器中打开 `http://localhost:3000`，可以看到项目已经启动成功了。
+
+
+**npm 命令**: npm 作为 Node.js 的包管理工具，也可以用于执行一些命令。因为 React 是一个框架，而浏览器是无法直接运行框架的代码的，最终需要编译为原生的 HTML、CSS 和 JavaScript，才能在浏览器中运行。所以，我们需要使用 npm 来执行一些命令，比如启动项目、编译项目等。让我们不妨打开 `package.json` 文件，看一下里面的内容：
+<img src="https://jetzihan-img.oss-cn-beijing.aliyuncs.com/20231122102144.png" alt="package.json" />
+这里声明的一些 `scripts`，就是我们可以通过 npm 来执行的命令。比如，我们可以通过 `npm run dev` 来启动项目，通过 `npm run build` 来编译项目。
+当你在终端中输入 `npm run dev` 时，实际上执行的是 `next dev` 命令，这个命令是 Next.js 提供的，用于启动项目。在这背后，Next.js 会自动帮我们编译项目，然后启动一个服务器，让我们可以在浏览器中访问项目。
+
+![](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/20231121195837.png)
+
+你可以将项目中的 `pages/index.js` 文件中的内容全部删除，然后修改为以下内容，然后保存，浏览器会自动刷新，你就可以看到修改后的效果了。
+
+```jsx
+export default function Home() {
+  return (
+    <div>
+      <h1>Hello World</h1>
+    </div>
+  );
+}
+```
+
+你可以看到下面的效果：
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="nextjs"
+    theme={sandpackDark}
+    files={{
+      '/pages/index.js': { code: EX4, active: true }
+    }}
+  >
+    <SandpackLayout>
+
+      <SandpackFileExplorer />
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+### 外部组件
+
+一个页面可能由很多组件组成，合理地拆分组件，可以让代码更加清晰，便于维护。
+
+如下图中，我们可以将页面拆分为 `LOGO`、`NavBar`、`Article`、`Footer` 四个组件。
+
+![](https://jetzihan-img.oss-cn-beijing.aliyuncs.com/20231121201746.png)
+
+我们可以将组件放在 `components` 目录下，然后在页面中引入。
+
+分别创建组件：
+
+`components/logo.js`
+
+```jsx
+export default function LOGO() {
+  return (
+    <div>
+      <h1>Stutuer</h1>
+    </div>
+  );
+}
+```
+
+注意，每个组件的名称首字母必须大写，否则会报错。
+
+且每个单独的组件必须有一个根元素，否则也会报错。比如下面的代码就会报错：
+
+```jsx
+export default function LOGO() {
+  return (
+    <h1>Stutuer</h1>
+    <p>这是一个网站</p>
+  );
+}
+```
+
+必要要使用一个根元素包裹起来：
+
+```jsx
+export default function LOGO() {
+  return (
+    <>
+      <h1>Stutuer</h1>
+      <p>这是一个网站</p>
+    </>
+  );
+}
+```
+
+这里使用了一个空标签 `<>`，它是一个占位符，不会在页面中显示。
+
+每个组件需要用 `export default` 导出，才能在其他地方引入。
+
+`components/NavBar.js`
+
+```jsx
+export default function NavBar() {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+    </div>
+  );
+}
+```
+
+`components/article.js`
+
+```jsx
+export default function Article() {
+  return (
+    <div>
+        <h1>Article</h1>
+        <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Quisquam, voluptatum. Quisquam, voluptatum. Quisquam, voluptatum.
+            Quisquam, voluptatum. Quisquam, voluptatum. Quisquam, voluptatum.
+        </p>
+    </div>
+  );
+}
+```
+
+`components/footer.js`
+
+```jsx
+export default function Footer() {
+  return (
+    <div>
+        <h1>Footer</h1>
+    </div>
+  );
+}
+```
+
+然后在 pages/index.js 中引入：
+
+```jsx
+import LOGO from "../components/logo";
+import NavBar from "../components/NavBar";
+import Article from "../components/article";
+import Footer from "../components/footer";
+```
+
+然后就可以在页面中使用组件了：
+
+```jsx
+export default function Home() {
+  return (
+    <div>
+      <LOGO />
+      <NavBar />
+      <Article />
+      <Footer />
+    </div>
+  );
+}
+```
+
+运行项目，可以看到被四个组件组装起来的页面：
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="nextjs"
+    theme={sandpackDark}
+    files={{
+      '/pages/index.js': { code: Index, active: true },
+      '/components/logo.js': { code: Logo },
+      '/components/NavBar.js': { code: NavBar },
+      '/components/article.js': { code: Article },
+      '/components/footer.js': { code: Footer }
+    }}
+  >
+    <SandpackLayout>
+
+      <SandpackFileExplorer />
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+当然，你也可以在组件中使用其他组件，比如在 `NavBar` 组件中使用 `LOGO` 组件：
+
+```jsx
+import LOGO from "../components/logo";
+export default function NavBar() {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <LOGO />
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+    </div>
+  );
+}
+```
+
+那么我们只需要在 Index 页面中引入 `NavBar` 组件即可，`LOGO` 组件会作为 `NavBar` 的子组件被渲染出来。
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="nextjs"
+    theme={sandpackDark}
+    files={{
+      '/pages/index.js': { code: NewIndex, active: true },
+      '/components/NavBar.js': { code: NewNavbar },
+      '/components/article.js': { code: Article },
+      '/components/footer.js': { code: Footer },
+      '/components/logo.js': { code: Logo }
+    }}
+  >
+    <SandpackLayout>
+
+      <SandpackFileExplorer />
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+### 静态资源
+
+在 Next.js 中，我们可以在 `public` 目录下存放静态资源，比如图片、视频、音频等。
+
+你可以在 `public` 目录下创建一个 `images` 目录，然后将图片放在里面。比如有一张图片 `logo.png`，那么我们可以在页面中这样引入：
+
+```jsx
+<img src="/images/logo.png" />
+```
+
+你可能注意到，这里的路径是 `/images/logo.png`，而不是 `../public/images/logo.png`，这是因为 Next.js 会将 `public` 目录下的文件映射到根路径 `/` 下，所以我们可以直接使用 `/images/logo.png`。正因为如此，你可以在浏览器导航栏输入 `http://localhost:3000/images/logo.png` 来正确访问到这张图片。
+
+### 路由
+
+Next.js 采用了约定式路由，即页面的路径和文件路径是一致的。你会发现，我们在创建工程时，会自动生成 `pages` 目录，这个目录下的每个文件(除了 `_app.js` 和 `_document.js`)或文件夹下的文件都会被映射为一个路由。
+
+例如，我们在 `pages` 目录下创建一个 `about.js` 文件，那么这个文件就会被映射为 `/about` 路由。
+
+```jsx
+import LOGO from "../components/logo";
+import Footer from "../components/footer";
+import NavBar from "../components/NavBar";
+export default function About() {
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <LOGO />
+        <NavBar />
+      </div>
+      <div>
+       This is the about page
+      </div>
+      <Footer />
+    </div>
+  );
+}
+```
+<div className={'my-3'}>
+  <SandpackProvider
+    template="nextjs"
+    theme={sandpackDark}
+    files={{
+      '/pages/index.js': { code: NewIndex },
+      '/components/NavBar.js': { code: NewNavbar },
+      '/components/article.js': { code: Article },
+      '/components/footer.js': { code: Footer },
+      '/components/logo.js': { code: Logo },
+      '/pages/about.js': { code: About, active: true }
+    }}
+  >
+    <SandpackLayout>
+
+      <SandpackFileExplorer />
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+我们修改一下 `NavBar` 组件，添加一个 `About` 的链接：
+
+```jsx
+import LOGO from "./logo";
+import Link from "next/link";
+export default function NavBar() {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <LOGO />
+      <Link href="/">
+        <a>Home</a>
+      </Link>
+      <Link href="/about">
+        <a>About</a>
+      </Link>
+    </div>
+  );
+}
+```
+
+注意，我们在这里使用了 `Link` 组件，这是 Next.js 提供的一个组件，用于实现客户端路由。由于它是一个组件，所以我们需要在 `NavBar` 组件中引入它。
+
+```jsx
+import Link from "next/link";
+```
+
+然后我们就可以在 `NavBar` 组件中使用它了，使其包裹 `a` 标签，这样点击 `a` 标签时就会触发路由跳转。
+
+```jsx
+<Link href="/about">
+  <a>About</a>
+</Link>
+```
+<div className={'my-3'}>
+  <SandpackProvider
+    template="nextjs"
+    theme={sandpackDark}
+    files={{
+      '/pages/index.js': { code: NewIndex },
+      '/components/NavBar.js': { code: NavBarWithLink, active: true },
+      '/components/article.js': { code: Article },
+      '/components/footer.js': { code: Footer },
+      '/components/logo.js': { code: Logo },
+      '/pages/about.js': { code: About }
+    }}
+  >
+    <SandpackLayout>
+
+      <SandpackFileExplorer />
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+点击 `About` 链接，你会发现页面跳转了到了 `http://localhost:3000/about`，并且页面内容也发生了变化。点击 `Home` 链接，页面又跳转回了 `http://localhost:3000/`。
+
+### 样式
+
+在 Next.js 中，我们可以使用 CSS 模块化来管理样式。CSS 模块化是一种将 CSS 作用域限制在组件内部的技术，这样就可以避免全局污染，同时也可以避免组件之间的样式冲突。
+
+例如，在这里，我们将 about.js 删除，然后创建 `About` 文件夹，再在里面创建 `index.js` 文件，并创建 `index.module.css` 文件。
+
+在 `index.js` 中添加下面的内容：
+
+```jsx
+import LOGO from "../../components/logo";
+import Footer from "../../components/footer";
+import NavBar from "../../components/NavBar";
+import styles from "./index.module.css";
+export default function About() {
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <LOGO />
+        <NavBar />
+      </div>
+      <div className={styles.container}>
+       This is the about page
+      </div>
+      <Footer />
+    </div>
+  );
+}
+```
+
+然后在 `index.module.css` 中添加下面的内容：
+
+```css
+.container {
+  font-size: 20px;
+  color: white;
+  background: #282c34;
+  padding: 20px;
+}
+```
+
+<div className={'my-3'}>
+  <SandpackProvider
+    template="nextjs"
+    theme={sandpackDark}
+    files={{
+      '/pages/index.js': { code: NewIndex },
+      '/components/NavBar.js': { code: NavBarWithLink },
+      '/components/article.js': { code: Article },
+      '/components/footer.js': { code: Footer },
+      '/components/logo.js': { code: Logo },
+      '/pages/about/index.js': { code: NewAbout, active: true },
+      '/pages/about/index.module.css': { code: AboutStyle }
+    }}
+  >
+    <SandpackLayout>
+
+      <SandpackFileExplorer />
+      <SandpackCodeEditor closableTabs showTabs />
+      <SandpackPreview />
+    </SandpackLayout>
+  </SandpackProvider>
+</div>
+
+可以看到样式已经生效了。

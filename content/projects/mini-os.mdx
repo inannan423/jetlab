@@ -1,0 +1,54 @@
+---
+title: Mini OS
+description: 北京林业大学 2023 年本科生操作系统课程设计（文件管理系统）
+date: "2023-06-23"
+url: https://github.com/inannan423/miniOS
+published: true
+repository: "inannan423/miniOS"
+---
+
+![image](https://github.com/inannan423/miniOS/assets/83146544/708ab853-93a4-419c-9e55-46ee925b8429)
+
+## 任务
+
+### 第一部分 磁盘模拟
+
+用一个文件来模拟一个磁盘驱动器，并在该磁盘驱动器中存放文件和目录。
+在模拟的磁盘驱动器中，利用文件系统的基础理论，管理记录在磁盘驱动器中的内容。
+
+### 第二部分 文件系统实现
+
+书写一个命令行形式的驱动器内容访问接口，即仿照cmd.exe的形式完成磁盘驱动器中内容的查看。要求实现的命令包括：`cd`，`dir`，`mkdir`，`rmdir`，`create`，`open`，`read`, `write`, `close`, `lseek`，`help`，`time`，`ver`，`rename`，`import`，`export`。
+
+另外，需要支持从本地磁盘复制内容到虚拟的磁盘驱动器中，也支持从虚拟的磁盘驱动器复制内容到本地磁盘。
+比如：
+
+- `import c:\a.txt .`  将本地C盘下的a.txt导入到当前目录。
+- `export a.txt c:\`   将当前目录下的a.txt导出到本地C盘。
+
+## 命令
+
+| 命令     | 说明             | 完成情况 |
+|--------|----------------|------|
+| cd     | 改变当前目录         | ✔️   |
+| dir    | 显示当前目录下的文件和子目录 | ✔️   |
+| mkdir  | 创建子目录          | ✔️   |
+| rmdir  | 删除子目录          | ✔️   |
+| create | 创建文件           | ✔️   |
+| open   | 打开文件           | ✔️   |
+| read   | 读取文件           | ✔️   |
+| write  | 写入文件           | ✔️   |
+| close  | 关闭文件           | ✔️   |
+| lseek  | 移动文件指针         | ✔️   |
+| help   | 显示帮助信息         | ✔️   |
+| time   | 显示当前时间         | ✔️   |
+| ver    | 显示版本信息         | ✔️   |
+| rename | 重命名文件          | ✔️   |
+| import | 导入文件           | ✔️   |
+| export | 导出文件           | ✔️   |
+| exit   | 退出程序           | ✔️   |
+
+
+## 运行
+
+使用 CMake 或使用 CLion 直接打开项目运行。

@@ -1,0 +1,116 @@
+---
+title: 使用 Certbot 申请 Let's Encrypt 证书
+date: "2023-03-27"
+description: 本文记录使用 Certbot 申请 Let's Encrypt 证书的过程。
+published: true
+tags: ["Certbot", "Let's Encrypt", "Nginx","速查"]
+---
+
+> Let's Encrypt 是一个免费的、自动化的证书颁发机构，可以为你的网站提供免费的 HTTPS 证书。这里使用 Certbot 来申请证书。
+
+## 前提
+
+- Ubuntu 20.04
+- 你的域名已经解析到服务器
+- 你的服务器已经安装了 Nginx
+
+## 安装 snapd
+
+snapd 是一个包管理器，可以用来安装 Certbot。
+
+```bash
+sudo apt update
+sudo apt install snapd
+```
+
+更新 snapd 到最新版本。
+
+```bash
+sudo snap install core; sudo snap refresh core
+```
+
+## 安装 Certbot
+
+```bash
+sudo snap install --classic certbot
+```
+
+## 配置 Nginx
+
+先为服务配置 80 端口的访问。
+
+```bash
+server {
+    listen 80;
+
+    server_name example.com www.example.com; #你的域名
+
+    location / {
+        proxy_set_header HOST $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_pass http://127.0.0.1:1000/; #你的服务地址
+    }
+}
+```
+
+## 执行签发证书命令
+
+```bash
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+sudo certbot --nginx
+```
+执行完毕后，Certbot 会询问你的邮箱地址以及需要签发证书的域名，按照提示操作即可。
+
+操作完成后，Certbot 会自动为你的 Nginx 配置文件添加 HTTPS 配置。结果应该类似于下面的配置。
+
+```bash
+server {
+
+    server_name example.com www.example.com;
+
+    client_max_body_size 1024m;
+
+    location / {
+        proxy_set_header HOST $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_pass http://127.0.0.1:1000/;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/www.example.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/www.example.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = www.example.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen 80;
+
+    server_name example.com www.example.com;
+    return 404; # managed by Certbot
+}
+```
+
+## 检查自动续订
+
+Certbot 会自动为你的证书设置自动续订，可以通过下面的命令来检查。
+
+```bash
+sudo certbot renew --dry-run
+```
+
+## 其他操作系统或平台
+
+[选择平台](https://certbot.eff.org/instructions)
+
+进入后可以选择你的操作系统和平台，然后按照提示操作即可。

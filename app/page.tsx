@@ -39,9 +39,9 @@ export default async function Home() {
                 Zihan.
               </div>
             </div>
-            <p className="mt-4 text-zinc-600">
-              I’m learning <b className={'underline decoration-dashed text-zinc-800 underline-offset-2 decoration-blue-500'}>Go, Redis, MySQL and LLM</b>.
-            </p>
+            <div className="mt-4 text-zinc-600">
+              A graduate student majoring in CS at <b className="font-bold font-serif">Beijing Jiao Tong University</b>. I’m learning <b className={'underline decoration-dashed text-zinc-800 underline-offset-2 decoration-blue-500'}>Go, Redis, MySQL and LLM</b>.
+            </div>
             <div className="mt-4"> {/* Add margin-top to GitHubStats */}
               <GitHubStats />
             </div>
@@ -94,7 +94,7 @@ export default async function Home() {
             <div
                 className={'flex p-3 justify-center relative overflow-hidden items-center bg-white col-span-3 h-96 w-full rounded-2xl forest-bg'}
             >
-                <div className={'bg-black dark:bg-white absolute w-full h-full opacity-30 '}></div>
+                <div className={'bg-black dark:bg-white absolute w-full h-full opacity-50 '}></div>
                 <div className={'font-bold text-2xl lg:text-4xl text-white dark:text-white z-10 underline decoration-emerald-400 underline-offset-4 leading-relaxed'}>
                   Hello World!
                 </div>
@@ -114,7 +114,7 @@ export default async function Home() {
                 new Date(b.date ?? Number.POSITIVE_INFINITY).getTime() -
                 new Date(a.date ?? Number.POSITIVE_INFINITY).getTime(),
             )
-            .slice(0, 5)
+            .slice(0, 20)
             .map((blog) => (
             <Card key={blog.slug}>
               <Article blog={blog} views={views[blog.slug] ?? 0} />

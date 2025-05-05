@@ -6,6 +6,7 @@ import { Header } from "@/app/components/header";
 import "./mdx.css";
 import { ReportView } from "./view";
 import { Redis } from "@upstash/redis";
+import { getRepoStats } from "@/lib/github"; // Import the function
 
 export const revalidate = 60;
 
@@ -33,12 +34,16 @@ export default async function PostPage({ params }: Props) {
     notFound();
   }
 
+  // Fetch views
   const views =
     (await redis.get<number>(["pageviews", "projects", slug].join(":"))) ?? 0;
 
+  // Fetch GitHub stats
+  const { stars, forks } = await getRepoStats(project.repository);
+
   return (
-    <div className="bg-zinc-50 min-h-screen">
-      {/* Use shared Header with appropriate props */}
+    <div className="min-h-screen">
+      {/* Use shared Header with appropriate props, including stats */}
       <Header
         title={project.title}
         description={project.description}
@@ -46,6 +51,8 @@ export default async function PostPage({ params }: Props) {
         repository={project.repository}
         url={project.url}
         backLink="/projects"
+        stars={stars} // Pass stars
+        forks={forks} // Pass forks
       />
       <ReportView slug={project.slug} />
 
