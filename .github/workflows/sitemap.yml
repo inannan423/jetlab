@@ -23,14 +23,19 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 8
+          run_install: false
+
+      - name: Add pnpm to PATH
+        run: echo "${PNPM_HOME}" >> $GITHUB_PATH
+        shell: bash
 
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build site (Contentlayer + Next.js)
+      - name: Build site (Next.js + Contentlayer)
         run: pnpm build
 
-      - name: Generate sitemap and robots.txt
+      - name: Generate sitemap
         run: node generate-sitemap.mjs
 
       - name: Create robots.txt
