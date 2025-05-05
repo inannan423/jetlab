@@ -5,11 +5,12 @@ on:
     branches:
       - main
   workflow_dispatch:
-  
+
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: Production
 
     steps:
       - name: Checkout repository
