@@ -1,0 +1,74 @@
+---
+title: GPT-Translate
+description: 基于 ChatGPT 的快捷翻译
+date: "2023-06-26"
+url: https://gpt-translate.netlify.app
+published: true
+repository: "inannan423/gpt-translate"
+
+---
+
+
+## GPT**Translate**
+
+> 基于 ChatGPT 的快捷翻译
+
+## 为什么用 ChatGPT?
+
+有那么多的翻译 API，为什么要用 ChatGPT 呢？  
+
+不知道你有没有遇到下面的情况，阅读 PDF 时，想翻译一下某一段话，但是 PDF 拷贝的内容是这样的:  
+
+```bash
+This is a Example text which 
+is copied from a PDF file.A bird in the hand is 
+worth two in the bush.
+```
+
+它是被截断的！把它复制到翻译软件里，你会得到这样的结果:  
+
+```bash
+这是一个示例文本
+是从PDF文件中复制的。手中的一只鸟是
+价值两美元。
+```
+
+而有了 ChatGPT 的加持，你会得到想要的，并且更加准确的结果:  
+
+![image](https://github.com/inannan423/gpt-translate/assets/83146544/6515d8de-c179-4296-8dfc-37baf3b50879)
+
+
+## Features
+
+- 支持多语言转换
+- 翻译历史记录
+
+## 使用方法
+
+### 在线使用
+
+访问本项目的 [部署版本](https://gpt-translate.netlify.app/)。
+
+- 点击 `settings`。
+- 填入你的 API 。最好使用被代理的 API ，因为原生 openai API 在国内无法访问。代理方式可以参考 [chatgptProxyAPI](https://github.com/x-dr/chatgptProxyAPI)。
+- 填入你的 API Key 。没有的话可以去 [openai](https://platform.openai.com/overview) 申请。或者某橙色软件，比较 cheap。
+- 点击 `Save changes`。
+
+> 填入的 API 和 API Key 会被保存在你的浏览器本地 localStorage 中，不会上传到服务器。因此请放心使用。
+
+### 自己部署
+
+- Fork 并克隆本项目。
+- 安装依赖: `pnpm install`。
+- 启动项目: `pnpm dev`。
+- 访问 `localhost:3000`。
+
+## 技术栈
+
+- Next.js
+- Tailwind CSS
+- [shadcn UI](https://ui.shadcn.com/)
+
+## 支持我
+
+请给我一个 star ⭐️。

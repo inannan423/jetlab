@@ -1,0 +1,49 @@
+[data-rehype-pretty-code-fragment] code {
+    @apply grid min-w-full break-words rounded-none border-0 bg-transparent p-0 text-sm text-black;
+    counter-reset: line;
+    box-decoration-break: clone;
+  }
+  [data-rehype-pretty-code-fragment] .line {
+    @apply px-4 py-1;
+  }
+  [data-rehype-pretty-code-fragment] [data-line-numbers] > .line::before {
+    counter-increment: line;
+    content: counter(line);
+    display: inline-block;
+    width: 1rem;
+    margin-right: 1rem;
+    text-align: right;
+    color: gray;
+  }
+  [data-rehype-pretty-code-fragment] .line--highlighted {
+    @apply bg-zinc-300 bg-opacity-10;
+  }
+  [data-rehype-pretty-code-fragment] .line-highlighted span {
+    @apply relative;
+  }
+  [data-rehype-pretty-code-fragment] .word--highlighted {
+    @apply rounded-md bg-zinc-300 bg-opacity-10 p-1;
+  }
+  [data-rehype-pretty-code-title] {
+    @apply mt-4 py-2 px-4 text-sm font-medium;
+  }
+  [data-rehype-pretty-code-title] + pre {
+    @apply mt-0;
+  }
+
+/* Style for highlighted heading */
+.heading-highlight {
+  @apply  text-gray-800 transition-all duration-1000 ease-in-out;
+  /* Or use a background color: */
+  /* @apply bg-blue-500 bg-opacity-20 rounded-md transition-all duration-300; */
+  scroll-margin-top: 120px; /* Adjust this value based on your fixed header height */
+}
+
+/* Ensure headings themselves have scroll margin */
+article h2[id],
+article h3[id],
+article h4[id],
+article h5[id],
+article h6[id] {
+  scroll-margin-top: 120px; /* Adjust this value based on your fixed header height */
+}
