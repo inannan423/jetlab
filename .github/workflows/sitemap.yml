@@ -24,9 +24,15 @@ jobs:
 
       - name: Build site (Next.js + Contentlayer)
         run: npm run build
+        env:
+          SITE_URL: https://jet-lab.site
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
 
       - name: Generate sitemap
         run: node generate-sitemap.mjs
+        env:
+          SITE_URL: https://jet-lab.site
 
       - name: Create robots.txt
         run: |
