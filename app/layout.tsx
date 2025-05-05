@@ -3,17 +3,18 @@ import { Inter } from "@next/font/google";
 import LocalFont from "@next/font/local";
 import { Metadata } from "next";
 import { Analytics } from "./components/analytics";
+import { Footer } from "./components/footer";
 
 export const metadata: Metadata = {
   title: {
-    default: "jetlab",
-    template: "%s | jetlab",
+    default: "JETLAB",
+    template: "%s | JETLAB",
   },
-  description: "Co-founder of unkey.dev and founder of planetfall.io",
+  description: "I’m a student passionate about technology, and I write technical articles on my blog.",
   openGraph: {
     title: "jetlab",
     description:
-      "Co-founder of unkey.dev and founder of planetfall.io",
+      "I’m a student passionate about technology, and I write technical articles on my blog.",
     url: "https://jet-lab.site",
     siteName: "jetlab",
     images: [
@@ -66,9 +67,10 @@ export default function RootLayout({
         <Analytics />
       </head>
       <body
-        className={``}
+        className={`bg-white text-zinc-900 dark:bg-black dark:text-zinc-100 min-h-screen flex flex-col`}
       >
-        {children}
+        <div className="flex-grow">{children}</div>
+        <Footer />
       </body>
     </html>
   );

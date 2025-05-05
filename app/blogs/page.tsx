@@ -35,7 +35,7 @@ export default async function BlogsPage() {
       <div className="px-6 pt-20 mx-auto space-y-8 container lg:px-8 md:space-y-16 md:pt-24 lg:pt-32">
         <div className="max-w-2xl mx-auto lg:mx-0">
           <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
-            Blog
+            Blogs
           </h2>
           <p className="mt-4 text-zinc-600">
             Musings on technology, design, and life.

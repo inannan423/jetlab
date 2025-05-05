@@ -107,3 +107,10 @@
     z-index: -10; /* Place it behind the content */
     pointer-events: none; /* Ensure it doesn't interfere with interactions */
 }
+
+.forest-bg{
+    background-image: url("./public/forest.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    backdrop-opacity: 0.5;
+}
