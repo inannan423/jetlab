@@ -1,0 +1,54 @@
+name: Generate Sitemap and Robots.txt
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build site (Contentlayer + Next.js)
+        run: pnpm build
+
+      - name: Generate sitemap and robots.txt
+        run: node generate-sitemap.mjs
+
+      - name: Create robots.txt
+        run: |
+          echo "User-agent: *" > public/robots.txt
+          echo "Allow: /" >> public/robots.txt
+          echo "Sitemap: https://jet-lab.site/sitemap.xml" >> public/robots.txt
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add public/sitemap*.xml public/robots.txt
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: generate sitemap and robots.txt [skip ci]"
+            git push
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
