@@ -1,9 +1,3 @@
-# *
 User-agent: *
 Allow: /
-
-# Host
-Host: https://jet-lab.site
-
-# Sitemaps
 Sitemap: https://jet-lab.site/sitemap.xml
