@@ -96,7 +96,7 @@ export default async function Home() {
             >
                 <div className={'bg-black dark:bg-white absolute w-full h-full opacity-50 '}></div>
                 <div className={'font-bold text-2xl lg:text-4xl text-white dark:text-white z-10 underline decoration-emerald-400 underline-offset-4 leading-relaxed'}>
-                  Hello World!
+                  fmt.Println("Hello, World!")
                 </div>
             </div>
             <div className={'flex h-96 w-full justify-center items-center lg:col-span-2 shadow-inner relative bg-zinc-800 rounded-2xl overflow-hidden'}>
