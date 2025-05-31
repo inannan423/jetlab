@@ -16,6 +16,13 @@ const friendLinks: FriendLink[] = [
     url: "https://kuizuo.cn/",
     description: "愧怍的小站",
     avatar: "https://kuizuo.cn/img/logo.webp"
+  },
+  {
+    // https://blog.051088.xyz/
+    name: "MarkBai",
+    url: "https://blog.051088.xyz/",
+    description: "MarkBai 的数字自留地",
+    avatar: "/MarkBai.jpg"
   }
 ];
 
