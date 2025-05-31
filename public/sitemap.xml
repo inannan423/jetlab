@@ -127,6 +127,12 @@
       <priority>0.7</priority>
     </url>
 <url>
+      <loc>https://jet-lab.site/projects/leaforum</loc>
+      <lastmod>2025-05-31T00:00:00.000Z</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.7</priority>
+    </url>
+<url>
       <loc>https://jet-lab.site/projects/mini-os</loc>
       <lastmod>2023-06-23T00:00:00.000Z</lastmod>
       <changefreq>monthly</changefreq>
@@ -135,6 +141,12 @@
 <url>
       <loc>https://jet-lab.site/projects/oss-strapi</loc>
       <lastmod>2023-08-05T00:00:00.000Z</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.7</priority>
+    </url>
+<url>
+      <loc>https://jet-lab.site/projects/redigo</loc>
+      <lastmod>2025-05-31T00:00:00.000Z</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.7</priority>
     </url>
