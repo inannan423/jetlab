@@ -3,8 +3,8 @@ export default `
   <body>
       <div id="main">
           <div id="" class="id-w">
-              <div id="">昵称</div>
-              <div id="">时间</div>
+              <div id="">昵称：</div>
+              <div id="">时间：</div>
           </div>
       </div>
       <script type="text/javascript">

@@ -12,6 +12,7 @@ import Image from "next/image"; // Import the Image component
 import { Github, Mail } from "lucide-react";
 import { MessageCircleIcon } from "lucide-react";
 import { ViewTracker } from "./components/view-tracker";
+import { FriendLinks } from "./components/friend-links"; // Import the FriendLinks component
 const redis = Redis.fromEnv();
 
 export default async function Home() {
@@ -126,6 +127,10 @@ export default async function Home() {
               Read more blogs &rarr;
             </Link>
           </div>
+        </div>
+        
+        <div className="mx-auto">
+          <FriendLinks />
         </div>
       </div>
     </div>

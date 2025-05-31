@@ -8,6 +8,7 @@ import { Redis } from "@upstash/redis";
 import { Eye, Star, GitFork } from "lucide-react"; // Import Star and GitFork icons
 import { Navigation } from "../components/nav";
 import { getAllRepoStats } from "@/lib/github"; // Import the new function
+import { LanguageTag } from "../components/language-tag";
 
 const redis = Redis.fromEnv();
 
@@ -27,8 +28,8 @@ export default async function ProjectsPage() {
   const githubStats = await getAllRepoStats(allProjects);
 
   const featured = allProjects.find((project) => project.slug === "daymd")!;
-  const top2 = allProjects.find((project) => project.slug === "gpt-translate")!;
-  const top3 = allProjects.find((project) => project.slug === "weberpenn")!;
+  const top2 = allProjects.find((project) => project.slug === "leaforum")!;
+  const top3 = allProjects.find((project) => project.slug === "redigo")!;
   const sorted = allProjects
     .filter((p) => p.published)
     .filter(
@@ -65,18 +66,23 @@ export default async function ProjectsPage() {
             <Link href={`/projects/${featured.slug}`}>
               <article className="relative w-full h-full p-4 md:p-8">
                 <div className="flex items-center justify-between gap-2">
-                  <div className="text-xs text-zinc-900">
-                    {featured.date ? (
-                      <time dateTime={new Date(featured.date).toISOString()}>
-                        {/* Format date manually to avoid hydration mismatch */}
-                        {new Date(featured.date).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </time>
-                    ) : (
-                      <span>SOON</span>
+                  <div className="flex items-center gap-2">
+                    <div className="text-xs text-zinc-900">
+                      {featured.date ? (
+                        <time dateTime={new Date(featured.date).toISOString()}>
+                          {/* Format date manually to avoid hydration mismatch */}
+                          {new Date(featured.date).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </time>
+                      ) : (
+                        <span>SOON</span>
+                      )}
+                    </div>
+                    {githubStats[featured.slug]?.language && (
+                      <LanguageTag language={githubStats[featured.slug]!.language!} size="sm" />
                     )}
                   </div>
                   {/* Display stats for featured project */}
@@ -133,6 +139,7 @@ export default async function ProjectsPage() {
                   views={views[project.slug] ?? 0}
                   stars={githubStats[project.slug]?.stars ?? 0}
                   forks={githubStats[project.slug]?.forks ?? 0}
+                  language={githubStats[project.slug]?.language}
                 />
               </Card>
             ))}
@@ -155,6 +162,7 @@ export default async function ProjectsPage() {
                     views={views[project.slug] ?? 0}
                     stars={githubStats[project.slug]?.stars ?? 0}
                     forks={githubStats[project.slug]?.forks ?? 0}
+                    language={githubStats[project.slug]?.language}
                   />
                 </Card>
               ))}
@@ -170,6 +178,7 @@ export default async function ProjectsPage() {
                     views={views[project.slug] ?? 0}
                     stars={githubStats[project.slug]?.stars ?? 0}
                     forks={githubStats[project.slug]?.forks ?? 0}
+                    language={githubStats[project.slug]?.language}
                   />
                 </Card>
               ))}
@@ -185,6 +194,7 @@ export default async function ProjectsPage() {
                     views={views[project.slug] ?? 0}
                     stars={githubStats[project.slug]?.stars ?? 0}
                     forks={githubStats[project.slug]?.forks ?? 0}
+                    language={githubStats[project.slug]?.language}
                   />
                 </Card>
               ))}

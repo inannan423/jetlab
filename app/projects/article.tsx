@@ -1,33 +1,38 @@
 import type { Project } from "@/.contentlayer/generated";
 import Link from "next/link";
 import { Eye, Star, GitFork } from "lucide-react";
+import { LanguageTag } from "../components/language-tag";
 
 type Props = {
 	project: Project;
 	views: number;
 	stars: number;
 	forks: number;
+	language?: string;
 };
 
-export const Article: React.FC<Props> = ({ project, views, stars, forks }) => {
+export const Article: React.FC<Props> = ({ project, views, stars, forks, language }) => {
 	return (
 		<Link href={`/projects/${project.slug}`}>
 			<article className="p-4 md:p-8">
 				<div className="flex justify-between gap-2 items-center">
-					<span className="text-xs duration-1000 text-zinc-700 group-hover:text-black group-hover:border-zinc-700 drop-shadow-orange">
-						{project.date ? (
-							<time dateTime={new Date(project.date).toISOString()}>
-								{/* Format date manually to avoid hydration mismatch */}
-								{new Date(project.date).toLocaleDateString("en-US", {
-									year: "numeric",
-									month: "short",
-									day: "numeric",
-								})}
-							</time>
-						) : (
-							<span>SOON</span>
-						)}
-					</span>
+					<div className="flex items-center gap-2">
+						<span className="text-xs duration-1000 text-zinc-700 group-hover:text-black group-hover:border-zinc-700 drop-shadow-orange">
+							{project.date ? (
+								<time dateTime={new Date(project.date).toISOString()}>
+									{/* Format date manually to avoid hydration mismatch */}
+									{new Date(project.date).toLocaleDateString("en-US", {
+										year: "numeric",
+										month: "short",
+										day: "numeric",
+									})}
+								</time>
+							) : (
+								<span>SOON</span>
+							)}
+						</span>
+						{language && <LanguageTag language={language} size="sm" />}
+					</div>
 					<div className="flex items-center gap-3 text-zinc-900 text-xs">
 						<span className="flex items-center gap-1" title={`${views} views`}>
 							<Eye className="w-4 h-4" />{" "}

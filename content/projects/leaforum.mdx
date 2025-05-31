@@ -1,0 +1,122 @@
+---
+title: Leaforum
+description: Leaforum 是一个现代化的、高性能的论坛系统，由 Go 语言构建，其特点是拥有可扩展的架构，该架构专为社交互动和内容分享而设计。
+date: "2025-05-31"
+url: https://github.com/inannan423/leaforum
+published: true
+repository: "inannan423/leaforum"
+---
+
+![LEAFORUM](/leaforum.png)
+
+Leaforum 是一个使用 Go 构建的现代化、高性能论坛系统，具有可扩展的架构，专为社交互动和内容分享而设计。
+
+## 功能特点
+
+- **用户认证**：完整的用户注册、登录和账户管理
+- **内容管理**：发布、编辑和管理文章及内容
+- **社交互动**：关注用户、点赞、评论和收藏文章
+- **实时信息流系统**：优化性能的混合推拉式信息流分发模型
+- **搜索功能**：基于 Elasticsearch 的内容搜索
+- **通知系统**：实时事件通知
+- **云存储**：集成阿里云 OSS 的文件上传
+
+## 架构
+
+Leaforum 采用清晰、模块化的架构：
+
+- **Web 层**：基于 Gin 框架的 API 端点
+- **服务层**：核心业务逻辑
+- **仓库层**：数据访问抽象
+- **领域层**：业务实体和模型
+- **事件系统**：基于 Kafka 的事件处理
+
+### 技术栈
+
+- **后端**：Go 1.23+
+- **数据库**：MySQL 8.0+
+- **缓存**：Redis
+- **消息队列**：Kafka
+- **搜索引擎**：Elasticsearch
+- **云存储**：阿里云 OSS
+- **容器化**：Docker、Kubernetes
+
+## 快速开始
+
+### 前置条件
+
+- Go 1.23+
+- Docker 和 Docker Compose（用于本地开发）
+- MySQL 8.0+
+- Redis
+- Kafka
+- Elasticsearch
+
+### 安装
+
+1. 克隆仓库：
+   ```bash
+   git clone https://github.com/inannan423/leaforum.git
+   cd leaforum
+   ```
+
+2. 配置环境：
+   基于示例创建配置文件：
+   ```bash
+   cp config/[env].example.yaml config/dev.yaml
+   ```
+   编辑配置文件，填入您的设置。
+
+3. 使用 Docker Compose 启动所需服务：
+   ```bash
+   docker-compose up -d
+   ```
+
+4. 构建并运行应用：
+   ```bash
+   go build -o leaforum
+   ./leaforum
+   ```
+
+### Docker 部署
+
+构建 Docker 镜像并在容器中运行应用：
+
+```bash
+make docker
+docker run -p 8080:8080 -v $(pwd)/config:/app/config leaforum:latest
+```
+
+### Linux 部署
+
+构建 Linux 可执行文件：
+
+```bash
+GOOS=linux GOARCH=amd64 go build -o leaforum-linux-amd64
+```
+
+## Kubernetes 部署
+
+Leaforum 可以使用 `k8s` 目录中的配置在 Kubernetes 上部署。
+
+详细部署说明请参阅 `k8s/guide.md`。
+
+## 开发
+
+### 项目结构
+
+```
+├── config/              # 配置文件
+├── docs/                # 文档
+├── internal/            # 内部应用代码
+│   ├── domain/          # 领域模型
+│   ├── events/          # 事件处理
+│   ├── job/             # 后台任务
+│   ├── repository/      # 数据访问层
+│   ├── service/         # 业务逻辑
+│   └── web/             # Web 处理器
+├── ioc/                 # 依赖注入
+├── pkg/                 # 共享包
+├── script/              # 设置和维护脚本
+└── k8s/                 # Kubernetes 部署配置
+``` 
