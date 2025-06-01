@@ -1,0 +1,785 @@
+---
+title: Kafka 学习手册（常见面试问题）
+date: "2025-6-1"
+description: Kafka 是一个开源流处理平台，旨在处理实时数据流。本文将介绍 Kafka 的基本概念和使用方法。
+published: true
+tags: ["Kafka", "流处理", "速查"]
+---
+
+# 一、Kafka 架构与基本原理
+
+## 1. **Kafka 是什么？**
+
+Kafka 是⼀个分布式流式处理平台。
+
+- 流式处理：**数据以事件的形式持续不断地产生**，不是像传统批处理那样一次性导入全部数据。
+
+- 分布式：
+
+  - Kafka 可以运行在多个服务器节点（Broker）上。
+
+  - 每个主题（Topic）可以分为多个分区（Partition），分布在不同节点。
+
+  - 它的 Producer 和 Consumer 也支持水平扩展。
+
+特点：高吞吐、低延迟、可扩展、高容错（持久化）。
+
+主要的使用场景：
+
+- 消息队列
+
+- 日志收集（通过 Kafka 将日志传递到监控系统）
+
+- 流计算：实时数据传递给实时计算系统
+
+### Go 中使用的是什么 Kafka 客户端？
+
+使用的是 Shopify 开源的 Sarama 客户端。
+
+## 2. **核心组件有哪些？各自的作用是什么？**
+
+Producer、Consumer、Broker、协调器
+
+- Producer 生产者：将数据发布到指定的 Topic 上面。Kafka 会根据要求将数据分散到 Topic 的不同分区之中去。
+
+- Consumer 消费者：从 Topic 中读取数据。消费者可以属于某个消费组，可以让多个消费者负载均衡地读取数据。
+
+- Broker 消息代理：Kafka 的核心，消息在这里存储，每个 Kafka 集群可以包含多个 Broker，负责接收、存储、发送数据。
+
+- 协调器
+
+  - Zookeeper 协调器：用于 Kafka 的分布式协调和管理，比如存储 Broker 的元数据信息、分区列表、Loader 等。Kafka 3.0 之后可选择移除。
+
+  - Kafka Controller： Kafka 的内部组件，负责管理分区的 leader 分配等，Kafka 3.0 起逐步替代 ZooKeeper。
+
+### Zookeeper 被移除了吗？
+
+截至 **Kafka 3.7（2024 年）及之前版本**，**Kafka 仍然支持 ZooKeeper 模式**：
+
+## 3. **🌟 Kafka 的 Topic、Partition、Offset 是什么？它们之间的关系？**
+
+### Topic 是什么有什么作用？
+
+用于区分不同类型的消息。每个 Topic 都有一个名称，生产者发消息到特定的 Topic 上，消费者从特定的消费者消费。例如，点赞事件可以创建一个 Topic 叫 "like_topic"。
+
+**如何创建一个 Topic？**
+
+- 使用命令行创建。使用 `kafka-topics.sh` 来创建。指定 Broker 的地址、副本数、分区数、Topic 名。这里指定副本后，Kafka 会**自动将这些副本分散到不同的 broker 上（前提是有 3 个及以上的 Broker）。**
+
+```sql
+kafka-topics.sh --create \
+  --bootstrap-server localhost:9092 \
+  --replication-factor 3 \  设置副本数量
+  --partitions 4 \
+  --topic my-topic
+```
+
+- 使用 API 创建。例如 Sarama 中，使用 CreateTopic 函数。
+
+```go
+// Topic 名称
+topicName := "my-sarama-topic"
+
+// Topic 配置
+topicDetail := &sarama.TopicDetail{
+    NumPartitions:     3,                // 分区数
+    ReplicationFactor: 2,                // 副本数
+    ConfigEntries: map[string]*string{  // 可选配置项
+        "retention.ms": strPtr("604800000"), // 保留 7 天
+    },
+}
+
+// 创建 Topic
+err = admin.CreateTopic(topicName, topicDetail, false)
+```
+
+查看已经创建的 Topic、详情。
+
+```sql
+列出所有 Topic：kafka-topics.sh --list --bootstrap-server localhost:9092
+展示 Topic 详情：kafka-topics.sh --describe --topic my-topic --bootstrap-server localhost:9092
+删除 Topic：kafka-topics.sh --delete --topic my-topic
+```
+
+### **Partition 是什么有什么作用？**
+
+每个 Topic 会被**划分为一个或多个分区**，**每个分区就是一个有序的、不可变的消息队列（日志文件）**。
+
+- **每条消息**会被顺序地追加到某个分区的末尾。
+
+- 消息在分区内具有**严格的顺序**，但**不同分区之间顺序不保证**。
+
+```sql
+Topic: order-events
+
+Partition 0 --> msg1, msg2, msg3, ...
+Partition 1 --> msg4, msg5, msg6, ...
+Partition 2 --> msg7, msg8, msg9, ...
+```
+
+为什么要多个分区？如果只有一个分区，只能一个 Consumer 顺序消费，就会导致性能瓶颈。
+
+怎么指定消息去哪个分区？
+
+- 使用 Send 函数显式指定：`send(topic, partition, key, value)`
+
+- **按 key 进行 hash 分配**：同一个 key 的消息会被发送到同一个分区（保持有序）
+
+- **轮询（默认）**：没有 key 时轮询分配给不同分区，负载均衡
+
+### Offset 是什么？
+
+**Offset（偏移量）** 是用于标识和追踪**消息**在分区中的**位置**的核心机制。**Offset 是 Kafka 中每条消息在某个分区（Partition）中的唯一编号，从 0 开始递增。**
+
+```sql
+offset:    0     1     2     3     4
+message:  login click buy  logout pay
+```
+
+- 每条消息被追加时，自动分配一个顺序递增的 **offset**。
+
+- **消费者（Consumer）** 在消费完一条消息后，会**提交它的 offset**，表示“我已经处理完了这个位置”。
+
+如何追踪消费进度？
+
+Kafka 消费者客户端（如 Java、Go）默认会**定时提交 offset** 到 Kafka 的内置 topic：`__consumer_offsets`。
+
+可以使用 `kafka-consumer-groups.sh`查看：
+
+```sql
+kafka-consumer-groups.sh \
+  --bootstrap-server localhost:9092 \
+  --describe \
+  --group my-consumer-group
+
+TOPIC         PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG   CONSUMER-ID
+user-events   0          350             360             10    consumer-1
+```
+
+- `CURRENT-OFFSET`: 消费者组消费到哪了
+
+- `LOG-END-OFFSET`: 分区中最新的 offset
+
+- `LAG`: 当前滞后数量（未消费的消息数）
+
+> **支持重置 Offset 吗？**
+>
+> 支持，使用 `kafka-consumer-groups.sh`：
+>
+> ```sql
+> kafka-consumer-groups.sh \
+>   --bootstrap-server localhost:9092 \
+>   --group my-group \
+>   --topic user-events \
+>   --reset-offsets --to-earliest --execute
+> ```
+>
+> 支持的选项包括：
+>
+> - `--to-earliest`（从最早开始）
+>
+> - `--to-latest`（从最新开始）
+>
+> - `--shift-by -5`（回滚 5 条）
+>
+> - `--to-offset 1234`（跳到固定位置）
+
+### 联系
+
+Topic 是分类，Partition 是分布式存储单元，Offset 是分区内的消息索引。
+
+## 4. **🌟 Kafka 为什么能做到高吞吐量？有哪些关键设计？**
+
+- 顺序 I/O。 **顺序追加到磁盘的日志文件中**，避免了随机磁盘写入带来的性能瓶颈。
+
+- **零拷贝（Zero-copy）**。使用 Linux 的 `sendfile()` 系统调用，将数据从磁盘直接传输到网络缓冲区，**无需应用程序层拷贝，提高了 I/O 效率，降低了 CPU 开销**。
+
+- 生产者和 Broker 支持**批量发送和批量写入**，一个批次可以包含多条消息，减少网络调用次数。消费者也支持批量拉取。
+
+- 分区。将 Topic 划分为多个 Partition，天然支持 **并行读写**。
+
+- Kafka 的日志文件由多个 **Segment 文件** 构成，便于管理和清理。使用**页缓存**（Page Cache）提升读性能。
+
+## 5. **🌟 Kafka 的存储机制是怎样的？怎么做到高效读写？（日志段 + 索引 + 顺序写）**
+
+在 **Apache Kafka** 中，**消息默认是被写入磁盘的。**
+
+Kafka 中的每个 **Partition 对应一个目录**，该目录下是按照时间或大小分割的**多个 segment 文件**，每个 segment 包含：
+
+- 一个 `.log` 文件：保存真实的消息数据（顺序写入）
+
+- 一个 `.index` 文件：保存 offset 到文件位置的索引
+
+- 一个 `.timeindex` 文件：记录时间戳与位置关系（用于时间查找）
+
+写入流程：
+
+1. **Producer 发送消息到 Broker**
+
+2. Kafka 会将消息 **顺序写入到当前 Partition 的活跃 segment 文件中（.log）**
+
+3. 同时更新内存页缓存与 offset 索引文件
+
+4. 根据配置定期落盘（flush）到磁盘
+
+读取流程：
+
+1. Consumer 向 Broker 发送 Fetch 请求，指定 partition 和 offset
+
+2. Kafka 通过 `.index` 快速定位到消息在 `.log` 文件中的物理位置
+
+3. 利用操作系统页缓存直接读取内存或触发顺序磁盘读
+
+4. 使用 **零拷贝（sendfile）** 直接将数据从磁盘传到 socket，提升效率
+
+## 6. **🌟 Kafka 是如何实现消息的持久化和可靠性的？**
+
+通过日志文件 （log files） 进行持久化。
+
+日志写入流程：
+
+- **Producer 发送消息** 到某个 Topic 的某个 Partition。
+
+- **Broker 接收消息**，先写入**Page Cache**（操作系统缓存）。
+
+- Kafka 使用 **顺序写入磁盘** 的方式，**把数据持久化到 log segment 文件中（.log）**。
+
+- 如果 `acks=all` 且消息同步到所有 ISR 副本，则返回 ACK 给 Producer。
+
+**为什么 Kafka 写磁盘还这么快？**
+
+- **顺序写入**
+
+- 使用操作系统的**页缓存**进行优化。
+
+- 零拷贝 （zero-copy）。Kafka 使用 sendfile 系统调用直接从文件发送给客户端，绕过应用层。
+
+Kafka 每个 Partition 都对应一个目录，内容如下：
+
+```sql
+/tmp/kafka-logs/user-events-0/
+├── 00000000000000000000.log      ← 消息日志（实际数据）
+├── 00000000000000000000.index    ← 位移索引
+├── 00000000000000000000.timeindex← 时间索引
+```
+
+**Broker 崩溃的时候**，重启后，使用本地日志恢复
+
+- Broker 重启时，会扫描其本地的所有分区目录：
+
+  - 恢复 `.log` 文件（即消息本体）
+
+  - 恢复 `.index` / `.timeindex`（索引文件）
+
+- 如果检测到某个 segment 没有正确关闭（如异常宕机），Kafka 会：
+
+  - 重建 segment 索引
+
+  - 截断未完成写入的部分（删除末尾可能写坏的部分）
+
+- 完成本地日志恢复后，Broker 会向 Controller 报告其状态。
+
+## 7. Kafka Controller 的作用
+
+Kafka Controller 是 **Kafka 集群中负责管理元数据和集群协调** 的角色（在 2.8 版本之前是 Zookeeper）。在一个 Kafka 集群中，**只会有一个 Broker 被选为 Controller**（主控制器），其余是候选。
+
+- **分区领导者 Partition Leader 选举**：Kafka 中的每个 topic 都会被分成多个 **partitions**，每个 partition 有一个 **leader** 和多个 **follower**。Controller 负责为每个 partition 选举一个 leader。这个 leader 负责读写请求，其它 follower 跟随它的数据变化。相当于 Redis 中的主从复制。
+
+- **Broker 监控与管理**：Kafka Controller 会监听其他 broker 的状态。如果发现有 broker 加入或离开集群，Controller 会触发重新分配分区领导者和副本（replica）。
+
+- **Replica （副本）状态管理**：控制副本（replica）的同步状态（In-Sync Replicas，ISR）。管理 partition 的副本是否仍然可用、是否落后等。
+
+- **处理集群变更事件**：比如 topic 创建/删除、分区数量变更等，Controller 都要做出相应处理并广播更新信息给所有 broker。
+
+---
+
+# 二、生产者（Producer）相关
+
+## 8. **🌟 消息是如何从 Producer 发送到 Kafka 的？批量发？**
+
+- 消息为字节数组。
+
+- 选择一个分区。
+
+- 把消息发送到缓冲区。当缓冲区达到一定的大小（或者时间超过阈值），将消息批量发到 Brokers。
+
+通过批量发送机制，可以减少网络的调用，减小 Broker 的压力。
+
+## 9. **🌟 Kafka 中 acks=0/1/all 分别表示什么？影响可靠性的哪些方面？Acks 的值如何影响性能？**
+
+`acks` 定义了 Producer 在写入消息时，**要求多少副本确认成功** 才认为这条消息写入成功。
+
+- acks=0，极速但是不可靠。都不一定写入 Leader，一旦 Broker 异常，可能导致消息 **直接丢失**。
+
+- acks=1，性能和可靠性的折中。Producer 等待 **Leader Broker 写入磁盘成功** 即可返回。但是可能会丢消息（可能没有副本备份）
+
+- acks=all/-1，**性能最差但是最可靠**。Producer 只有在 **ISR 中所有副本都确认写入成功后才返回**。如果 ISR 中某个副本滞后太久、不可达，Kafka 会拒绝写入。
+
+## 10. **🌟 Kafka Producer 如何保证幂等性？幂等性是如何实现的？**
+
+**“幂等性” 指的是生产者发送消息到 Kafka 集群时，无论发送多少次相同的消息，Kafka 集群最终只会保存一条该消息，且仅会处理一次。**
+
+Kafka 的幂等性是通过启用 **幂等生产（idempotent producer）** 实现的。
+
+```sql
+enable.idempotence=true
+```
+
+🌟 怎么实现的幂等性：Kafka 会自动**为每个 Producer 分配一个唯一的 ID**，也就是 Producer ID。同时，它会**为每个分区维护一个消息的序列号**，每发一条消息，序号都会递增。Kafka 的 Broker 会记录每个 Producer 最后一次写入的序列号。这样如果 Producer 因为网络原因重试了某条消息，Broker 就能通过序列号识别出这是一条重复的消息，从而丢弃它。
+
+## 11. **Kafka 的分区策略是怎样的？如何自定义消息的分区？**
+
+每个 Topic 会被**划分为一个或多个分区**，**每个分区就是一个有序的、不可变的消息队列（日志文件）**。
+
+- **每条消息**会被顺序地追加到某个分区的末尾。
+
+- 消息在分区内具有**严格的顺序**，但**不同分区之间顺序不保证**。
+
+```sql
+Topic: order-events
+
+Partition 0 --> msg1, msg2, msg3, ...
+Partition 1 --> msg4, msg5, msg6, ...
+Partition 2 --> msg7, msg8, msg9, ...
+```
+
+为什么要多个分区？如果只有一个分区，只能一个 Consumer 顺序消费，就会导致性能瓶颈。
+
+怎么指定消息去哪个分区？
+
+- 使用 Send 函数显式指定：`send(topic, partition, key, value)`
+
+- **按 key 进行 hash 分配**：同一个 key 的消息会被发送到同一个分区（保持有序）
+
+- **轮询（默认）**：没有 key 时轮询分配给不同分区，负载均衡
+
+### 自定义分区策略
+
+生产中如果需要更复杂的分区逻辑，**比如根据用户类型、地理位置等分区**，我们可以实现 Partitioner 接口，定义自己的分区规则，然后在 Producer 配置中指定这个类名即可。
+
+---
+
+# 三、消费者（Consumer）相关
+
+## 12. **Kafka 的消费模型是怎样的？消费者组（Consumer Group）如何工作？**
+
+每个 Kafka 消费者（Consumer）会从指定的 **topic 的分区（partition）** 中拉取消息。
+
+Kafka 消费模型支持：
+
+- 点对点消费（每条消息只被一个消费者组里面的唯一消费者处理），适用于任务处理、日志入库等场景。
+
+- 发布订阅（每个消费者组都能消费所有消息），适用于需要广播的场景，例如数据同步。
+
+> Kafka 的“消费模型”不是通过某个设置项来配置的，而是通过“消费者组的组织方式”天然决定的。取决于我们怎么用而已。例如我们项目中实现的浏览量统计就属于的是点对点消费。
+
+一个 **Consumer Group** 是由多个消费者实例组成的组，用于**协调消费任务**，实现消息的负载均衡处理。
+
+- Kafka 将一个 topic 的 **多个分区**平均分配给消费者组中的**不同消费者**。
+
+- **同一组内**，每个分区只能被 **一个消费者消费**。
+
+- **不同组之间**可以并行消费 **相同的消息**。
+
+### 什么是 再平衡 Rebalance ？
+
+当消费者组中有消费者**加入、离开或挂掉**时，Kafka 会触发 **rebalance**，重新分配分区。
+
+### 🌟 消费者是怎么做到批量消费的？
+
+在 **Kafka 中的消费者（Consumer）实现批量消费**，是通过 **一次 poll 拉取多个消息** 实现的，不是一条条单独处理，而是**批量拉取 + 批量处理**。
+
+## 13. Kafka 的分区分配策略？（如何将分区分配给消费组中的消费者）
+
+分区分配策略：当多个消费者加入同一个 Consumer Group 时，Kafka 如何把 Topic 的分区分配给这些消费者。
+
+- **Range 范围**：按照范围将分区分配给消费者。
+
+- **RoundRobin 轮询**：均匀分配的方式进行分配。
+
+  假设：
+
+  - topicA: P0, P1, P2
+
+  - topicB: P0, P1, P2
+
+  - 两个消费者，分配：
+
+  ```sql
+  C1 → topicA-P0, topicB-P1, topicA-P2
+  C2 → topicA-P1, topicB-P0, topicB-P2
+  ```
+
+- **Sticky 粘性**（2.4 版本起成为默认策略）：在轮询的基础上，还能保证尽可能保持上一次分配的结果。减少分区重新平衡导致的延迟和性能损失。
+
+- **协作粘性分配**（2.4 + 版本引入）
+
+当使用消费者组时，Kafka 会把分区平均分配给消费者。但如果：
+
+- 有新消费者加入（扩容）
+
+- 有消费者掉线（故障）
+
+- 有 Topic 变化（新增分区）
+
+Kafka 就会触发 再平衡 Rebalance，把分区**重新分配一遍**。传统 Rebalance 是“暴力式”的：所有消费者 **先丢掉全部分区**（revoke），然后再统一重新分配（assign）。
+
+然后就引入了协作粘性分配：能实现“**渐进式分区迁移**”，不必每次都 revoke 所有分区。
+
+## 14. **Kafka 如何管理 offset？自动提交 vs 手动提交，有什么区别？**
+
+Kafka 使用 offset 来确保 **消费者知道上次消费到哪了**，从而实现**可控的消费进度和容错恢复**。
+
+Kafka 会把 offset 存储在一个特殊的内部 topic 中：
+
+```sql
+__consumer_offsets
+```
+
+这个 topic 会记录每个 `(consumer group, topic, partition)` 的 offset 值。
+
+注意，每个 cosumer group 都会有一个关于这个分区的 offset 记录。
+
+Kafka 的消费者有两种提交 offset 的方式：
+
+- 自动提交，在配置文件中开启。
+
+```sql
+enable.auto.commit=true
+auto.commit.interval.ms=5000
+```
+
+Kafka 每隔 `auto.commit.interval.ms` 毫秒自动提交当前消费的 offset。适合对“**消息不重要 / 允许重复消费**”的场景。但是可能会导致消息没有真正消费成功却自动提交了，造成消息的丢失。
+
+- 手动提交，即关闭自动提交 `enable.auto.commit=false`
+
+### 消费失败用户可以不提交 Offset，那么这个分区后面的消息是否会被阻塞？
+
+kafka 的 offset 是按 partition 和 group 串行推进的，如果消费失败但没有提交 offset，后续的消息在该消费者组内会被阻塞，因为 Kafka 要求每个分区内的消息顺序消费。
+
+## 15. **一个 partition 会被多个 consumer 消费吗？为什么？**
+
+不会。一个 partition 在同一个 Consumer Group 内只能被一个 consumer 实例消费。
+
+### 不同的 Consumer Group 里面的 Consumer 可以消费同一个分区吗？
+
+Consumer Group A 和 Consumer Group B 都订阅了 Topic T。
+
+Partition P0 的消息，会分别被 Group A 和 Group B 中的消费者消费一次。**这属于发布订阅模式。**
+
+每个 cosumer group 都会有一个关于这个分区的 offset 记录，因此 kafka 天然支持多个 group 消费同一个消息。
+
+## 16. **如何处理消费失败的消息？Kafka 有死信队列机制吗？**
+
+**消费失败的消息可以创建重试机制完成。尝试重新处理失败的消息 N 次。如果超过重试次数就记录错误日志**，人工介入或手动消费处理。
+
+> 死信队列（Dead Letter Queue，DLQ）是一种用于处理无法正常处理的消息的机制。在消息队列系统中，当消息因为各种原因（如格式错误、处理逻辑异常、目标系统不可用等）无法被成功消费或处理时，这些消息就会被发送到死信队列。死信队列可用于人工核查。
+
+和 RabbitMQ 不同，Kafka 本身没有内建死信队列（DLQ）机制。为什么？Kafka 最初是为构建高吞吐量的日志收集系统而设计的，在这种场景下，**消息丢失比消息出错更严重** ，所以 Kafka 更关注的是不丢消息、可回溯消费等能力。
+
+而且 kafka 允许用户自己控制 Offset 的提交，那么消费失败用户可以不提交 Offset，然后重新拉取消息重试。RabbitMQ 消息是否被确认是由 broker 控制的。
+
+但是我们可以手动实现死信队列。在应用层实现。
+
+做法是在消费失败后，**手动将消息 produce 到一个名为 `dlq-xxx` 的 Kafka topic 中**。
+
+然后消费者再消费这个 Topic 达成重试的效果。
+
+---
+
+# 四、可靠性与顺序性
+
+## 17. **🌟 Kafka 是如何保证消息顺序的？**
+
+Kafka 是**在单个分区内保证消息顺序的**。只要生产者发送消息到同一个分区，Kafka 保证这些消息按照发送顺序被写入、被拉取、被消费。跨分区的顺序是不保证的。
+
+### 某个 Topic 有多个分区，但是我想保证 Topic 内消息有序，怎么做？
+
+- 最简单的就是减少到一个分区，但是会导致性能问题
+
+- Producer 发送消息时带上 key（如用户 ID、订单号等）。这样相同的 Key 的消息会进入同一个分区。最常见的场景就是，同一个用户的消费需要有序，方便扣款。
+
+```go
+topic := "user-events"
+key := "user123"  // 👈 同样的 key 保证进入同一个分区
+
+err = p.Produce(&kafka.Message{
+    TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+    Key:            []byte(key),
+    Value:          []byte("some message for user123"),
+}, nil)
+```
+
+此外，写入有序后，需要保证每个分区只能由一个消费者消费。否则仍然不能保证顺序。
+
+## 18. **🌟 Kafka 是如何保证消息“不重复” 或者 “不丢失”的？**
+
+- 如何保证不重复的？使用生产者幂等性 + Exactly Once 来实现不重复。
+
+- 什么情况下消息会丢失？
+
+  - 例如 ack 设为 0 或者 1 的时候
+
+  - 设置自动提交 Offset，但是消费者并没有 正确处理的时候
+
+- 如何保证不丢失？
+
+  - 生产端
+
+    - 使用 ACKS = all
+
+    - 设置重试机制
+
+  - Broker
+
+    - 持久化到日志
+
+    - 每个分区创建多个副本
+
+    - 配置最小 ISR 数量
+
+  - 消费端
+
+    - 手动提交 offset
+
+## 19. **🌟 Kafka 能做到 exactly-once 吗？具体怎么实现？**
+
+使用 **Kafka 实现 Exactly Once 语义（EOS）**，也就是确保：
+
+> **每条消息只被处理一次，既不重复、也不丢失**，即使在重试、故障等情况下也能保持数据一致性。
+
+Exactly Once 意味着：
+
+- Producer 只写入一次
+
+- Consumer 只处理一次
+
+- 状态系统（如数据库、状态存储）保持一致
+
+Kafka 的 Exactly Once 是通过**幂等性 + 事务机制**实现的。
+
+- 幂等：生产者幂等（见上面）
+
+- 事务机制：将批量发送消息到 Broker 作为一个原子事件处理。实现原子写入。
+
+Consumer 端也要配合事务才能实现 EOS：
+
+```sql
+isolation.level=read_committed # 读已提交
+```
+
+这样 Consumer 只会读到**已经 commit 的事务性消息**，不会读到中间状态的数据。
+
+### 事务怎么实现的？
+
+事务机制通过事务管理器、生产者、消费者进行实现。
+
+事务使用两阶段提交协议，第一阶段生产者发送消息但不提交，第二阶段，事务管理器确定事务是否提交或中止，通知生产者执行最终提交或者回滚。
+
+---
+
+# 五、扩展与高可用
+
+## 20. **🌟 Kafka 的副本机制是怎样的？ISR 是什么？AR、OSR 呢？**
+
+Kafka 中每个分区（Partition）都可以配置多个副本（Replica），包括 **1 个 Leader 副本和多个 Follower 副本**。**副本之间的数据通过复制保持一致。**
+
+每个分区的副本会分散在不同的 Broker 上面。
+
+所有写操作都会落到 Leader 副本。Follwer 副本会被动地从 Leader 同步数据。
+
+副本同步流程：
+
+- Producer 写消息到 Leader（Broker 1）
+
+- Follower 副本（Broker 2 和 3）从 Leader 拉取数据
+
+- **副本写入成功后，才会向生产者返回 ACK**：写入成功时，Leader 等待 ISR 中副本的 ACK（可配置），若满足 acks 条件，就返回成功响应给 Producer
+
+可以使用 `kafka-topics.sh` 的 describe 命令查看副本详情：
+
+```sql
+kafka-topics.sh --describe --topic your-topic --bootstrap-server localhost:9092
+
+Topic: order-events   Partition: 0   Leader: 1   Replicas: 1,2,3   Isr: 1,2,3
+```
+
+### 怎么设置副本因子？
+
+使用 `replication.factor = 3` 参数进行设置。副本因子数量不能大于 Broker 的数量。
+
+```bash
+kafka-topics.sh --bootstrap-server <broker:port> \
+                --create \
+                --topic my-topic \
+                --partitions 3 \
+                --replication-factor 3
+```
+
+### 什么是 ISR？
+
+ISR（In-Sync Replicas，同步副本集合）。
+
+**ISR 是与 Leader 副本保持“同步状态”的所有副本的集合**。（只有同步的那些副本才叫 ISR），Kafka 会动态维护 ISR 列表，失速或宕机的副本会**被踢出 ISR**，重新同步后再加入回来。
+
+Kafka 只有在消息被写入 ISR 中的副本后，才认为写入是成功的（取决于 `acks=all` 和其他配置）。
+
+> 可以设置**最小 ISR 数量**，在同步的副本数量少于这个规定的数量后，就不再正常接收请求。
+>
+> 也可以设置副本的最大滞后时间，在这个滞后事件之内的，也容忍为一个同步副本。
+
+### 什么是 OSR 和 AR
+
+OSR：Out-of-Sync Replicas
+
+AR：Assigned Replicas 所有副本 = ISR + OSR
+
+## 21. **Leader 和 Follower 的职责？如果 Leader 崩溃了，怎么处理？**
+
+Kafka 中每个 **分区（Partition）** 都有一个：
+
+- **Leader 副本**（Primary Replica）：负责 **所有读写操作，**&#x50;roducer 写消息 → 发送给 Leader，Consumer 读取消息 → 从 Leader 拉取，维护当前的最新 offset 状态，将写入的数据 **同步给 followers。**
+
+- **Follower 副本**（Secondary Replicas）：被动地 **从 Leader 拉取数据（同步副本），**&#x4FDD;持和 Leader 数据一致（即进入 **ISR - In-Sync Replica 集合**），不对外提供读写服务（默认情况下）。
+
+如果 Leader 崩溃了，会重新选举一个新的 Leader。
+
+1. **Zookeeper / KRaft Controller** 检测到 Leader 不可用（**通过心跳失联**）。
+
+2. 从 ISR（In-Sync Replica）列表中**挑选一个 follower 副本成为新的 Leader**。
+
+3. Controller 更新分区的元数据，将新的 Leader 广播给所有 Broker。
+
+4. 生产者和消费者重新感知 Leader 地址，**自动连接新 Leader**。
+
+## 22. **如何增加 Kafka 的 partition 数量？会带来什么影响？**
+
+修改分区数量：
+
+```sql
+kafka-topics.sh --bootstrap-server localhost:9092 \
+  --alter --topic my-topic --partitions 10
+```
+
+这个命令会将 `my-topic` 的分区数从原有值**增加到 10**。
+
+会带来更多的吞吐量。但是会触发 Rebalance，带来短暂的消费中断。然后同一个 Key 可能会因为 N 的改变，会落入不同样的分区。
+
+## 23. **Kafka 如何保证高可用性？Zookeeper 的作用是什么？**
+
+主要还是靠多副本机制来实现的，配合 KRaft 或者 Zookeeper 的选举。
+
+Zookeeper 在 2.8 之前，负责元数据的管理、Leader 的选举，以及 Broker 的健康检查（心跳机制）。
+
+---
+
+# 六、使用与运维场景
+
+## 24. **你在项目中 Kafka 的使用场景是什么？为什么选择 Kafka？**
+
+我们在项目中主要通过 Kafka 实现了系统的异步解耦和高并发处理能力，比如用户浏览事件会发送事件到 Kafka，缓解数据库的压力。
+
+Feed 事件也使用 Kafka 进行异步处理，来将用户相关的消息推送到订阅者的收件箱中。
+
+选择 Kafka，主要是对比了三个主流的消息中间件，**发现 kafka 的 github 的 star 数量最多，所以就选了它**。此外因为它具备高吞吐、可靠的消息持久化能力，支持横向扩展，适合处理大量用户行为数据。
+
+## 25. **🌟 Kafka 消费延迟（Lag）是什么？怎么排查和优化？**
+
+Kafka 的 Lag 是指：
+
+> **某个 Consumer Group 尚未处理的消息数量**，即：
+>
+> Lag = 当前 Partition 的最新 Offset（Log End Offset）– 消费者已提交的 Offset
+
+Lag 表示的是“**消费者落后了多少消息**”，它反映了消费的**实时性和处理能力是否跟得上生产速度**。
+
+怎么排查？
+
+使用 `kafka-consumer-groups.sh` 的 describe 方法：
+
+```sql
+kafka-consumer-groups.sh --bootstrap-server <broker> \
+  --describe --group <group-id>
+```
+
+可以增加 topic 的分区数优化。
+
+## 26. **🌟 Kafka 消息积压怎么排查和解决？**
+
+排查 Lag 即可，查看落后的消息多不多，落后的非常多就说明消息积压。
+
+Kafka 消息积压（backlog）是生产环境中非常常见的问题，核心是**消息生产速度 > 消费处理速度**，导致未消费的消息越来越多，**Topic 的分区中堆积了大量未被消费者消费的消息**。，进而影响系统稳定性。
+
+可以增加 Consumer 实例、增加分区数来解决，**如果是单机，可以升级为集群**。对于使用了 Key 的情况，要保证 Key 要均匀，不能集中在一个分区。
+
+## 27. 🌟 Kafka 的重平衡会有哪些问题？怎么优化？
+
+当 Consumer Group 中的成员（Consumer）发生变动（加入、离开、崩溃）时，Kafka 会重新分配分区给消费者的过程，称为 **Rebalance**。
+
+会带来：
+
+- 消费中断，因为要重新分配分区。
+
+- 消息丢失，可能 Rebalance 之前没有正确提交 Offset。
+
+怎么优化？可以使用稳定分区分配策略比如协作粘性分区，渐进式 Rebalance，几乎无停顿。
+
+_具体参考上面的分配策略那。_
+
+## 28. 🌟 Kafka 如何应对数据倾斜？
+
+Kafka 的某些 **分区接收到的数据远多于其他分区**，导致消费或存储不均衡，从而影响整体吞吐、性能或延迟。
+
+原因可能是：
+
+- 使用了固定的 Key。
+
+- 指定了某个分区。
+
+解决：
+
+- 不使用固定的 Key，轮询发送消息。
+
+- 如果必须指定 key，要保证其分布均匀，例如使用一致性哈希来自定义分区器。
+
+- 增加分区的数量。
+
+## 29. Kafka 是如何做负载均衡的？
+
+- 生产者负载均衡：使用基于轮询的或者基于 Hash Key 的分区投递策略。
+
+- Broker 的负载均衡：多分区
+
+- 消费者负载均衡：使用合理的分区分配策略，例如粘性或者协作粘性。
+
+## 30. **Kafka 的典型使用模式有哪些？比如解耦、异步、日志采集等**
+
+- 消息队列模式：任务分发、发短信等
+
+- 发布订阅：一个消息可以被**多个不同消费者组独立消费，例如订单创建事件被库存服务、通知服务、积分服务等多个系统订阅处理。**
+
+- 日志采集：将多个服务节点上的日志收集到 Kafka，再统一落地、分析。
+
+---
+
+# 七、对比题
+
+## 31. **Kafka 、RocketMQ 和 RabbitMQ 有什么区别？各自的优劣？适用场景？**
+
+**Kafka**：擅长**高吞吐、批量处理、日志流式场景**，强在**流处理、可持久化、扩展性**。
+
+**RocketMQ**：国产，注重**事务性、可靠性、灵活性**，适合对**消息可靠**投递有较高要求的场景。
+
+**RabbitMQ**：强调**灵活的路由、低延迟和协议支持**，适合**中小型系统和短消息通讯**。
+
+## 32. **Kafka 和传统消息队列相比最大的特点是什么？**
+
+最大区别在于它不是只为了传递消息，而是把消息**当作可持久化的日志来管理**，并支持**高吞吐、可重放、多消费者并行消费**的场景。这使它非常适合做**事件流平台**或**数据管道**，而不仅仅是消息队列。
+
+---
+
+# 八、项目实战提问
+
+## 33. **Kafka 与数据库、缓存如何集成？保证一致性？**
+
+Kafka 与数据库、缓存集成时，要重点解决数据一致性问题。我们可以通过 Kafka 的事务机制保证消费 + offset + 写库的原子性，也可以采用 outbox 模式先写数据库 / 缓存再异步发消息，从而避免数据丢失。
