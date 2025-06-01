@@ -43,6 +43,12 @@
       <priority>0.8</priority>
     </url>
 <url>
+      <loc>https://jet-lab.site/blogs/kafka</loc>
+      <lastmod>2025-06-01T00:00:00.000Z</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.8</priority>
+    </url>
+<url>
       <loc>https://jet-lab.site/blogs/minipro</loc>
       <lastmod>2022-07-02T00:00:00.000Z</lastmod>
       <changefreq>weekly</changefreq>
