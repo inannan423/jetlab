@@ -51,24 +51,91 @@ export const TableOfContents: React.FC = () => {
       headingElementsWithIds.forEach((elem) => observer.current?.observe(elem));
     };
 
+    // Function to update active heading based on scroll position
+    const updateActiveHeading = () => {
+      const headingElements = Array.from(document.querySelectorAll('article h2[id], article h3[id], article h4[id], article h5[id], article h6[id]'));
+      const headerOffset = 120; // Height of fixed header + some padding
+      
+      // Find the heading that's currently at the top of the viewport
+      let currentActiveId = null;
+      
+      for (let i = headingElements.length - 1; i >= 0; i--) {
+        const element = headingElements[i] as HTMLElement;
+        const rect = element.getBoundingClientRect();
+        
+        if (rect.top <= headerOffset) {
+          currentActiveId = element.id;
+          break;
+        }
+      }
+      
+      // If we're at the very top of the page, select the first heading
+      if (!currentActiveId && window.scrollY < 100 && headingElements.length > 0) {
+        currentActiveId = (headingElements[0] as HTMLElement).id;
+      }
+      
+      if (currentActiveId && currentActiveId !== activeId) {
+        setActiveId(currentActiveId);
+      }
+    };
+
+    // Throttled scroll handler
+    let scrollTimeoutId: NodeJS.Timeout;
+    const handleScroll = () => {
+      clearTimeout(scrollTimeoutId);
+      scrollTimeoutId = setTimeout(updateActiveHeading, 10);
+    };
 
     // Debounce or throttle this if performance becomes an issue
     const timeoutId = setTimeout(extractHeadings, 100); // Delay slightly to ensure content is rendered
 
+    // Add scroll listener for manual scroll tracking
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
     // --- Intersection Observer for Active Heading ---
     observer.current = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            // Use timeout to avoid rapid activeId changes during scroll
-            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-            scrollTimeout.current = setTimeout(() => {
-              setActiveId(entry.target.id);
-            }, 100); // Adjust delay as needed
+        // Clear any existing timeout
+        if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+        
+        // Find the first visible heading that's closest to the top
+        const visibleEntries = entries.filter(entry => entry.isIntersecting);
+        
+        if (visibleEntries.length > 0) {
+          // Sort by distance from top (closest to top first)
+          const sortedEntries = visibleEntries.sort((a, b) => {
+            return a.boundingClientRect.top - b.boundingClientRect.top;
+          });
+          
+          // Use timeout to avoid rapid activeId changes during scroll
+          scrollTimeout.current = setTimeout(() => {
+            setActiveId(sortedEntries[0].target.id);
+          }, 50); // Reduced delay for more responsive updates
+        } else {
+          // If no headings are visible, find the heading that's just above the viewport
+          const allHeadings = Array.from(document.querySelectorAll('article h2[id], article h3[id], article h4[id], article h5[id], article h6[id]'));
+          let lastVisibleHeading = null;
+          
+          for (const heading of allHeadings) {
+            const rect = heading.getBoundingClientRect();
+            if (rect.top < 120) { // 120px is roughly the header height
+              lastVisibleHeading = heading;
+            } else {
+              break;
+            }
           }
-        });
+          
+          if (lastVisibleHeading) {
+            scrollTimeout.current = setTimeout(() => {
+              setActiveId(lastVisibleHeading.id);
+            }, 50);
+          }
+        }
       },
-      { rootMargin: '-20% 0px -80% 0px' } // Adjust margins to highlight heading when it's near the top
+      { 
+        rootMargin: '-100px 0px -60% 0px', // Adjust margins for better detection
+        threshold: [0, 0.1, 0.5, 1] // Multiple thresholds for better tracking
+      }
     );
 
     // Initial observation setup (will be re-done in extractHeadings)
@@ -76,10 +143,12 @@ export const TableOfContents: React.FC = () => {
 
     return () => {
       clearTimeout(timeoutId);
+      clearTimeout(scrollTimeoutId);
       if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+      window.removeEventListener('scroll', handleScroll);
       observer.current?.disconnect();
     };
-  }, []);
+  }, [activeId]); // Add activeId to dependency array
 
   // Handle smooth scrolling and highlight on click
   const handleClick = (e: MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -126,16 +195,16 @@ export const TableOfContents: React.FC = () => {
           {headings.map((heading) => (
             <li
               key={heading.id}
-              className="my-1"
+              className="my-2"
               style={{ marginLeft: `${(heading.level - 2) * 1}rem` }}
             >
               <Link
                 href={`#${heading.id}`}
                 onClick={(e) => handleClick(e, heading.id)} // Add onClick handler
-                className={`block text-sm transition-all duration-300 ease-in-out
+                className={`block text-sm transition-all duration-300 ease-in-out pl-3 -ml-3
                   ${activeId === heading.id
-                    ? 'text-zinc-900'
-                    : 'text-zinc-400 hover:text-zinc-900'}
+                    ? 'text-zinc-900 border-zinc-900 font-medium'
+                    : 'text-zinc-400 hover:text-zinc-900 border-transparent'}
                 `}
               >
                 {heading.text}
