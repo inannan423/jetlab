@@ -10,6 +10,7 @@ import { TableOfContents } from "./sidebar"; // Import the sidebar
 import Link from "next/link"; // Import Link
 import { Bookmark } from "lucide-react"; // Import Tag icon
 import GiscusComments from "@/app/components/GiscusComments"; // Import the Giscus component
+import { Metadata } from "next";
 
 export const revalidate = 60;
 
@@ -18,6 +19,37 @@ type Props = {
     slug: string;
   };
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const slug = params?.slug;
+  const blog = allBlogs.find((blog) => blog.slug === slug);
+
+  if (!blog) {
+    return {
+      title: "文章未找到 - JETLAB",
+      description: "抱歉，您访问的文章不存在。",
+    };
+  }
+
+  return {
+    title: `${blog.title} - JETLAB`,
+    description: blog.description,
+    keywords: `${blog.title}, 技术博客, 编程, ${blog.tags?.join(", ") || ""}`,
+    openGraph: {
+      title: `${blog.title} - JETLAB`,
+      description: blog.description,
+      url: `https://jet-lab.site/blogs/${blog.slug}`,
+      type: "article",
+      publishedTime: blog.date,
+      tags: blog.tags,
+    },
+    twitter: {
+      title: `${blog.title} - JETLAB`,
+      description: blog.description,
+      card: "summary_large_image",
+    },
+  };
+}
 
 const redis = Redis.fromEnv();
 

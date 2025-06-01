@@ -9,6 +9,19 @@ import { Eye, Star, GitFork } from "lucide-react"; // Import Star and GitFork ic
 import { Navigation } from "../components/nav";
 import { getAllRepoStats } from "@/lib/github"; // Import the new function
 import { LanguageTag } from "../components/language-tag";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "项目展示 - JETLAB",
+  description: "展示我的开源项目和技术作品，包含Web应用、工具软件、技术实验等。查看源代码、在线演示和技术详情。",
+  keywords: "开源项目, Web应用, 技术作品, GitHub项目, 前端项目, 后端项目, 编程作品",
+  openGraph: {
+    title: "项目展示 - JETLAB",
+    description: "展示我的开源项目和技术作品，包含Web应用、工具软件、技术实验等。",
+    url: "https://jet-lab.site/projects",
+    type: "website",
+  },
+};
 
 const redis = Redis.fromEnv();
 

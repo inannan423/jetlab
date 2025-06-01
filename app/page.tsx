@@ -13,6 +13,25 @@ import { Github, Mail } from "lucide-react";
 import { MessageCircleIcon } from "lucide-react";
 import { ViewTracker } from "./components/view-tracker";
 import { FriendLinks } from "./components/friend-links"; // Import the FriendLinks component
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "JETLAB - ChengZihan 的技术博客",
+  description: "I'm a student passionate about technology, and I write technical articles on my blog. 分享编程技术、项目开发经验和学习心得。",
+  keywords: "技术博客, 编程, Web开发, Next.js, React, TypeScript, 前端开发",
+  openGraph: {
+    title: "JETLAB - ChengZihan 的技术博客",
+    description: "I'm a student passionate about technology, and I write technical articles on my blog. 分享编程技术、项目开发经验和学习心得。",
+    url: "https://jet-lab.site",
+    type: "website",
+  },
+  twitter: {
+    title: "JETLAB - ChengZihan 的技术博客",
+    description: "I'm a student passionate about technology, and I write technical articles on my blog.",
+    card: "summary_large_image",
+  },
+};
+
 const redis = Redis.fromEnv();
 
 export default async function Home() {

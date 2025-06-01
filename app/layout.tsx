@@ -7,8 +7,8 @@ import { Footer } from "./components/footer";
 
 export const metadata: Metadata = {
   title: {
-    default: "JETLAB",
-    template: "%s | JETLAB",
+    default: "JETLAB - ChengZihan 的技术博客",
+    template: "%s",
   },
   description: "I’m a student passionate about technology, and I write technical articles on my blog.",
   openGraph: {

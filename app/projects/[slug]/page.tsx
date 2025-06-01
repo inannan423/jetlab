@@ -7,6 +7,7 @@ import "./mdx.css";
 import { ReportView } from "./view";
 import { Redis } from "@upstash/redis";
 import { getRepoStats } from "@/lib/github"; // Import the function
+import { Metadata } from "next";
 
 export const revalidate = 60;
 
@@ -15,6 +16,36 @@ type Props = {
     slug: string;
   };
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const slug = params?.slug;
+  const project = allProjects.find((project) => project.slug === slug);
+
+  if (!project) {
+    return {
+      title: "项目未找到 - JETLAB",
+      description: "抱歉，您访问的项目不存在。",
+    };
+  }
+
+  return {
+    title: `${project.title} - JETLAB`,
+    description: project.description,
+    keywords: `${project.title}, 开源项目, GitHub, 编程项目, Web应用, 技术作品`,
+    openGraph: {
+      title: `${project.title} - JETLAB`,
+      description: project.description,
+      url: `https://jet-lab.site/projects/${project.slug}`,
+      type: "article",
+      publishedTime: project.date,
+    },
+    twitter: {
+      title: `${project.title} - JETLAB`,
+      description: project.description,
+      card: "summary_large_image",
+    },
+  };
+}
 
 const redis = Redis.fromEnv();
 

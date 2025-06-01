@@ -7,6 +7,19 @@ import { Article } from "./article";
 import { Redis } from "@upstash/redis";
 import { Eye } from "lucide-react";
 import { Header } from "@/app/components/header";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "技术博客 - JETLAB",
+  description: "分享最新的技术文章、编程教程、开发经验和学习心得。包含前端开发、后端技术、数据库、DevOps等技术内容。",
+  keywords: "技术博客, 编程教程, 前端开发, 后端技术, Web开发, JavaScript, TypeScript, React, Next.js",
+  openGraph: {
+    title: "技术博客 - JETLAB",
+    description: "分享最新的技术文章、编程教程、开发经验和学习心得。",
+    url: "https://jet-lab.site/blogs",
+    type: "website",
+  },
+};
 
 const redis = Redis.fromEnv();
 

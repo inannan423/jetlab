@@ -1,15 +1,23 @@
 "use client";
 
+import { VercelAnalytics } from './vercel-analytics';
+
 export function Analytics() {
-	const token = process.env.NEXT_PUBLIC_BEAM_TOKEN;
-	if (!token) {
-		return null;
-	}
+	const beamToken = process.env.NEXT_PUBLIC_BEAM_TOKEN;
+	
 	return (
-		<script
-			src="https://beamanalytics.b-cdn.net/beam.min.js"
-			data-token={token}
-			async
-		/>
+		<>
+			{/* Vercel Analytics & Speed Insights */}
+			<VercelAnalytics />
+			
+			{/* Beam Analytics (如果配置了 token) */}
+			{beamToken && (
+				<script
+					src="https://beamanalytics.b-cdn.net/beam.min.js"
+					data-token={beamToken}
+					async
+				/>
+			)}
+		</>
 	);
 }

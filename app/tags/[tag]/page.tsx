@@ -5,6 +5,7 @@ import { Article } from "@/app/blogs/article"; // Reuse the Article component
 import { Redis } from "@upstash/redis";
 import Link from "next/link";
 import { Bookmark } from "lucide-react";
+import { Metadata } from "next";
 
 const redis = Redis.fromEnv();
 
@@ -23,6 +24,32 @@ export async function generateStaticParams(): Promise<Props["params"][]> {
     blog.tags?.forEach((tag) => tags.add(tag));
   });
   return Array.from(tags).map((tag) => ({ tag: decodeURIComponent(tag) })); // Decode URI component for safety
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const decodedTag = decodeURIComponent(params.tag);
+
+  // Count blogs with this tag
+  const blogsWithTag = allBlogs.filter(
+    (blog) => blog.published && blog.tags?.includes(decodedTag),
+  );
+
+  return {
+    title: `标签: ${decodedTag} - JETLAB`,
+    description: `浏览所有标记为 "${decodedTag}" 的技术文章，共 ${blogsWithTag.length} 篇相关内容。`,
+    keywords: `${decodedTag}, 技术标签, 技术博客, 编程文章`,
+    openGraph: {
+      title: `标签: ${decodedTag} - JETLAB`,
+      description: `浏览所有标记为 "${decodedTag}" 的技术文章，共 ${blogsWithTag.length} 篇相关内容。`,
+      url: `https://jet-lab.site/tags/${encodeURIComponent(decodedTag)}`,
+      type: "website",
+    },
+    twitter: {
+      title: `标签: ${decodedTag} - JETLAB`,
+      description: `浏览所有标记为 "${decodedTag}" 的技术文章。`,
+      card: "summary",
+    },
+  };
 }
 
 export default async function TagPage({ params }: Props) {
