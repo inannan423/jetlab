@@ -32,13 +32,13 @@
     </url>
 <url>
       <loc>https://jet-lab.site/blogs/git-faqs</loc>
-      <lastmod>2025-06-01T00:00:00.000Z</lastmod>
+      <lastmod>2025-05-31T00:00:00.000Z</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.8</priority>
     </url>
 <url>
       <loc>https://jet-lab.site/blogs/git</loc>
-      <lastmod>2022-06-01T00:00:00.000Z</lastmod>
+      <lastmod>2022-05-31T00:00:00.000Z</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.8</priority>
     </url>
@@ -50,6 +50,12 @@
     </url>
 <url>
       <loc>https://jet-lab.site/blogs/kafka</loc>
+      <lastmod>2025-05-30T00:00:00.000Z</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.8</priority>
+    </url>
+<url>
+      <loc>https://jet-lab.site/blogs/micro-services</loc>
       <lastmod>2025-06-01T00:00:00.000Z</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.8</priority>
