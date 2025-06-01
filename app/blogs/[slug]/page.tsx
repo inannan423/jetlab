@@ -84,32 +84,38 @@ export default async function PostPage({ params }: Props) {
       />
       <ReportView slug={blog.slug} />
 
-      {/* Increased top padding to push content below header */}
-      <div className="container mx-auto flex flex-col lg:flex-row pt-16 px-4 gap-8"> {/* Added gap for spacing */}
-        <article className="prose prose-quoteless max-w-4xl flex-grow">
-          {/* Display Tags below header/metadata */}
-          {blog.tags && blog.tags.length > 0 && (
-            <div className="mb-4 flex flex-wrap gap-2">
-              {blog.tags.map((tag) => (
-                <Link key={tag} href={`/tags/${tag}`}>
-                  <span
-                    className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-zinc-200 text-zinc-800 hover:bg-zinc-300 transition-all duration-500 ease-linear cursor-pointer"
-                  >
-                    <Bookmark className="w-4 h-4 mr-1.5" />
-                    {tag}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          )}
-          <Mdx code={blog.body.code} />
-          {/* Add Giscus comments section below the article content */}
-          <div className="mt-12">
-            <GiscusComments />
+      {/* Responsive layout with proper mobile spacing */}
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 lg:pt-16">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 justify-center">
+          {/* Main content area */}
+          <div className="w-full lg:max-w-4xl">
+            <article className="prose prose-zinc prose-quoteless max-w-none">
+              {/* Display Tags below header/metadata */}
+              {blog.tags && blog.tags.length > 0 && (
+                <div className="mb-6 flex flex-wrap gap-2">
+                  {blog.tags.map((tag) => (
+                    <Link key={tag} href={`/tags/${tag}`}>
+                      <span
+                        className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-zinc-200 text-zinc-800 hover:bg-zinc-300 transition-all duration-500 ease-linear cursor-pointer"
+                      >
+                        <Bookmark className="w-4 h-4 mr-1.5" />
+                        {tag}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+              <Mdx code={blog.body.code} />
+              {/* Add Giscus comments section below the article content */}
+              <div className="mt-12">
+                <GiscusComments />
+              </div>
+            </article>
           </div>
-        </article>
-        
-        <TableOfContents /> {/* Add the sidebar component */} 
+          
+          {/* Table of Contents - responsive positioning */}
+          <TableOfContents />
+        </div>
       </div>
     </div>
   );

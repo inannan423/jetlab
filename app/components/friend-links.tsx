@@ -78,7 +78,7 @@ export const FriendLinks = () => {
       </div>
       
       <div className="mt-6 text-center font-mono">
-        <p className="text-sm text-zinc-400">
+        <p className="text-xs text-zinc-400">
           If you want to add your link here, please{" "}
           <Link 
             href="https://github.com/inannan423/jetlab/issues/new"

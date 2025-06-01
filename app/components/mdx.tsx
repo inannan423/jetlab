@@ -5,6 +5,7 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMDXComponent } from "next-contentlayer/hooks";
+import { CopyButton } from "./copy-button";
 
 function clsx(...args: any) {
 	return args.filter(Boolean).join(" ");
@@ -144,15 +145,42 @@ const components = {
 			{...props}
 		/>
 	),
-	pre: ({ className, ...props }) => (
-		<pre
-			className={clsx(
-				"mt-6 mb-4 overflow-x-auto rounded-lg bg-zinc-900 py-4 -z-10", // Keep pre background dark
-				className,
-			)}
-			{...props}
-		/>
-	),
+	pre: ({ className, children, ...props }) => {
+		const [codeContent, setCodeContent] = React.useState("");
+
+		React.useEffect(() => {
+			// Extract text content from the pre element
+			if (children && typeof children === "object" && "props" in children) {
+				const codeElement = children as React.ReactElement;
+				if (codeElement.props && codeElement.props.children) {
+					const extractText = (node: any): string => {
+						if (typeof node === "string") return node;
+						if (Array.isArray(node)) return node.map(extractText).join("");
+						if (node && typeof node === "object" && node.props) {
+							return extractText(node.props.children);
+						}
+						return "";
+					};
+					setCodeContent(extractText(codeElement.props.children));
+				}
+			}
+		}, [children]);
+
+		return (
+			<div className="relative">
+				<pre
+					className={clsx(
+						"mt-6 mb-4 overflow-x-auto rounded-lg bg-zinc-900 py-4 pr-12", // Add pr-12 for copy button space
+						className,
+					)}
+					{...props}
+				>
+					{children}
+				</pre>
+				{codeContent && <CopyButton text={codeContent} />}
+			</div>
+		);
+	},
 	code: ({ className, ...props }) => (
 		<code
 			className={clsx(

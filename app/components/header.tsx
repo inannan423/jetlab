@@ -198,35 +198,35 @@ export const Header: React.FC<Props> = ({ title, description, views, repository,
             </div>
 
             <div className="relative">
-                <div className="container mx-auto relative isolate py-24 sm:py-32"> {/* Keep isolate and z-40 here */}
+                <div className="container mx-auto relative isolate py-16 sm:py-24 lg:py-32"> {/* Keep isolate and z-40 here */}
                     <div className="absolute inset-0 -mt-20 flex justify-center items-center z-0"> {/* Removed z-10 */}
                         <InteractiveGridPatternDiv />
                     </div>
-                    <div className="mx-auto max-w-7xl px-6 lg:px-8 text-center flex flex-col items-center z-50">
-                        <div className="mx-auto max-w-2xl lg:mx-0 z-40">
-                            <h1 ref={titleRef} className="text-4xl !leading-normal tracking-wide font-bold text-black sm:text-5xl font-display">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center z-50">
+                        <div className="mx-auto max-w-4xl lg:mx-0 z-40">
+                            <h1 ref={titleRef} className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl !leading-normal tracking-wide font-bold text-black font-display break-words">
                                 {title}
                             </h1>
-                            <p className="mt-6 text-lg leading-8 text-zinc-800">
+                            <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg leading-relaxed text-zinc-800 px-2 sm:px-0">
                                 {description}
                             </p>
                             {date && (
-                                <p className="mt-4 text-sm text-zinc-800">
+                                <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-zinc-800">
                                     <time dateTime={new Date(date).toISOString()}>
                                         {/* Format date manually to avoid hydration mismatch */}
                                         {new Date(date).toISOString().split('T')[0]}
                                     </time>
                                 </p>
                             )}
-                            <div className="flex gap-4 justify-center mt-2">
+                            <div className="flex gap-2 sm:gap-4 justify-center mt-3 sm:mt-4 flex-wrap">
                                 {stars !== undefined && stars !== 0 && (
                                     <a
                                         href={`https://github.com/${repository}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-sm text-zinc-800 flex items-center gap-1 px-3 py-1 rounded hover:bg-zinc-200/50 transition-colors"
+                                        className="text-xs sm:text-sm text-zinc-800 flex items-center gap-1 px-2 sm:px-3 py-1 rounded hover:bg-zinc-200/50 transition-colors"
                                     >
-                                        <Star className="w-4 h-4" />
+                                        <Star className="w-3 h-3 sm:w-4 sm:h-4" />
                                         {Intl.NumberFormat("en-US", { notation: "compact" }).format(stars)}
                                     </a>
                                 )}
@@ -235,19 +235,19 @@ export const Header: React.FC<Props> = ({ title, description, views, repository,
                                         href={`https://github.com/${repository}/forks`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-sm text-zinc-800 flex items-center gap-1 px-3 py-1 rounded hover:bg-zinc-200/50 transition-colors"
+                                        className="text-xs sm:text-sm text-zinc-800 flex items-center gap-1 px-2 sm:px-3 py-1 rounded hover:bg-zinc-200/50 transition-colors"
                                     >
-                                        <GitFork className="w-4 h-4" />
+                                        <GitFork className="w-3 h-3 sm:w-4 sm:h-4" />
                                         {Intl.NumberFormat("en-US", { notation: "compact" }).format(forks)}
                                     </a>
                                 )}
                             </div>
                         </div>
 
-                        <div className="mx-auto mt-5 max-w-2xl lg:mx-0 lg:max-w-none z-40">
-                            <div className="grid grid-cols-1 gap-y-6 gap-x-8 text-base font-semibold leading-7 text-black sm:grid-cols-2 md:flex lg:gap-x-10">
+                        <div className="mx-auto mt-4 sm:mt-6 max-w-2xl lg:mx-0 lg:max-w-none z-40">
+                            <div className="grid grid-cols-1 gap-y-4 gap-x-4 text-sm sm:text-base font-semibold leading-7 text-black sm:grid-cols-2 md:flex lg:gap-x-10 justify-center">
                                 {links.map((link) => (
-                                    <Link target="_blank" key={link.label} href={link.href}>
+                                    <Link target="_blank" key={link.label} href={link.href} className="break-words text-center">
                                         {link.label} <span aria-hidden="true">&rarr;</span>
                                     </Link>
                                 ))}

@@ -87,9 +87,12 @@ export default async function PostPage({ params }: Props) {
       />
       <ReportView slug={project.slug} />
 
-      <article className="px-4 py-12 mx-auto prose prose-zinc prose-quoteless">
-        <Mdx code={project.body.code} />
-      </article>
+      {/* Responsive container with proper mobile spacing */}
+      <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+        <article className="prose prose-zinc prose-quoteless max-w-none prose-sm sm:prose-base lg:prose-lg">
+          <Mdx code={project.body.code} />
+        </article>
+      </div>
     </div>
   );
 }

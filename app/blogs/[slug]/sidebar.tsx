@@ -23,6 +23,7 @@ const highlightElement = (id: string) => {
 export const TableOfContents: React.FC = () => {
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [isMobileOpen, setIsMobileOpen] = useState(false); // Add mobile state
   const observer = useRef<IntersectionObserver | null>(null);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null); // Ref to manage scroll timeout
 
@@ -186,42 +187,92 @@ export const TableOfContents: React.FC = () => {
   }
 
   return (
-    // Ensure sidebar sticks to the top and doesn't overlap content
-    <aside className="sticky top-24 hidden lg:block w-64 flex-shrink-0 ml-16 self-start">
-      {/* Add max-h and overflow-y-auto here */}
-      <nav className="max-h-[calc(100vh-6rem-2rem)] overflow-y-auto pr-4"> {/* Adjust 6rem based on actual top offset (top-24) and 2rem for bottom padding */}
-        <h3 className="text-sm font-semibold text-zinc-900 mb-2 uppercase tracking-wider">On this page</h3>
-        <ul>
-          {headings.map((heading) => (
-            <li
-              key={heading.id}
-              className="my-2"
-              style={{ marginLeft: `${(heading.level - 2) * 1}rem` }}
-            >
-              <Link
-                href={`#${heading.id}`}
-                onClick={(e) => handleClick(e, heading.id)} // Add onClick handler
-                className={`block text-sm transition-all duration-300 ease-in-out pl-3 -ml-3
-                  ${activeId === heading.id
-                    ? 'text-zinc-900 border-zinc-900 font-medium'
-                    : 'text-zinc-400 hover:text-zinc-900 border-transparent'}
-                `}
-              >
-                {heading.text}
-              </Link>
-            </li>
-          ))}
-        </ul>
-        {/* Scroll to top button */}
-        <div className="mt-4 pt-4 border-t border-zinc-700">
-          <button
-            onClick={scrollToTop}
-            className="text-sm text-zinc-600 hover:text-zinc-900 transition-colors duration-150 w-full text-left"
+    <>
+      {/* Mobile TOC - collapsible button */}
+      <div className="lg:hidden mb-6">
+        <button
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          className="flex items-center justify-between w-full p-3 bg-zinc-50 rounded-lg border border-zinc-200 hover:bg-zinc-100 transition-colors"
+        >
+          <span className="text-sm font-semibold text-zinc-900">Table of Contents</span>
+          <svg
+            className={`w-4 h-4 transition-transform ${isMobileOpen ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            Scroll to top
-          </button>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        
+        {isMobileOpen && (
+          <nav className="mt-3 p-4 bg-zinc-50 rounded-lg border border-zinc-200">
+            <ul className="space-y-2">
+              {headings.map((heading) => (
+                <li
+                  key={heading.id}
+                  style={{ marginLeft: `${(heading.level - 2) * 0.75}rem` }}
+                >
+                  <Link
+                    href={`#${heading.id}`}
+                    onClick={(e) => {
+                      handleClick(e, heading.id);
+                      setIsMobileOpen(false); // Close mobile menu after click
+                    }}
+                    className={`block text-sm py-1 transition-all duration-300 ease-in-out
+                      ${activeId === heading.id
+                        ? 'text-zinc-900 font-medium'
+                        : 'text-zinc-600 hover:text-zinc-900'}
+                    `}
+                  >
+                    {heading.text}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </div>
+
+      {/* Desktop TOC - sticky sidebar */}
+      <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0">
+        <div className="sticky top-24">
+          <nav className="max-h-[calc(100vh-8rem)] overflow-y-auto pr-4">
+            <h3 className="text-sm font-semibold text-zinc-900 mb-4 uppercase tracking-wider">
+              On this page
+            </h3>
+            <ul className="space-y-2">
+              {headings.map((heading) => (
+                <li
+                  key={heading.id}
+                  style={{ marginLeft: `${(heading.level - 2) * 1}rem` }}
+                >
+                  <Link
+                    href={`#${heading.id}`}
+                    onClick={(e) => handleClick(e, heading.id)}
+                    className={`block text-sm py-1 transition-all duration-300 ease-in-out pl-3 -ml-3 rounded-md
+                      ${activeId === heading.id
+                        ? 'text-zinc-900 font-medium'
+                        : 'text-zinc-600 hover:text-zinc-900'}
+                    `}
+                  >
+                    {heading.text}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            {/* Scroll to top button */}
+            <div className="mt-6 pt-4 border-t border-zinc-200">
+              <button
+                onClick={scrollToTop}
+                className="text-sm text-zinc-600 hover:text-zinc-900 transition-colors duration-150 w-full text-left py-1"
+              >
+                ↑ Scroll to top
+              </button>
+            </div>
+          </nav>
         </div>
-      </nav>
-    </aside>
+      </aside>
+    </>
   );
 };

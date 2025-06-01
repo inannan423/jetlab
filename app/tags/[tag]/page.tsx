@@ -77,33 +77,50 @@ export default async function TagPage({ params }: Props) {
   return (
     <div className="relative pb-16">
       <Navigation />
-      <div className="px-6 pt-20 mx-auto space-y-8 container lg:px-8 md:space-y-16 md:pt-24 lg:pt-32">
-        <div className="max-w-2xl mx-auto lg:mx-0">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl inline-flex items-center">
-            <Bookmark className="w-9 h-9 mr-2" /> Posts tagged with "{decodedTag}"
-          </h2>
-          <p className="mt-4 text-zinc-600">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-32 space-y-6 sm:space-y-8 lg:space-y-12">
+        {/* Header section with responsive spacing */}
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+            <Bookmark className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 flex-shrink-0" />
+            <span className="break-all sm:break-words">Posts tagged with "{decodedTag}"</span>
+          </h1>
+          <p className="mt-3 sm:mt-4 text-sm sm:text-base text-zinc-600">
             Found {blogsWithTag.length} blog post{blogsWithTag.length !== 1 ? 's' : ''} with this tag.
           </p>
         </div>
-        <div className="w-full h-px bg-zinc-800" />
+        
+        {/* Divider */}
+        <div className="w-full h-px bg-zinc-200 max-w-4xl mx-auto" />
 
-        <div className="grid grid-cols-1 gap-4 mx-auto">
-          {blogsWithTag.length > 0 ? (
-            blogsWithTag.map((blog) => (
-              <Card key={blog.slug}>
-                <Article blog={blog} views={views[blog.slug] ?? 0} />
-              </Card>
-            ))
-          ) : (
-            <p className="text-zinc-600">No posts found with this tag.</p>
-          )}
-        </div>
-         <div className="mt-8 text-center">
-            <Link href="/blogs" className="text-sm font-medium text-zinc-500 hover:text-zinc-700">
-              &larr; Back to all blogs
+        {/* Content grid with responsive layout */}
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6">
+            {blogsWithTag.length > 0 ? (
+              blogsWithTag.map((blog) => (
+                <Card key={blog.slug}>
+                  <Article blog={blog} views={views[blog.slug] ?? 0} />
+                </Card>
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-zinc-600 text-lg">No posts found with this tag.</p>
+              </div>
+            )}
+          </div>
+          
+          {/* Back link with responsive positioning */}
+          <div className="mt-8 sm:mt-12 text-center">
+            <Link 
+              href="/blogs" 
+              className="inline-flex items-center text-sm font-medium text-zinc-500 hover:text-zinc-700 transition-colors duration-200"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to all blogs
             </Link>
           </div>
+        </div>
       </div>
     </div>
   );

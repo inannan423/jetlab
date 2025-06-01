@@ -65,35 +65,34 @@ export default async function Home() {
             <div className="mt-4"> {/* Add margin-top to GitHubStats */}
               <GitHubStats />
             </div>
-            {/* Add GitHub profile button */}
-            <div className="mt-4 first-letter:mb-4 flex gap-4">
+            {/* Add beautiful action buttons */}
+            <div className="mt-6 flex flex-wrap gap-3">
               <a
                 href="https://github.com/inannan423"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 border border-zinc-300 text-sm font-medium rounded-md text-black bg-zinc-100 hover:bg-zinc-200"
+                className="group inline-flex items-center px-4 py-2 text-zinc-900 text-sm border border-zinc-300 font-medium rounded-lg transform hover:-translate-y-0.5 transition-all duration-200 ease-out"
               >
-                <Github className="w-4 h-4 mr-2" />
-                Follow me on GitHub
+                <Github className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform duration-200" />
+                Follow on GitHub
               </a>
               <a
                 href="mailto:jetzihan@outlook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 border border-zinc-300 text-sm font-medium rounded-md text-black bg-zinc-100 hover:bg-zinc-200"
+                className="group inline-flex items-center px-4 py-2 text-zinc-900 text-sm border border-zinc-300 font-medium rounded-lg transform hover:-translate-y-0.5 transition-all duration-200 ease-out"
               >
-                <Mail className="w-4 h-4 mr-2" />
-                Email me
+                <Mail className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform duration-200" />
+                Send Email
               </a>
-
               <a
                 href="https://github.com/inannan423/jetlab/issues/new"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 border border-zinc-300 text-sm font-medium rounded-md text-black bg-zinc-100 hover:bg-zinc-200"
+                className="group inline-flex items-center px-4 py-2 text-zinc-900 text-sm border border-zinc-300 font-medium rounded-lg transform hover:-translate-y-0.5 transition-all duration-200 ease-out"
               >
-                <MessageCircleIcon className="w-4 h-4 mr-2" />
-                Leave a message
+                <MessageCircleIcon className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform duration-200" />
+                Leave Message
               </a>
             </div>
             
@@ -110,7 +109,7 @@ export default async function Home() {
             />
           </div>
         </div>
-        <div className={'w-full flex flex-col lg:grid lg:grid-flow-row-dense lg:grid-cols-5 gap-2'}>
+        {/* <div className={'w-full flex flex-col lg:grid lg:grid-flow-row-dense lg:grid-cols-5 gap-2'}>
             <div
                 className={'flex p-3 justify-center relative overflow-hidden items-center bg-white col-span-3 h-96 w-full rounded-2xl forest-bg'}
             >
@@ -120,13 +119,16 @@ export default async function Home() {
                 </div>
             </div>
             <div className={'flex h-96 w-full justify-center items-center lg:col-span-2 shadow-inner relative bg-zinc-800 rounded-2xl overflow-hidden'}>
-                <CobeModel /> {/* Use the imported component */}
+                <CobeModel />
                 <div className={'absolute w-full opacity-30 flex justify-center items-center z-0 text-white text-2xl lg:text-4xl font-bold'}>
                     Now in Beijing, China.
                 </div>
             </div>
+        </div> */}
+        <div className="flex items-center gap-4">
+          <h3 className="text-xl font-semibold text-zinc-900">Recent Blogs</h3>
+          <div className="flex-1 h-px bg-black"></div>
         </div>
-        <div className="w-full h-px bg-zinc-800" />
         <div className="grid grid-cols-1 gap-8 mx-auto">
           {allBlogs.filter((blog) => blog.published)
             .sort(

@@ -61,12 +61,12 @@ export default async function ProjectsPage() {
     <div className="relative pb-16">
       {/* Replace Navigation with Header */}
       <Navigation />
-      <div className="px-6 pt-20 mx-auto space-y-8 container lg:px-8 md:space-y-16 md:pt-24 lg:pt-32">
+      <div className="px-4 sm:px-6 lg:px-8 pt-20 mx-auto space-y-8 container md:space-y-16 md:pt-24 lg:pt-32">
         <div className="max-w-2xl mx-auto lg:mx-0">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 lg:text-4xl">
             Projects
           </h2>
-          <p className="mt-4 text-zinc-600">
+          <p className="mt-4 text-sm sm:text-base text-zinc-600">
             A collection of my work, from personal projects to open-source
             contributions.
           </p>
@@ -74,19 +74,19 @@ export default async function ProjectsPage() {
 
         <div className="w-full h-px bg-zinc-800" />
 
-        <div className="grid grid-cols-1 gap-8 mx-auto lg:grid-cols-2 ">
+        <div className="grid grid-cols-1 gap-6 sm:gap-8 mx-auto lg:grid-cols-2">
           <Card>
             <Link href={`/projects/${featured.slug}`}>
-              <article className="relative w-full h-full p-4 md:p-8">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
+              <article className="relative w-full h-full p-4 sm:p-6 md:p-8">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <div className="text-xs text-zinc-900">
                       {featured.date ? (
                         <time dateTime={new Date(featured.date).toISOString()}>
                           {/* Format date manually to avoid hydration mismatch */}
                           {new Date(featured.date).toLocaleDateString("en-US", {
                             year: "numeric",
-                            month: "short",
+                            month: "short", 
                             day: "numeric",
                           })}
                         </time>
@@ -99,9 +99,9 @@ export default async function ProjectsPage() {
                     )}
                   </div>
                   {/* Display stats for featured project */}
-                  <div className="flex items-center gap-4 text-xs text-zinc-900">
+                  <div className="flex items-center gap-2 sm:gap-4 text-xs text-zinc-900 flex-wrap">
                     <span className="flex items-center gap-1">
-                      <Eye className="w-4 h-4" />{" "}
+                      <Eye className="w-3 h-3 sm:w-4 sm:h-4" />{" "}
                       {Intl.NumberFormat("en-US", { notation: "compact" }).format(
                         views[featured.slug] ?? 0,
                       )}
@@ -109,13 +109,13 @@ export default async function ProjectsPage() {
                     {githubStats[featured.slug] && (
                       <>
                         <span className="flex items-center gap-1">
-                          <Star className="w-4 h-4" />{" "}
+                          <Star className="w-3 h-3 sm:w-4 sm:h-4" />{" "}
                           {Intl.NumberFormat("en-US", { notation: "compact" }).format(
                             githubStats[featured.slug].stars,
                           )}
                         </span>
                         <span className="flex items-center gap-1">
-                          <GitFork className="w-4 h-4" />{" "}
+                          <GitFork className="w-3 h-3 sm:w-4 sm:h-4" />{" "}
                           {Intl.NumberFormat("en-US", { notation: "compact" }).format(
                             githubStats[featured.slug].forks,
                           )}
@@ -127,15 +127,15 @@ export default async function ProjectsPage() {
 
                 <h2
                   id="featured-post"
-                  className="mt-4 text-3xl font-bold text-zinc-600 group-hover:text-black sm:text-4xl font-display transition-all duration-1000 ease-in-out"
+                  className="mt-4 text-2xl sm:text-3xl font-bold text-zinc-600 group-hover:text-black lg:text-4xl font-display transition-all duration-1000 ease-in-out"
                 >
                   {featured.title}
                 </h2>
                 <p className="mt-4 text-sm text-zinc-500 group-hover:text-zinc-900 transition-all duration-1000 ease-in-out">
                   {featured.description}
                 </p>
-                <div className="absolute bottom-4 md:bottom-8">
-                  <p className="hidden text-zinc-500 hover:text-zinc-900 lg:block transition-all duration-1000 ease-in-out">
+                <div className="absolute bottom-4 sm:bottom-6 md:bottom-8">
+                  <p className="hidden text-zinc-500 hover:text-zinc-900 sm:block lg:block transition-all duration-1000 ease-in-out">
                     Read more <span aria-hidden="true">&rarr;</span>
                   </p>
                 </div>
@@ -143,7 +143,7 @@ export default async function ProjectsPage() {
             </Link>
           </Card>
 
-          <div className="flex flex-col w-full gap-8 mx-auto border-t border-gray-900/10 lg:mx-0 lg:border-t-0 ">
+          <div className="flex flex-col w-full gap-6 sm:gap-8 mx-auto border-t border-gray-900/10 lg:mx-0 lg:border-t-0">
             {[top2, top3].map((project) => (
               <Card key={project.slug}>
                 {/* Pass stats to Article */}
@@ -159,11 +159,11 @@ export default async function ProjectsPage() {
           </div>
         </div>
 
-        {         sorted.length > 0 &&
+        {sorted.length > 0 && (
           <div className="hidden w-full h-px md:block bg-zinc-800" />
-        }
+        )}
 
-        <div className="grid grid-cols-1 gap-4 mx-auto lg:mx-0 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 mx-auto lg:mx-0 sm:grid-cols-2 lg:grid-cols-3">
           <div className="grid grid-cols-1 gap-4">
             {sorted
               .filter((_, i) => i % 3 === 0)
