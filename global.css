@@ -84,7 +84,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url("./public/mask.png");
+    /* background-image: url("./public/mask.png"); */
     background-size: 128px;
     background-repeat: repeat;
     opacity: 0.08;

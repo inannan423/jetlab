@@ -58,7 +58,7 @@ export const Navigation: React.FC<{ isHome?: boolean }> = ({ isHome }) => {
 										: "text-zinc-800 hover:text-zinc-900"
 								}`}
 							>
-								<ArrowLeft className="w-4 h-4" />
+								<ArrowLeft className="w-6 h-6" />
 							</Link>
 						) : (
 							<a
