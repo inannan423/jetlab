@@ -18,7 +18,7 @@ const computedFields = {
 
 export const Project = defineDocumentType(() => ({
 	name: "Project",
-	filePathPattern: "./projects/**/*.mdx",
+	filePathPattern: "./projects/**/*.{md,mdx}",
 	contentType: "mdx",
 
 	fields: {
@@ -48,7 +48,7 @@ export const Project = defineDocumentType(() => ({
 
 export const Blog = defineDocumentType(() => ({
 	name: "Blog",
-	filePathPattern: "./blogs/**/*.mdx",
+	filePathPattern: "./blogs/**/*.{md,mdx}",
 	contentType: "mdx",
 
 	fields: {
@@ -78,7 +78,7 @@ export const Blog = defineDocumentType(() => ({
 
 export const Page = defineDocumentType(() => ({
 	name: "Page",
-	filePathPattern: "pages/**/*.mdx",
+	filePathPattern: "pages/**/*.{md,mdx}",
 	contentType: "mdx",
 	fields: {
 		title: {
