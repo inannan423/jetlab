@@ -23,13 +23,6 @@ const friendLinks: FriendLink[] = [
     url: "https://blog.051088.xyz/",
     description: "MarkBai 的数字自留地",
     avatar: "/MarkBai.jpg"
-  },
-  {
-    // ethanzhou.cn
-    name: "Ethan",
-    url: "https://ethanzhou.cn/",
-    description: "Ethan Zhou 的个人博客",
-    // avatar: "https://ethanzhou.cn/avatar.png"
   }
 ];
 
