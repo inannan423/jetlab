@@ -1,5 +1,7 @@
 # Jetlab
 
-My personal blog and portfolio website, built with Next.js, Tailwind CSS, Redis, and TypeScript.
+This is my personal blog and portfolio website, developed with Next.js, Tailwind CSS, Redis, and TypeScript.
 
-If you want to deploy your own blog, please fork this repository. Before you publish, please delete all my personal information, including my blogs, projects, and personal information. They are not open source, if you want to forward them, please contact me first.
+If you wish to deploy a similar blog of your own, feel free to fork this repository. Before publishing your site, please be sure to remove all of my personal content—including blog posts, project showcases, and personal details.
+
+Note: My personal content is not open source. Please contact me for permission before any form of redistribution.
