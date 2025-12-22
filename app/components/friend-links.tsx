@@ -23,6 +23,12 @@ const friendLinks: FriendLink[] = [
     url: "https://blog.051088.xyz/",
     description: "MarkBai 的数字自留地",
     avatar: "/MarkBai.jpg"
+  },
+  {
+    "name": "YuxBao",
+    "url": "https://yux-bao.site",
+    "description": "一程山水，一念清欢",
+    "avatar": "https://yux-bao.site/avatar.webp"
   }
 ];
 
